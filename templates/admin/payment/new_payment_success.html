@@ -1,0 +1,62 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+{% comment %}
+<div class="container">
+    <div class="jumbotron text-center mt-5">
+        <h1 class="text-success">Payment Success</h1>
+        <p>We received your order. You can now close this window or use the
+            link below to visit
+            <a href="{% url 'home' %}">home page</a>.
+        </p>
+    </div>
+</div>
+{% endcomment %}
+{% if cost %}
+<div class="row dashboard_section payment_success_section" style="display:block;">
+      <div class="col-md-12 col-sm-12">
+
+        <div class="payment-success">
+          <div class="payment-icon"></div>
+          <h4>
+            Subscription Successfully!
+          </h4>
+          <p>
+            <strong>
+            Thank you <br>
+              {% comment %}Your payment of <span id="subsAmtPaid">{% if cost %}${{cost}}{% endif %}</span> has been received{% endcomment %}
+              Your subscription has been created successfully.
+          </strong>
+          </span>
+<!--          <p class="light">-->
+<!--          Order ID: <span id="subsOrdId">{% if transaction_id %}{{transaction_id}}{% endif %}</span>  | Transaction ID: <span id="subsTransId">{% if order_id %}{{order_id}}{% endif %}</span>-->
+<!--          </p>-->
+          <small>
+            Please contact us at +1 (669) 800-0690 or email to support@gsa.com for any enquiry.
+          </small>
+          <button type="button" class="btn btn-primary" id="returnBtn">Return</button>
+        </div>
+
+      </div><!-- End .col-md-10 -->
+    </div><!-- End .row -->
+
+
+</div><!-- End .dashboard-body -->
+{% else %}
+Not Found
+{%endif%}
+
+{% endblock %}
+
+{% block js_content %}
+<script>
+    $(document).on('click', '#returnBtn', function(){
+        window.location.href = '/admin/';
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,290 @@
+{% load static %}
+{% load dashboard_extra %}
+<div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Property Name
+                </div>
+                <div class="item">
+                  Property Type
+                </div>
+                <!-- <div class="item">
+                  Auction Type
+                </div> -->
+                {% if auction_id != 6 %}
+                <div class="item">
+                  {% if auction_id == 4 or auction_id == 7 %}Review Offers{% else %}Bidders{% endif %}
+                </div>
+                {% endif %}
+                <div class="item">
+                  Listing Agent
+                </div>
+                {% if auction_id == 4 or auction_id == 6 or auction_id == 7 %}
+                {% else %}
+                <div class="item">
+                  Bids
+                </div>
+                {% endif %}
+                <div class="item">
+                  No. of view
+                </div>
+                {% if auction_id == 4 %}
+                {% else %}
+                  {% if auction_id == 7 %}
+                    <div class="item">
+                      Offer Start
+                    </div>
+                    <div class="item">
+                      Offer End
+                    </div>
+                  {% else %}
+                    <div class="item">
+                      Bidding Start
+                    </div>
+                    <div class="item">
+                      Bidding End
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+                <div class="item">
+                  Created Date
+                </div>
+                <div class="item">
+                  Status
+                </div>
+                <div class="item">
+                  Approval
+                </div>
+
+                <div class="item">
+                  Action
+                </div>
+
+              </div><!-- End .block -->
+              <input type="hidden" name="counter_num" id="counter_num" value="{{ sno|default:1 }}">
+              <div class="block sscroll"  id="property_list">
+                {% if property_list|length > 0 %}
+                  {% if property_list|length > 3 %}
+                    {% define_var property_list|length|add:'-1' as first_row %}
+                    {% define_var property_list|length as second_row %}
+                  {% else %}
+                    {% define_var 0 as first_row %}
+                    {% define_var 0 as second_row %}
+                  {% endif %}
+                {% for property in property_list %}
+                <div class="block-item listing_blocks {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}" data-auction-type="{{ property.sale_by_type }}" data-property="{{ property.id }}" data-index="{{ forloop.counter0|add:sno }}" rel_id="{{ property.id }}" row_id="row_id_{{ property.id }}">
+
+                  <div class="item srNum">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+
+                  <div class="item">
+                    <div class="user-pics">
+                      <a href="/asset-details/?property_id={{ property.id }}" target="_blank">
+                      <span class="user-pic"><img src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt=""></span>
+                      <h6>
+                        <span class="blue-text" title="{{ property.name }}">{{ property.name|slice:":22" }}...</span>
+                        <i class="fas fa-map-marker-alt"></i> {{ property.property_location }}
+                      </h6>
+                        </a>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    {{ property.property_type|default:'' }}
+                  </div>
+                  <!-- <div class="item">
+                    {{ property.auction_type }}
+                  </div> -->
+                  {% if property.sale_by_type != 6 %}
+                  <div class="item">
+                    {% if property.sale_by_type == 7 %}
+                      <a href="{% if property.bidder_offer_count > 0 %}/admin/user-best-offer-list/?id={{ property.id }}{% else %}javascript:void(0){% endif %}"  style="{% if property.bidder_offer_count > 0 %}cursor:pointer;{% else %}cursor: initial;{% endif %}">
+                    {% elif property.sale_by_type == 4 %}
+                      <a href="{% if property.bidder_offer_count > 0 %}/admin/user-traditional-offer-list/?id={{ property.id }}{% else %}javascript:void(0){% endif %}"  style="{% if property.bidder_offer_count > 0 %}cursor:pointer;{% else %}cursor: initial;{% endif %}">
+                    {% else %}
+                    <a href="javascript:void(0)"  onclick="propertyBidderListingSearch({{ property.id }} ,1, '')" style="{% if property.bidder_offer_count > 0 %}cursor:pointer;{% else %}cursor: initial;{% endif %}">
+                    {% endif %}
+                    <button class="badge {% if property.sale_by_type == 7 or property.sale_by_type == 4 %}badge-warning{% else %}badge-info{% endif %} bidder-badge" ><i class="fas fa-user"></i></button><span class="total-bidder">{{ property.bidder_offer_count|default:'0' }}</span>
+                    </a>
+                      <!-- <button class="badge badge-info" data-toggle="modal" data-target="#bidderlistModal"><i class="fas fa-user"></i> 5</button> -->
+                  </div>
+                  {% endif %}
+                  <div class="item">
+                    <div class="brokr-nme">
+                      <span>{{ property.broker_name }}</span>
+                      <small class="blue-text"><a href="{{ property.domain_url }}" target="_blank">{{ property.domain_url }}</a></small>
+                    </div>
+                  </div>
+                  {% if property.sale_by_type == 4 or property.sale_by_type == 6 or property.sale_by_type == 7 %}
+                  {% else %}
+                  <div class="item">
+                    {% if property.sale_by_type == 4 %}
+                      <button class="badge badge-info bids-limit">0</button>
+                    {% elif property.sale_by_type == 2 %}
+                      <button class="badge badge-info bids-limit" onclick="propertyInsiderBidHistorySearch({{ property.id }} ,1, 'dutch')">{{ property.bids }}</button>
+                    {% else %}
+                      <button class="badge badge-info bids-limit" onclick="propertyBidHistorySearch({{ property.id }} ,1)">{{ property.bids }}</button>
+                    {% endif %}
+                  </div>
+                  {% endif %}
+                  <div class="item">
+                    {{ property.no_view }}
+                  </div>
+                  {% if property.sale_by_type == 4 %}
+                  {% else %}
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ property.bidding_start|default:'' }}">
+                    {{ property.bidding_start|default:'' }}
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ property.bidding_end|default:'' }}">
+                    {{ property.bidding_end|default:'' }}
+                  </div>
+                  {% endif %}
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ property.created_date|default:'' }}">
+                    {{ property.created_date|default:'' }}
+                  </div>
+
+                  <div class="item">
+                    <div class="{% if is_broker == 1 %}display_status{% endif %}" id="display_status_{{ property.id }}">
+                    <span class="badge {% if property.status_id == 2 %} badge-danger{% elif property.status_id == 4 %} badge-warning{% else %}badge-success{% endif %}" style="cursor:pointer;">
+                      {{ property.status }}
+                    </span>
+                  </div>
+                    <div class="{% if is_broker == 1 %}change_status{% endif %}" id="change_status_{{ property.id }}" style="display:none;">
+                      <select class="select form-control listing_change_status" name="listing_change_status" id="listing_change_status_{{ property.id }}" onchange="change_property_status({{ property.id }},this)">
+
+                        {% if status_list %}
+                        {% for item in status_list %}
+                          <option value="{{ item.id }}" {% if item.id == property.status_id %}selected{% endif %}>{{ item.status_name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                      </select>
+                    </div>
+
+                  </div>
+                  <div class="item">
+
+                    <div class="{% if is_broker == 1 %}approval_status{% endif %}" id="approval_status_{{ property.id }}">
+                      <span class="badge {% if property.is_approved %} badge-success{% else %}badge-warning{% endif %}" style="cursor:pointer;">
+                        {{ property.approval }}
+                      </span>
+                    </div>
+                    <div class="{% if is_broker == 1 %}change_approval{% endif %}" id="change_approval_{{ property.id }}" style="display:none;">
+                    <select class="select form-control listing_change_approval" name="listing_change_approval" id="listing_change_approval_{{ property.id }}" onchange="change_apporval_status({{ property.id }}, this)">
+
+
+                          <option value="1" {% if property.is_approved == True %}selected{% endif %}>Approved</option>
+                          <option value="0" {% if property.is_approved == False %}selected{% endif %}>Not Approved</option>
+
+                      </select>
+                      </div>
+                  </div>
+
+
+                  <div class="item">
+                    <div class="action_dropdown {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}dropup{% endif %}{% endif %}">
+                    <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </a>
+                    <ul role="menu" class="dropdown-header-top author-log dropdown-menu right">
+                        <li><a href="/admin/listing-property-info/?property_id={{ property.id }}"><i class="far fa-edit"></i> Edit</a>
+                        </li>
+                        <li><a href="javascript:void(0)" onclick="property_delete_confirmation({{ property.id }});"><i class="fas fa-trash"></i> Delete</a>
+
+                        </li>
+                        {% if property.sale_by_type == 4 or property.sale_by_type == 6 or property.sale_by_type == 7  %}
+                        {% else %}
+                        <li><a href="javascript:void(0)" onclick="get_listing_setting_details({{ property.id }})"><i class="fas fa-cogs"></i> Setting</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                      </div>
+                  </div>
+
+                </div><!-- End .block-item -->
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <div class="item fullwidth">
+                        <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div><!-- End .block -->
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=6.2"></script>
+  <script type="text/javascript" src="{% static 'admin/js/properties.js' %}?v=6.2"></script>
+  <script>
+    $('.select').chosen();
+    try{
+
+            $("#property_list").sortable({
+          start: function (event, ui) {
+              //console.log('start');
+          },
+          stop: function(event, ui) {
+            var total_length = $('div.block-item').length;
+            if(total_length && parseInt(total_length) > 3){
+                var first_row = parseInt(total_length) -1;
+                var second_row = parseInt(total_length);
+            }else{
+                var first_row = 0;
+                var second_row = 0;
+            }
+             var arr = [];
+             var property='';
+             var index = '';
+             var count = parseInt($("#counter_num").val());
+             var new_counter = 1;
+             $.map($(this).find('div.block-item'), function(el) {
+                if(first_row > 0 && second_row > 0){
+                    if(new_counter == first_row || new_counter == second_row){
+                        $(el).addClass('last-row');
+                        $(el).find('.action_dropdown').addClass('dropup');
+                    }else{
+                        $(el).removeClass('last-row');
+                        $(el).find('.action_dropdown').removeClass('dropup');
+                    }
+                }
+                //$(el).data('property') + ' = ' + $(el).index() + ' = ' + $(el).data('index');
+                property = $(el).data('property');
+                index = count;//$(el).index() + 1;
+                var new_obj = {'property_id': property, 'reorder_id': index};
+                arr.push(new_obj);
+                $(".srNum:eq("+$(el).index()+")").text(count);
+                count++;
+                new_counter++;
+            });
+            var data = {"reorder": JSON.stringify(arr)}
+            $.ajax({
+              url: '/admin/property-listing-ordering/',
+              type: 'post',
+              dataType: 'json',
+              data: data,
+              beforeSend: function(){
+                  //$('.overlay').show();
+              },
+              success: function(response){
+                  if(response.error == 0){
+                    //console.log(response.msg);
+                  }else{
+                    //console.log(response.msg);
+                  }
+              }
+          });
+          },
+          change: function(event, ui) {
+            //console.log('change');
+            //console.log(ui);
+          }
+        });
+        }catch(ex){
+            //console.log(ex);
+        }
+  </script>
+{% endblock %}

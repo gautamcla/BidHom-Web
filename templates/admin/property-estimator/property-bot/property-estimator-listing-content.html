@@ -1,0 +1,58 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if estimator_list %}
+    {% for estimator in estimator_list %}
+    <tr class="even pointer">
+    <td class=" ">{{ forloop.counter0|add:sno }}</td>
+    <td class=" ">{{ estimator.user_first_name|default:'' }} {{ estimator.user_last_name|default:'' }}</td>
+    <td class=" ">{{ estimator.user_type|default:'' }}</td>
+    <td class=" ">{{ estimator.user_email|default:'' }}</td>
+    <td class=" ">{{ estimator.user_phone_no|phone_split|default:'-' }}</td>
+    <td class=" ">{{ estimator.property_type|default:'' }}</td>
+    <td class="convert_to_local_date" data-value="{{ estimator.added_on|default:'' }}">{{ estimator.added_on }}</td>
+    <td class=" ">
+        {% if estimator.assign_to_first_name %}
+            {{ estimator.assign_to_first_name|default:'' }} {{ estimator.assign_to_last_name|default:'' }}
+        {% else %}
+          Not Assigned Yet
+        {% endif %}
+    </td>
+    <td class=" ">
+      <a type="button" class="btn  btn-xs btn-round {% if estimator.complete_status_id == 2 %} btn-danger{% elif estimator.complete_status_id == 4 %} btn-warning{% else %}btn-success{% endif %}" id="statusText{{user.id}}">{{ estimator.complete_status|default:'' }}</a>
+    </td>
+    <td>
+        <a href="javascript:void(0)" onclick="show_message('{{ estimator.review_msg|escape_char|default:'' }}');" class="blue-text" title="View Message">View Message</a>
+    </td>
+    <td class="last">
+      <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+        <a href="/admin/estimator-details/?id={{estimator.id}}"  type="button" data-id="{{estimator.id}}"  class="btn btn-xs btn-round btn-primary edit-question"><i class="fa fa-eye"></i> View</a>
+      </div>
+
+    </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr>  <td class=" ">No Data available </td></tr>
+{% endif %}
+{% block javascripts %}
+<script type="text/javascript" src="{% static 'admin/build/js/property-estimator.js' %}"></script>
+<script>
+    $('.convert_to_local_date').each(function(){
+        try{
+
+            var added_on = $(this).attr('data-value');
+            if(added_on.trim() != "" && added_on.trim() != "None"){
+                var local_date = getLocalDate(added_on.trim(), 'mm/dd/yyyy','ampm');
+                //console.log(local_date);
+                var actual_date = local_date.split(" ");
+                //actual_date = actual_date[0]+' '+actual_date[1]+' '+actual_date[2];
+                $(this).html(actual_date[0]);
+            }else{
+                $(this).html('');
+            }
+        }catch(ex){
+            console.log(ex);
+        }
+    });
+</script>
+{% endblock javascripts %}

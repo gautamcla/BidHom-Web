@@ -1,0 +1,857 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+{% load humanize %}
+<div class="dashboard-body">
+    <input type="hidden" name="current_plan_id" id="current_plan_id" value="{{current_plan_list.plan_id}}"/>
+    <div  class="row dashboard_section change_plan_section">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="membership-wrap">
+              <h6>
+                Manage Your Membership Plan
+              </h6>
+              
+              <div class="listing_blocks">
+                <ul class="bottom">
+                  <li>
+                    {{ plan_details.plan_name }}
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li>
+                    <h3 class="name">
+                      ${{ plan_details.cost }}
+                      <span>
+                        Per user/month billled annually
+                      </span>
+                    </h3>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-circle-check"></i> Theme-based Website Designs
+                    </div>
+                    <div class="email-text">
+                      <i class="fa-solid fa-circle-check"></i> Website on your domain
+                    </div>
+                    <div class="email-text">
+                      <i class="fa-solid fa-circle-check"></i> Dynamic Homepage
+                    </div>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)" class="btn btn-secondary" id="changePlanBtn" {% if request.session.is_broker %}onclick="change_plan();"{% else %}disabled{% endif %}>Change Plan</a>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              
+            </div><!-- End .membership-wrap -->
+
+            <div class="upcoming-wrap">
+              <h6> 
+                Upcoming Bill 
+                <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                  <span class="tooltipp__content right">Auto payment mode for subscription plan is on, upcoming bill will be automatically debited from your account.</span>
+                </div> 
+              </h6>
+    
+              {% if plan_details.upcoming_bill.member_plan or plan_details.upcoming_bill.payment_date or plan_details.upcoming_bill.amount %}
+              <div class="listing_blocks">
+                <ul class="bottom">
+                  <li  data-value="{{ plan_details.upcoming_bill.payment_date|default:'' }}">
+                    Payment Date | 
+                    <span style="margin-left: 2px;" class="convert_to_local_date_time" data-value="{{ plan_details.upcoming_bill.payment_date|default:'' }}">
+                        {{ plan_details.upcoming_bill.payment_date }}
+                    </span>
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li>
+                    <h6 class="name">
+                      {{ plan_details.upcoming_bill.member_plan }}
+                      <span>
+                        Membership Plan	
+                      </span>
+                    </h6>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-palette"></i>
+                      <h6>
+                        {{ plan_details.theme_name }}
+                        <span>
+                          Theme
+                        </span>
+                      </h6>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-tags"></i>
+                      <h6 class="price">
+                        {% if plan_details.upcoming_bill.amount %}${{ plan_details.upcoming_bill.amount|intcomma }} {% endif %} {% if plan_details.is_first_subscription == 1 %}(Free Trial Subscription){% endif %}
+                        <span>
+                          Price
+                        </span>
+                      </h6>
+                    </div>
+                  </li>
+                  <li>
+                    {% if request.session.is_broker %}
+                    <a href="javascript:void(0)" class="btn btn-secondary " onclick="show_theme_section()">Change Theme</a>
+                    {% endif %}
+                  </li>
+                  <li>
+                    <p class="btn btn-primary" id="cancel_member">Cancel Subscription</p>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% else %}
+              
+              <div class="listing_blocks">
+                <ul class="bottom">
+                  <li>
+                    No data Available
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li class="fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" />
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endif %}
+              
+            </div><!-- End .upcoming-wrap -->
+
+
+            <div class="upcoming-wrap">
+              <h6>
+                Billing History
+              </h6>
+    
+              <div id="planHistory" class="listing-table">
+                {% if plan_history_list %}
+                {% for history in plan_history_list %}
+                <div class="listing_blocks">
+                  <ul class="bottom">
+                    <li>
+                      Membership Plan	
+                    </li>
+                  </ul>
+                  <ul class="top">
+                    <li>
+                      <span class="label label-success">Success</span>
+    
+                      <h6 class="name">
+                        {{ history.member_plan }}
+                      </h6>
+                    </li>
+                    <li>
+                      <div class="email-text">
+                        <i class="fa-solid fa-palette"></i>
+                        <h6>
+                          {{ history.theme_name|default:'' }}
+                          <span>
+                            Theme
+                          </span>
+                        </h6>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="email-text">
+                        <i class="fa-solid fa-tags"></i>
+                        <h6 class="price">
+                          {% if history.amount %}${{ history.amount|floatformat:"-2"|intcomma }} {% else %} $0 {% endif %}
+                          <span>
+                            Price
+                          </span>
+                        </h6>
+                      </div>
+                    </li>
+                    <li>
+                      <h6>
+                        <div class="convert_to_local_date_time" data-value="{{ history.payment_date|default:'' }}">
+                          {% if history.payment_date %}{{ history.payment_date }}{% else %} - {% endif %}
+                        </div>
+                        <span>
+                          Payment Date
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      {% if not history.is_free %}
+                      <a href="javascript:void(0)" class="btn btn-primary" onclick="download_invoice_pdf('{{ history.id|default:'' }}')">
+                        Download Invoice
+                      </a>
+                      {% else %}-{% endif %}
+                    </li>
+                  </ul>
+                </div><!-- End .block-item -->
+                {% endfor %}
+                {% else %}
+                
+                <div class="listing_blocks">
+                  <ul class="bottom">
+                    <li>
+                      No data Available
+                    </li>
+                  </ul>
+                  <ul class="top">
+                    <li class="fullwidth">
+                      <img src="images/no-data-image.png" alt="">
+                    </li>
+                  </ul>
+                </div><!-- End .block-item -->
+                {% endif %}
+                </div><!-- End .create-table -->
+                
+            </div><!-- End .Billing-wrap -->
+
+            
+
+            <div class="pagination" id="article_listing_pagination">
+              <ul id="history_listing_pagination_list">
+                {{ pagination_html }}
+              </ul>
+            </div><!-- End .pagination -->
+          </div>
+        </div>
+
+
+  <div class="row dashboard_section change_theme_section" style="display:none;">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="website-plan-back">
+              <a href="javascript:void(0)" class="show_dashboard_section" onclick="show_dashboard_section()"><i class="fas fa-chevron-left"></i> Back To Dashboard</a>
+            </div>
+
+            <div class="website-plan">
+              <div class="steps">
+                <ul class="progress-barr">
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon plan-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Select Plan</span>
+                  </li>
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon website-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Select Website Theme</span>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon payment-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Payment</span>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .website-plan -->
+
+            <h6 class="blue-text">
+              Choose your website theme
+            </h6>
+
+            <div class="price-plan">
+              {% for theme in theme_list %}
+              <div class="block">
+                
+                <div class="block-item {% if theme.id == 1 %}red-theme{% elif theme.id == 4 %}golden-theme{% elif theme.id == 5 %}blue-theme{% elif theme.id == 7%}sky-theme{% endif %}">
+                  <figure>
+                    <img class="slide-fixed" src="{% static 'admin/images/transparent.png' %}" alt="">
+                    <img class="slide-img" src="{% static 'admin/images/' %}{% if theme.id == 1 %}theme-1.jpg{% elif theme.id == 4 %}theme-3.jpg{% elif theme.id == 7 %}theme-4.jpg{% else %}theme-2.jpg{% endif %}" alt="">
+                    <h6>
+                      {{ theme.theme_name }}
+                    </h6>
+                  </figure>
+                  <figcaption>
+                    <!--<small>{{ theme.theme_name }}</small>-->
+                    <div class="price-button">
+                      <h6>
+                        {{ theme.theme_name }}
+                      </h6>
+                      <a href="javascript:void(0)" rel="{{ theme.id }}" rel_name="{{ theme.theme_name }}" class="check changeThemeBtn {% if theme.id == plan_details.theme_id %}selected_theme{% endif %}" onclick="change_theme(this);"></a>
+                    </div>
+                  </figcaption>
+                  <div class="center">
+                    <a href="javascript:void(0)" onclick="theme_preview('{{ theme.id }}')" class="btn btn-primary"><i class="fa-solid fa-eye"></i> Preview</a>
+                  </div>
+                </div>
+              </div><!-- End .block -->
+              {% endfor %}
+
+            </div><!-- End .price-plan -->
+            <form name="change_theme_frm" id="change_theme_frm" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="selected_theme_id" id="selected_theme_id" value="{{ plan_details.theme_id|default:'' }}"/>
+            </form>
+            <div class="ptb20">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="submit_theme()">Update</button>
+              <button class="btn btn-primary btn-sm  ml10 show_dashboard_section" onclick="show_dashboard_section()">Back To Dashboard</button>
+            </div>
+
+
+          </div>
+        </div>
+  <div class="row dashboard_section plan_section" style="display:none;">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="website-plan-back">
+              <a href="javascript:void(0)" class="dashboard_back_btn"><i class="fas fa-chevron-left"></i> Back</a>
+            </div>
+
+            <div class="website-plan">
+              <div class="steps">
+                <ul class="progress-barr">
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon plan-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Select Plan</span>
+                  </li>
+<!--                  <li>-->
+<!--                    <a href="javascript:void(0)">-->
+<!--                      <span class="circle">-->
+<!--                        <div class="icon website-icon"></div>-->
+<!--                      </span>-->
+<!--                    </a>-->
+<!--                    <span class="name">Select Website Theme</span>-->
+<!--                  </li>-->
+                  <li>
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon payment-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Payment</span>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .website-plan -->
+
+            <h6 class="blue-text">
+              Manage Your Membership Plan
+            </h6>
+
+            <div class="member-plan">
+              {% for plan in subscription_plan_list%}
+                {% if current_plan_list.is_free %}
+                  <div class="block" id="block_{{ plan.id }}">
+                    <div class="block-box {% if plan.is_current_plan %} current {% endif %}">
+                      <h4>
+                        {{ plan.plan_name }}
+                      </h4>
+                      <h1>${{ plan.cost }}</h1>
+                      <p class="lightgray-text center mb0">Per Month</p>
+                      {% if plan.cost == 0 %}
+                      <p class="pink-text center">Free Plan</p>
+                      {% endif %}
+                      <div class="block-list">
+                        <ul>
+                          <li>
+                            {% autoescape off %}
+                            {{ plan.plan_desc }}
+                            {% endautoescape %}
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="block-button">
+
+                        <a href="javascript:void(0)" rel="{{ plan.id }}" rel_name="{{ plan.plan_name }}" rel_cost="{{ plan.cost }}" rel_plan_price="{{ plan.plan_price_id }}" class="btn btn-primary selectPlanBtn choose-plan" style="display:{% if plan.is_current_plan %}none{% else %}block{% endif %};">Choose Plan</a>
+                        <a href="javascript:void(0)" rel="{{ plan.id }}" rel_name="{{ plan.plan_name }}" rel_cost="{{ plan.cost }}" rel_plan_price="{{ plan.plan_price_id }}" class="btn btn-default selectPlanBtn_noaction current-plan" style="display:{% if plan.is_current_plan %}block{% else %}none{% endif %};">Your Current Plan</a>
+                        <a href="javascript:void(0)" rel="{{ plan.id }}" rel_name="{{ plan.plan_name }}" rel_cost="{{ plan.cost }}" rel_plan_price="{{ plan.plan_price_id }}" class="btn selected-plan selectPlanBtn" style="display:none;"><span class="check-box" ></span> Plan Selected</a>
+                      </div>
+                    </div>
+                  </div>
+                {% elif not plan.is_free %}
+                  <div class="block" id="block_{{ plan.id }}">
+                    <div class="block-box {% if plan.is_current_plan %} current {% endif %}">
+                      <div class="top">
+                        <figure>
+                          <div class="icon">
+                            <i class="fa-solid fa-user-tie fa-3x"></i>
+                          </div>
+                        </figure>
+                        <figcaption>
+                          <h4>
+                            {{ plan.plan_name }}
+                          </h4>
+                          <h1>${{ plan.cost }}</h1>
+                          <p class="lightgray-text center mb0">Per Month</p>
+                          {% if plan.cost == 0 %}
+                          <p class="pink-text center">Free Plan</p>
+                          {% endif %}
+                        </figcaption>
+                      </div>
+                      <div class="block-list">
+                        <ul>
+                          <li>
+                            {% autoescape off %}
+                            {{ plan.plan_desc }}
+                            {% endautoescape %}
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="block-button">
+
+                        <a href="javascript:void(0)" rel="{{ plan.id }}" rel_name="{{ plan.plan_name }}" rel_cost="{{ plan.cost }}" rel_plan_price="{{ plan.plan_price_id }}" class="btn btn-primary selectPlanBtn choose-plan" style="display:{% if plan.is_current_plan %}none{% else %}block{% endif %};">Choose Plan</a>
+                        <a href="javascript:void(0)" rel="{{ plan.id }}" rel_name="{{ plan.plan_name }}" rel_cost="{{ plan.cost }}" rel_plan_price="{{ plan.plan_price_id }}" class="btn btn-default selectPlanBtn_noaction current-plan" style="display:{% if plan.is_current_plan %}block{% else %}none{% endif %};">Your Current Plan</a>
+                        <a href="javascript:void(0)" rel="{{ plan.id }}" rel_name="{{ plan.plan_name }}" rel_cost="{{ plan.cost }}" rel_plan_price="{{ plan.plan_price_id }}" class="btn selected-plan selectPlanBtn" style="display:none;"><span class="check-box" ></span> Plan Selected</a>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+              <!--<div class="block">
+                <div class="block-box">
+                  <h4>
+                    Agent Website
+                  </h4>
+                  <h1><sup>$</sup>95</h1>
+                  <p class="lightgray-text center mb0">Per Month Setup Fee</p>
+                  <p class="pink-text center">Singal User Website</p>
+                  <div class="block-list">
+                    <ul>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="block-button">
+                    <a href="#" class="btn selected-plan"><span class="check-box"></span> Plan Selected</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="block">
+                <div class="block-box">
+                  <h4>
+                    Broker Website
+                  </h4>
+                  <h1><sup>$</sup>110</h1>
+                  <p class="lightgray-text center mb0">Per Month Setup fee</p>
+                  <p class="pink-text center">Multi User Website</p>
+                  <div class="block-list">
+                    <ul>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="block-button">
+                    <a href="#" class="btn btn-primary choose-plan">Choose Plan</a>
+                  </div>
+                </div>
+              </div>-->
+              <!-- End .block -->
+
+            </div><!-- End .member-plan -->
+
+            <div class="pt20 pb20 center">
+              <a href="javascript:void(0)" class="btn btn-primary" id="planNextBtn">Next</a>
+            </div>
+
+          </div>
+        </div>
+
+  <div class="row dashboard_section theme_section" style="display:none;">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="website-plan-back">
+              <a href="javascript:void(0)" class="dashboard_back_btn"><i class="fas fa-chevron-left"></i> Back</a>
+            </div>
+
+            <div class="website-plan">
+              <div class="steps">
+                <ul class="progress-barr">
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon plan-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Select Plan</span>
+                  </li>
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon website-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Select Website Theme</span>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon payment-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Payment</span>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .website-plan -->
+            
+            <h6 class="blue-text">
+              Choose your website theme
+            </h6>
+
+            <div class="price-plan">
+              {% for theme in theme_list %}
+              <div class="block">
+                <div class="block-item {% if theme.id == 1 %}red-theme{% elif theme.id == 4 %}golden-theme{% elif theme.id == 5 %}blue-theme{% elif theme.id == 7%}sky-theme{% endif %}">
+                  <figure>
+                    <img class="slide-fixed" src="{% static 'admin/images/transparent.png' %}" alt="">
+                    <img class="slide-img" src="{% static 'admin/images/' %}{% if theme.id == 1 %}theme-1.jpg{% elif theme.id == 4 %}theme-3.jpg{% else %}theme-2.jpg{% endif %}" alt="">
+                    <h6>
+                      {{ theme.theme_name }}
+                    </h6>
+                  </figure>
+                  <figcaption>
+                    <!--<small>{{ theme.theme_name }}</small>-->
+                    <div class="price-button">
+                      <h6>
+                        {{ theme.theme_name }}
+                      </h6>
+                      <a href="javascript:void(0)" rel="{{ theme.id }}" rel_name="{{ theme.theme_name }}" class="check selectThemeBtn {% if theme.id == plan_details.theme_id %}selected_theme{% endif %}"></a>
+                    </div>
+                  </figcaption>
+                  <div class="center">
+                    <a href="javascript:void(0)" onclick="theme_preview('{{ theme.id }}')" class="btn btn-primary"><i class="fa-solid fa-eye"></i> Preview</a>
+                  </div>
+                </div>
+              </div><!-- End .block -->
+              {% endfor %}
+              <!--<div class="block">
+                <div class="block-item">
+                  <figure>
+                    <img src="{% static 'admin/images/theme-2.jpg' %}" alt="">
+                    <h6>
+                      Real Estate Properties
+                    </h6>
+                  </figure>
+                  <figcaption>
+                    <small>Real Estate Properties</small>
+                    <div class="price-button">
+                      <a href="javascript:void(0)" rel="1" rel_name="Real Estate Properties" class="btn btn-primary-bdr selectThemeBtn"><span class="icon check-icon"></span> Select <span class="hiden">Website</span> Theme</a>
+                      <a href="#" class="btn btn-primary"><span class="icon eye-icon"></span> Preview</a>
+                    </div>
+                  </figcaption>
+                </div>
+              </div>
+
+              <div class="block">
+                <div class="block-item">
+                  <figure>
+                    <img src="{% static 'admin/images/theme-3.jpg' %}" alt="">
+                    <h6>
+                      Real Estate Properties
+                    </h6>
+                  </figure>
+                  <figcaption>
+                    <small>Real Estate Properties</small>
+                    <div class="price-button">
+                      <a href="javascript:void(0)" rel="2" rel_name="Real Estate Properties" class="btn btn-primary-bdr selectThemeBtn"><span class="icon check-icon"></span> Select <span class="hiden">Website</span> Theme</a>
+                      <a href="#" class="btn btn-primary"><span class="icon eye-icon"></span> Preview</a>
+                    </div>
+                  </figcaption>
+                </div>
+              </div>--><!-- End .block -->
+            </div><!-- End .price-plan -->
+
+            <div class="pt20 pb20">
+              <a href="javascript:void(0)" class="btn btn-primary" id="themeNextBtn">Next</a>
+            </div>
+
+          </div>
+        </div>
+
+  <form method="post" name="update_membership_frm" id="update_membership_frm" autocomplete="off">
+        {% csrf_token %}
+    <input type="hidden" name="plan_id" id="plan_id" value="{{ plan_details.subscription_id|default:'' }}"/>
+    <input type="hidden" name="plan_price_id" id="plan_price_id" value=""/>
+    <input type="hidden" name="theme_id" id="theme_id" value="{{ plan_details.theme_id|default:'1' }}"/>
+  <div class="row dashboard_section payment_section" style="display:none;">
+          <div class="col-md-12 col-sm-12">
+            <div class="website-plan-back">
+              <a href="javascript:void(0)" class="dashboard_back_btn"><i class="fas fa-chevron-left"></i> Back</a>
+            </div>
+
+            <div class="website-plan">
+              <div class="steps">
+                <ul class="progress-barr">
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon plan-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Select Plan</span>
+                  </li>
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon website-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Select Website Theme</span>
+                  </li>
+                  <li class="active">
+                    <a href="javascript:void(0)">
+                      <span class="circle">
+                        <div class="icon payment-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Payment</span>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .website-plan -->
+            
+
+            <div class="payment-plan">
+              <div class="block">
+                <div class="item-block">
+                  <h6>
+                    Payment Method
+                  </h6>
+                  {% comment %}
+                  <div class="form-group">
+                    <label for="card_number">Card Number</label>
+                    <input type="text" name="card_number" id="card_number" class="form-control" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="16">
+                    <div id="card_type" class="cards-icon"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                      <div class="form-group payment-error">
+                        <label for="card_expiry_month">Expiry Month</label>
+                        <input type="text" name="card_expiry_month" id="card_expiry_month" class="form-control" onblur="leading_zero('card_expiry_month')" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="2" min="1" max="12" >
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                      <div class="form-group payment-error">
+                        <label for="card_expiry_yr">Expiry Year</label>
+                        <input type="text" name="card_expiry_yr" id="card_expiry_yr" class="form-control" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="4">
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                      <div class="form-group payment-error">
+                        <label for="card_cvv_no">CVV</label>
+                        <input type="password" name="card_cvv_no" id="card_cvv_no" class="form-control" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="3">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="card_user_name">Name on Card</label>
+                    <input type="text" name="card_user_name" id="card_user_name" class="form-control">
+                  </div>
+                  <div class="pt20">
+                    <button type="submit" name="submit_payment" id="submit_payment" class="btn btn-primary">Payment</button>
+                  </div>
+                  {% endcomment %}
+                  <div class="pt20">
+                    <button type="button" name="pay_now" id="pay_now" class="btn btn-primary">Pay Now</button>
+                  </div>
+                </div><!-- End .item-block -->
+              </div><!-- End .block -->
+              <div class="block">
+
+                <div class="item-block">
+                  <h6>
+                    <span class="card-icon"></span> Your Order
+                  </h6>
+                  <small id="selectedThemeName">Selected Design: {{ plan_details.theme_name|default:'Real Estate' }}</small>
+                  <div class="clear"></div>
+                  <div class="payment-image">
+                    <ul>
+                      <li class="theme_img" id="theme_1" style="display:none;">
+                        <img src="{% static 'admin/images/order-item.jpg' %}" alt="">
+                      </li>
+                      <li class="theme_img" id="theme_2" style="display:none;">
+                        <img src="{% static 'admin/images/order-item-2.jpg' %}" alt="">
+                      </li>
+                      <li class="theme_img" id="theme_3" style="display:none;">
+                        <img src="{% static 'admin/images/order-item-3.jpg' %}" alt="">
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <h5 id="selectedPlanName">
+                    {{ plan_details.plan_name }}
+                  </h5>
+                  <small id="selectedPlanCost">
+                    Setup fee: ${{ plan_details.cost }}
+                  </small>
+                </div><!-- End .item-block -->
+              </div><!-- End .block -->
+            </div><!-- End .payment-plan -->
+
+
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+    </form>
+
+  <div class="row dashboard_section payment_success_section" style="display:none;">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="payment-success">
+              <div class="payment-icon"></div>
+              <h4>
+                Payment Successfull!
+              </h4>
+              <p>
+                <strong>
+                Thank you <br>
+                  Your payment of <span id="subsAmtPaid">$99</span> has been received
+              </strong>
+              </span>
+              <p class="light">
+              order ID: <span id="subsOrdId">IC-8372</span>  | Transaction ID: <span id="subsTransId">458796</span>
+              </p>
+              <small>
+                Please contact us at 1800-7823828 or email to example@gmail.com for any enquiry.
+              </small>
+              <button type="button" class="btn btn-primary" id="returnBtn">Return</button>
+            </div>
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+
+
+  </div><!-- End .dashboard-body -->
+
+<div id="changeThemeSecurityModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+      <div class="modal-header">
+          <h5 class="modal-title">Password Confirmation</h5>
+          <button type="button" class="close" id="change_theme_pass_false_top">
+          <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <form name="checkPassFrm" id="checkPassFrm" method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="form-group">
+                <label for="user_pass" class="pb10">Enter your Password</label>
+                <input type="password" name="user_pass" id="user_pass" class="form-control bdr" placeholder="Enter your Password"/>
+            </div>
+            <div class="center">
+                <button type="submit" class="btn btn-secondary">Submit</button><button type="button" class="btn btn-primary-bdr change_theme_btn" id="change_theme_pass_false">Cancel</button>
+            </div>
+          </div>
+      </form>
+      </div>
+  </div>
+  </div><!-- End .chatagentModal -->
+
+<!-- Cancel Member Popup -->
+<div class="modal fade centered-modal" id="cancel_member_popup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Cancel Subscription</h5>
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> -->
+      </div>
+      <div class="modal-body center">
+        <p>If you're planning to cancel your subscription, Kindly reach out to us on below details.</p>
+        <p>
+          <span style="margin-right: 15px;"><i class="fa-solid fa-envelope"></i> support@gsa.com</span> <span><i class="fa-solid fa-phone"></i> (646) 421-8637</span>
+        </p>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+
+<!--      <div class="modal-footer">-->
+<!--        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+<!--        <button type="button" class="btn btn-primary">Save changes</button>-->
+<!--      </div>-->
+    </div>
+  </div>
+</div>
+<!-- End Cancel Member Popup -->
+
+<div class="overlay" style="display:none;">
+  <div class="loader">Loading...</div>
+</div>
+{% endblock %}
+
+{% block js_content %}
+    <script>
+      var change_plan = '{{ request.GET.change_plan }}';
+      console.log(change_plan);
+      if(change_plan== 'yes'){
+        setTimeout(function(){
+          $("#changePlanBtn").click();
+        }, 2000);
+      }
+      //var is_free_plan = '{{ request.session.is_free_plan|lower }}';
+      //var is_broker = '{{ request.session.is_broker|lower }}';
+      //console.log(is_free_plan);
+      //console.log(is_broker);
+      //if(is_free_plan == 'true' && is_broker == 'true'){
+      //  setTimeout(function(){
+      //    $("#changePlanBtn").click();
+      //  }, 2000);
+      //}
+
+      var current_plan_id = '{{ plan_details.subscription_id }}';
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+      function theme_preview(theme_id){
+      window.open('/admin/preview-theme/?theme='+theme_id, '_blank', 'width=1100, height=600');
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.5"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dashboard.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/payments.js' %}?v=2.7"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/membership_tour.js' %}?v=3.1"></script>
+    <script>
+      var stripe = Stripe('{{ stripe_publishable_key }}');
+    </script>
+{% endblock %}

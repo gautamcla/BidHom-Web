@@ -1,0 +1,662 @@
+.steps {
+    width: 100%;
+    padding: 50px 0 80px;
+    position: relative;
+    @include breakpoint(xs) {
+        padding: 20px 0 0;
+    }
+}
+    
+.progressbar {
+    counter-reset: step;
+    text-align: center;
+    width: 100%;
+    @include breakpoint(xs) {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    li {
+        list-style-type: none;
+        width: 19%;
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        @include breakpoint(laptop) {
+            font-size: $fontMiddle;
+        }
+        @include breakpoint(xxs) {
+            width: 50%;
+            padding-bottom: 10px;
+        }
+        a {
+            color: rgba($color: #000000, $alpha: 0.5);
+            z-index: 1;
+            position: relative;
+        }
+        &.active {
+            .number {
+                color: $black;
+            }
+            &:before {
+                background-color: $secondary;
+            }
+            + li:after {
+                background-color: #D8D6D5;
+            }
+        }
+        &.process {
+            .number {
+                color: $white;
+                border: 3px solid $black;
+                background: $secondary;
+            }
+            &:before {
+                background-color: $secondary;
+            }
+            + li:after {
+                background-color: #D8D6D5;
+            }
+        }
+        &:first-child {
+            &:after {
+                content: none;
+            }
+        }
+        &:after {
+            width: 100%;
+            height: 1px;
+            content: '';
+            position: absolute;
+            background-color: #D8D6D5;
+            top: 25px;
+            left: -50%;
+            @media screen and (min-width: 1680px) {
+                top: 30px;
+            }
+            @include breakpoint(xs) {
+                content: none;
+            }
+        }
+        .number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            line-height: 50px;
+            display: inline-block;
+            font-size: $fontLarge;
+            font-weight: $bold;
+            color: $white;
+            margin-bottom: 10px;
+            box-shadow: 0 0 10px #ccc;
+            background: rgb(255,41,72);
+            background: radial-gradient(circle, rgba(255,41,72,1) 30%, rgba(19,16,16,1) 100%);
+            @media screen and (min-width: 1680px) {
+                width: 60px;
+                height: 60px;
+                line-height: 60px;
+                font-size: $fontExtraLarge;
+            }
+            @include breakpoint(laptop) {
+                font-size: $fontMiddle;
+            }
+            @include breakpoint(md) {
+                font-size: $fontSmall;
+            }
+        }
+        .name {
+            display: block;
+            font-weight: $semibold;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -110px;
+            width: 75%;
+            height: 100px;
+            font-size: $fontLarge;
+            @media screen and (min-width: 1680px) {
+                font-size: $fontExtraLarge;
+            }
+            @include breakpoint(lg) {
+                font-size: $font14;
+            }
+            @include breakpoint(xs) {
+                position: relative;
+                transform: inherit;
+                left: inherit;
+                width: 100%;
+                bottom: inherit;
+                height: auto;
+            }
+        }
+    }
+}
+
+.bot-chat {
+    padding: 20px 0;
+    position: relative;
+    &:before {
+        content: "";
+        height: calc(100% - 43px);
+        width: 1px;
+        background: #f2f2f2;
+        position: absolute;
+        left: 37px;
+        top: 50px;
+    }
+    li {
+        margin-bottom: 10px;
+        padding-top: 20px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+        .chat-align {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            &.lft-chat {
+                justify-content: flex-start;
+                figcaption {
+                    margin-left: 15px;
+                    background: #F1F4F7;
+                    
+                    @include border-radius (30px 30px 30px 0);
+                    @include breakpoint(xs) {
+                        margin-left: 5px;
+                    }
+                    p {
+                        font-size: $fontMedium;
+                    }
+                    &.type {
+                        background: transparent;
+                        padding: 0;
+                        p {
+                            background: #F1F4F7;
+                            padding: 20px 30px;
+                            @include border-radius (30px 30px 30px 0);
+                            @include breakpoint(xs) {
+                                padding: 10px;
+                            }
+                        }
+                        .item {
+                            display: flex;
+                            margin: 10px 0 0;
+                            .block {
+                                padding: 0 20px;
+                                @include breakpoint(xs) {
+                                    padding: 0 5px;
+                                }
+                                @include breakpoint(xxs) {
+                                    padding: 0 3px;
+                                }
+                                &:first-child {
+                                    padding-left: 0;
+                                }
+                                .icon {
+                                    background: url(../images/bot-icons.svg) no-repeat;
+                                    width: 55px;
+                                    height: 55px;
+                                    display: block;
+                                    margin: 0 auto;
+                                    &.icon-residential {
+                                        background-position: 8px 0;
+                                    }
+                                    &.icon-land {
+                                        background-position: -79px 0;
+                                    }
+                                    &.icon-commercial {
+                                        background-position: -173px 0;
+                                    }
+                                }
+                                
+                                input[type=radio].css-radio + label.radio-label {
+                                    background-color: #E6EBF1;
+                                    border: 2px solid #E6EBF1;
+                                    background-image: none;
+                                    padding: 10px 20px;
+                                    height: auto;
+                                    text-align: center;
+                                    @include border-radius (6px);
+                                    @include breakpoint(xs) {
+                                        padding: 5px;
+                                    }
+                                }
+                                input[type=radio].css-radio:checked + label.radio-label {
+                                    border: 2px solid $secondary;
+                                }
+                            }
+                        }
+                    }
+
+                    &.map-bot {
+                        background: transparent;
+                        padding: 0;
+                        .item {
+                            display: flex;
+                            align-items: center;
+                            margin: 0;
+                            .block {
+                                padding: 0 10px;
+                                position: relative;
+                                text-align: left;
+                                &:first-child {
+                                    width: 120px;
+                                    padding-left: 0;
+                                    padding-right: 0;
+                                    @include breakpoint(xs) {
+                                        width: 100px;
+                                    }
+                                    &:before {
+                                        content: "";
+                                        position: absolute;
+                                        width: 100%;
+                                        height: 100%;
+                                        top: 0;
+                                        left: 0;
+                                        background: rgba($color: #000000, $alpha: 0.5);
+                                        @include border-radius (10px);
+                                    }
+                                    img {
+                                        width: 100%;
+                                        height: 100%;
+                                        max-width: 100%;
+                                        max-height: 100%;
+                                        @include border-radius (10px);
+                                    }
+                                }
+                                &:last-child {
+                                    width: 20px;
+                                    padding-left: 0;
+                                    padding-right: 0;
+                                }
+                                .map-zoom {
+                                    position: absolute;
+                                    z-index: 1;
+                                    background: url(../images/bot-icons.svg) no-repeat;
+                                    width: 60px;
+                                    height: 60px;
+                                    display: block;
+                                    background-position: -284px 0;
+                                    top: 50%;
+                                    left: 50%;
+                                    transform: translate(-50%, -50%);
+                                }
+                                .edit-link {
+                                    color: $secondary;
+                                }
+                            }
+                        }
+                    }
+                    
+                    &.loading-bot-box {
+                        .loader-bot {
+                            position: relative;
+                            width: 120px;
+                            height: 50px;
+                            top: -10px;
+                        }
+                        .loaderb,
+                        .loaderb:before,
+                        .loaderb:after {
+                            border-radius: 50%;
+                            width: 2.5em;
+                            height: 2.5em;
+                            -webkit-animation-fill-mode: both;
+                            animation-fill-mode: both;
+                            -webkit-animation: load7 1.8s infinite ease-in-out;
+                            animation: load7 1.8s infinite ease-in-out;
+                        }
+                        .loaderb {
+                            color: $secondary;
+                            font-size: 10px;
+                            margin: 0 auto;
+                            position: relative;
+                            text-indent: -9999em;
+                            -webkit-transform: translateZ(0);
+                            -ms-transform: translateZ(0);
+                            transform: translateZ(0);
+                            -webkit-animation-delay: -0.16s;
+                            animation-delay: -0.16s;
+                        }
+                        .loaderb:before,
+                        .loaderb:after {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                        }
+                        .loaderb:before {
+                            left: -3.5em;
+                            -webkit-animation-delay: -0.32s;
+                            animation-delay: -0.32s;
+                        }
+                        .loaderb:after {
+                            left: 3.5em;
+                        }
+                        @-webkit-keyframes load7 {
+                            0%,
+                            80%,
+                            100% {
+                                box-shadow: 0 2.5em 0 -1.3em;
+                            }
+                            40% {
+                                box-shadow: 0 2.5em 0 0;
+                            }
+                        }
+                        @keyframes load7 {
+                            0%,
+                            80%,
+                            100% {
+                                box-shadow: 0 2.5em 0 -1.3em;
+                            }
+                            40% {
+                                box-shadow: 0 2.5em 0 0;
+                            }
+                        }
+                    }
+                }
+            }
+            &.rgt-chat {
+                justify-content: flex-end;
+                padding-right: 0;
+                figcaption {
+                    width: 100%;
+                    margin-right: 0;
+                    padding: 0;
+                    text-align: right;
+                    word-break: break-all;
+                    background: $secondary;
+                    padding: 20px 30px;
+                    @include border-radius (30px 30px 0 30px);
+                    @include breakpoint(xs) {
+                        padding: 10px;
+                    }
+                    .chat-time {
+                        left: inherit;
+                        right: 20px;
+                        @include breakpoint(laptop) {
+                            right: 10px;
+                        }
+                    }
+                    
+                    &.bot-pics {
+                        background: transparent;
+                        padding: 0;
+                        max-width: 520px;
+                        .upload-images {
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-end;
+                            @include breakpoint(xs) {
+                                flex-wrap: wrap;
+                            }
+                            .block {
+                                &:first-child {
+                                    ol {
+                                        display: flex;
+                                        flex-wrap: wrap;
+                                        padding: 0;
+                                        margin: 0 -5px;
+                                        li {
+                                            padding: 0 5px;
+                                            figure {
+                                                position: relative;
+                                                width: 60px;
+                                                height: 45px;
+                                                .thumbnail {
+                                                    padding: 0;
+                                                    border: none;
+                                                    margin-bottom: 0;
+                                                    height: 100%;
+                                                    background: transparent;
+                                                    &:before {
+                                                        content: "";
+                                                        position: absolute;
+                                                        left: 0;
+                                                        top: 0;
+                                                        width: 100%;
+                                                        height: 100%;
+                                                        background: rgba($color: #000000, $alpha: 0.5);
+                                                        @include border-radius (10px);
+                                                    }
+                                                }
+                                                .close-pic {
+                                                    position: absolute;
+                                                    top: -5px;
+                                                    right: -5px;
+                                                    width: 20px;
+                                                    height: 20px;
+                                                    background: $secondary;
+                                                    text-align: center;
+                                                    line-height: 20px;
+                                                    @include border-radius (10px);
+                                                    a {
+                                                        color: $white;
+                                                        line-height: normal;
+                                                    }
+                                                }
+                                                .resize-pic {
+                                                    position: absolute;
+                                                    top: -5px;
+                                                    left: -5px;
+                                                    width: 20px;
+                                                    height: 20px;
+                                                    background: $secondary;
+                                                    text-align: center;
+                                                    line-height: 20px;
+                                                    @include border-radius (10px);
+                                                    a {
+                                                        color: $white;
+                                                        line-height: 20px;
+                                                        font-size: 12px;
+                                                        padding: 0;
+                                                        background: transparent;
+                                                        border: none;
+                                                        margin-bottom: 0;
+                                                    }
+                                                }
+                                            }
+                                            img {
+                                                @include border-radius (10px);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .upload-pic {
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50% , -50%);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        .upload-pic [type=file]{
+                            height: 0;
+                            overflow: hidden;
+                            width: 0;
+                        }
+                        .upload-pic [type=file] + label {
+                            margin-bottom: 0;
+                            display: block;
+                            border: none;
+                            color: $white;
+                            font-weight: 400;
+                            font-size: 20px;
+                            cursor: pointer;
+                            display: inline-block;
+                            outline: none;
+                            padding: 0;
+                            position: relative;
+                            transition: all 0.3s;
+                        }
+                    }
+                    &.bot-rating {
+                        background: transparent;
+                        padding: 0;
+                        .rating {
+                            display: flex;
+                            justify-content: flex-end;
+                            margin: 0 -5px;
+                            li {
+                                padding: 0 5px;
+                                margin-bottom: 0;
+                                font-size: 20px;
+                                &.active {
+                                    color: $secondary;
+                                }
+                            }
+                        }
+                    }
+                    textarea {  
+                        overflow: hidden;
+                        padding: 0px;
+                        width: 100%;
+                        min-height: 25px;
+                        font-size: 14px;
+                        margin: 0;
+                        display:block;
+                        border: none;
+                        resize: none;
+                        color: $white;
+                        word-break: break-word;
+                        background: transparent;
+                        &:focus {
+                            color: $white;
+                            outline: none;
+                        }
+                        &::-webkit-input-placeholder {
+                            /* Edge */
+                            color: $white;
+                        }
+                        &:-ms-input-placeholder {
+                        /* Internet Explorer 10-11 */
+                            color: $white;
+                        }
+                        &::placeholder {
+                            color: $white;
+                        }
+                    }
+                }
+                .chat-btns {
+                    display: flex;
+                    align-items: center;
+                    margin: 0 0 0 10px;
+                    padding: 0;
+                    li {
+                        margin-bottom: 0;
+                        padding: 0 5px;
+                        white-space: nowrap;
+                    }
+                }
+            }
+        }
+        figure {
+            width: 80px;
+            height: 62px;
+            position: relative;
+            z-index: 1;
+            @include breakpoint(xs) {
+                width: 40px;
+                height: 31px;
+            }
+            img {
+                width: 100%;
+                height: 100%;
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+        figcaption {
+            position: relative;
+            max-width: 570px;
+            padding: 20px 30px;
+            min-width: 100px;
+            @include breakpoint(xs) {
+                padding: 10px;
+                width: calc(100% - 40px);
+            }
+            p {
+                margin-bottom: 0;
+            }
+            .chat-time {
+                width: 125px;
+                position: absolute;
+                top: -20px;
+                left: 20px;
+                line-height: 15px;
+                font-size: $fontMiddle;
+                color: rgba($color: #000000, $alpha: 0.5);
+                @include breakpoint(laptop) {
+                    left: 10px;
+                }
+                span {
+                    padding-left: 5px;
+                }
+            }
+        }
+    }
+}
+
+
+.bot-popup {
+    .modal-header {
+        padding: 0;
+        border-bottom: none;
+        .close {
+            right: 0;
+            top: -25px;
+            color: $white;
+            opacity: 1;
+            line-height: 15px;
+        }
+    }
+    .modal-body {
+        padding: 0;
+        
+    }
+    .bot-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 0;
+        .block {
+            padding: 0 10px;
+            &:first-child {
+                width: 60%;
+            }
+            .form-control {
+                border: 1px solid #687480;
+                padding: 10px;
+                resize: none;
+                overflow: hidden;
+            }
+        }
+    }
+}
+
+
+.lightbox-modal {
+    .modal-header {
+        padding: 0;
+        border-bottom: none;
+        .close {
+            right: 0;
+            top: 5px;
+            right: 5px;
+            padding: 3px 5px;
+            height: auto;
+            width: auto;
+            font-size: 20px;
+            color: $white;
+            background: $secondary;
+        }
+    }
+    .modal-dialog {
+        width: auto;
+        max-width: 750px;
+    }
+    .modal-body {
+        padding: 0;
+    }
+}

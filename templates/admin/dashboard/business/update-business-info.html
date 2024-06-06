@@ -1,0 +1,304 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.2" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-body">
+        <div class="row">
+          {% if response.msg != ''%}
+          <span class="col-md-12 col-sm-12">
+          </span>
+          {% endif %}
+          <div class="col-md-12 col-sm-12">
+            <h6>
+              <strong id="startTourBtn">Business Information</strong>
+            </h6>
+
+            <div class="box">
+                <form method="post" name="update_business_frm" id="update_business_frm" autocomplete="off">
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <label for="business_first_name">First Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control alphaAccpt" placeholder="Enter your first name" name="business_first_name" id="business_first_name" value="{{ business_details.first_name|default:'' }}" maxlength="40">
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <label for="business_last_name">Last Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control alphaAccpt" placeholder="Enter your last name" name="business_last_name" id="business_last_name" value="{{ business_details.last_name|default:'' }}" maxlength="40">
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <label for="company_name">Company <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter your company name" name="company_name" id="company_name" value="{{ business_details.company_name|default:'' }}">
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <label for="business_phone">Phone <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter your phone number" name="business_phone" id="business_phone" value="{{ business_details.phone_no|default:'' }}" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true">
+                    <span id="custom_business_phone_error"  class="custom_error" style="display:none;">Phone no already in use.</span>
+                    <span id="custom_business_phone_length_error"  class="custom_error" style="display:none;">Please enter valid phone no.</span>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <label for="business_mobile">Mobile <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter your mobile number" name="business_mobile" id="business_mobile" value="{{ business_details.mobile_no|default:'' }}" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true">
+                    <span id="custom_business_mobile_error"  class="custom_error" style="display:none;">Mobile no already in use.</span>
+                    <span id="custom_business_mobile_length_error"  class="custom_error" style="display:none;">Please enter valid Mobile no.</span>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <label for="business_email">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" placeholder="Enter your email"  name="business_email" id="business_email" value="{{ business_details.email|default:'' }}">
+                    <span id="custom_business_email_error"  class="custom_error" style="display:none;">Email Address already in use</span>
+                  </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6">
+                    <div class="form-group">
+                      <label for="country">Country <span class="text-danger">*</span></label>
+                      <select class="country form-control" name="country" id="country">
+                        <option value="">Select</option>
+                        {% for country in country_list %}
+                          <option value="{{ country.id }}" data-short-code="{{ country.alpha2_code }}" {% if business_details.country == country.id%}selected{% endif %}>{{ country.country_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                </div>
+              </div>
+                            
+              <input type="hidden" name="total_section" id="total_section" value="{% if business_details.address|length > 0 %}{{ business_details.address|length }}{% else %}1{% endif %}"/>
+              {% if business_details.address|length > 0 %}
+                {% for item in business_details.address %}
+                    <div class="testi-box add_more_address" id="add_more_address_{{ forloop.counter0 }}" rel_position="{{ forloop.counter0 }}">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group add-multi-address">
+                                  <label for="office_address_{{ forloop.counter0 }}">Address <span class="text-danger">*</span></label>
+                                  <input type="text" class="form-control office_address" placeholder="Enter your address" name="office_address_{{ forloop.counter0 }}" id="office_address_{{ forloop.counter0 }}" value="{{ item.address_first|default:'' }}">
+                                
+                                  <div class="plus_addr_div multi-btn" style="{% if forloop.counter == 1 %}{% else %}display:none;{% endif %}">
+                                    <button type="button" class="btn btn-secondary add_more"><i class="fas fa-plus"></i></button>
+                                  </div>
+                                  <div class="minus_addr_div multi-btn" style="{% if forloop.counter > 1 %}{% else %}display:none;{% endif %}">
+                                    <button type="button" class="btn btn-secondary remove" onclick="confirm_delete_address(this)"><i class="fas fa-times"></i></button>
+                                  </div>
+                              </div>
+                            </div>
+                            
+
+                          <div class="col-lg-6 col-md-6">
+                            <div class="form-group">
+                              <label for="state_{{ forloop.counter0 }}">State <span class="text-danger">*</span></label>
+                              <select class="state form-control" name="state_{{ forloop.counter0 }}" id="state_{{ forloop.counter0 }}">
+                                <option value="">Select</option>
+                                {% for state in state_list %}
+                                  <option value="{{ state.id }}" data-short-code="{{ state.iso_name }}" {% if state.id == item.state %}selected{% endif %}>{{ state.state_name }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6">
+                            <div class="form-group">
+                              <label for="zip_code_{{ forloop.counter0 }}">Zip Code <span class="text-danger">*</span></label>
+                              <input type="text" class="form-control zip_code" placeholder="Enter your Zip Code" name="zip_code_{{ forloop.counter0 }}" id="zip_code_{{ forloop.counter0 }}" value="{{ item.postal_code|default:'' }}" maxlength="10">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+              {% endfor %}
+              {% else %}
+                <div class="testi-box add_more_address" id="add_more_address_0" rel_position="0">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="form-group">
+                                  <label for="office_address_0">Address <span class="text-danger">*</span></label>
+                                  <input type="text" class="form-control office_address" placeholder="Enter your office address" name="office_address_0" id="office_address_0" value="">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="plus_addr_div" style="">
+                                  <button type="button" class="btn btn-secondary add_more"><i class="fas fa-plus"></i></button>
+                                </div>
+                                <div class="minus_addr_div" style="display:none;">
+                                  <button type="button" class="btn btn-secondary remove" onclick="confirm_delete_address(this)"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                          <label for="state_0">State <span class="text-danger">*</span></label>
+                          <select class="state form-control" name="state_0" id="state_0">
+                            <option value="">State</option>
+                            {% for state in state_list %}
+                              <option value="{{ state.id }}" data-short-code="{{ state.iso_name }}" >{{ state.state_name }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="zip_code_0">Zip Code <span class="text-danger">*</span></label>
+                          <input type="text" class="form-control zip_code" placeholder="Enter your Zip Code" name="zip_code_0" id="zip_code_0" value="" maxlength="10">
+                        </div>
+
+                      </div>
+              {% endif %}
+
+
+              <div class="row">
+<!--                <div class="col-md-6">-->
+<!--                  <div class="form-group">-->
+<!--                    <label for="zip_code">Zip Code</label>-->
+<!--                    <input type="text" class="form-control" placeholder="08232" name="zip_code" id="zip_code" value="{{ business_details.postal_code|default:'' }}" maxlength="10">-->
+<!--                  </div>-->
+<!--                </div>-->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="broker_license_no">Broker license No. <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter license no." name="broker_license_no" id="broker_license_no" value="{{ business_details.licence_no|default:'' }}">
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-12">
+                  <div class="form-group">
+                    <label for="uploadBusinessLogoImgFrm">
+                      Company Logo
+                    </label>
+                      <div class="upload-fav pt10 pb0">
+                  <div class="item">
+                    <!--<form action="/upload-target" class="dropzone" id="favicon_img" name="favicon_img"></form>-->
+                    <div class="dropzone" id="uploadBusinessLogoImgFrm">
+                        <input type="hidden" id="business_logo_img_id" name="business_logo_img_id" value="{{ business_details.company_logo.upload_id|default:'' }}"/>
+                          <input type="hidden" name="business_logo_img_name" id="business_logo_img_name" value="{{ business_details.company_logo.doc_file_name|default:'' }}"/>
+                        <div class="dz-default dz-message" data-dz-message="">
+                        <!--<input name="file" type="file" id="favicon_img" name="favicon_img" />
+                        <button><i class="fas fa-upload"></i> Upload favicon</button>-->
+
+                        <div class="block">
+                          <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i>  Upload Logo</button>
+                        </div>
+                        <div class="block">
+                          or
+                        </div>
+                        <div class="block">
+                          <h6>
+                            Drag & Drop Docs
+                            <span>Supported Files:  png, jpg, jpeg</span>
+                          </h6>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="item" class="businessLogoImageDiv" id="businessLogoImageDiv" style="{% if business_details.company_logo.doc_file_name %}{% else %}display:none;{% endif %}">
+                    <div class="logo-icon business-logo">
+                      <figure>
+                        <img src="{{ aws_url }}{{ business_details.company_logo.bucket_name }}/{{ business_details.company_logo.doc_file_name }}" class="businessLogoImageId" id="businessLogoImageId" alt="" width="211" height="113">
+                      </figure>
+                      <a href="javascript:void(0)" class="confirm_image_delete" data-image-id="{{ business_details.company_logo.upload_id|default:'' }}" data-image-name="{{ business_details.company_logo.doc_file_name|default:'' }}" data-image-section="{{ business_details.company_logo.bucket_name|default:'' }}" data-count=""><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                  </div>
+
+                </div>
+                    <!--<div class="upload-fav pt10 pb0">
+                      <div class="item">
+                        <div class="dropzone" id="uploadBusinessLogoImgFrm">
+                          <input type="hidden" id="business_logo_img_id" name="business_logo_img_id" value="{{ business_details.company_logo.upload_id|default:'' }}"/>
+                          <input type="hidden" name="business_logo_img_name" id="business_logo_img_name" value="{{ business_details.company_logo.doc_file_name|default:'' }}"/>
+                          <div class="fallback">
+                            <input name="file" type="file" name="upload_business_logo_img" id="upload_business_logo_img" />
+                            <button><i class="fas fa-upload"></i> Upload Photo</button>
+                          </div>
+                          <div class="block">
+                             Supported Files:  png, jpg, jpeg, svg
+                          </div>
+                        </div>
+                      </div>
+                      <div class="item" class="businessLogoImageDiv" id="businessLogoImageDiv" style="{% if business_details.company_logo.doc_file_name %}{% else %}display:none;{% endif %}">
+                        <div class="logo-icon business-logo">
+                          <figure>
+                            <img src="{{ aws_url }}{{ business_details.company_logo.bucket_name }}/{{ business_details.company_logo.doc_file_name }}" class="businessLogoImageId" id="businessLogoImageId" alt="" width="211" height="113">
+                          </figure>
+                          <a href="javascript:void(0)" class="confirm_image_delete" data-image-id="{{ business_details.company_logo.upload_id|default:'' }}" data-image-name="{{ business_details.company_logo.doc_file_name|default:'' }}" data-image-section="{{ business_details.company_logo.bucket_name|default:'' }}" data-count=""><i class="fas fa-trash-alt"></i></a>
+                        </div>
+                      </div>
+                    </div>-->
+                  </div>
+                </div>
+              </div>
+              </form>
+              <div class="pt20">
+                <button type="button" class="btn btn-secondary" onclick="submit_business_frm()">Save</button>
+              </div>
+
+            </div><!-- End .box -->
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+<div id="confirmAddressDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button"  class="btn btn-primary-bdr del_address_btn" id="del_address_false" del_element_id="">No</button> <button type="button" class="btn btn-primary del_address_btn" id="del_address_true" del_element_id="">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+{% endblock %}
+{% block js_content %}
+
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/business.js' %}?v=2.7"></script>
+<script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+      <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/business_tour.js' %}?v=3.1"></script>
+
+    <script>
+      /*var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }*/
+      $("#business_phone").inputmask('(999) 999-9999');
+      $("#business_mobile").inputmask('(999) 999-9999');
+    </script>
+{% endblock %}

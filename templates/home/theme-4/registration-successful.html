@@ -1,0 +1,17 @@
+{% load static %}
+<div class="verify-wrap">
+    <div class="verify-email center">
+        <p>
+        <img src="{% static 'theme-4/images/verify-email.png' %}" alt="real estate sales">
+        </p>
+        <p>
+        A verification Link has just been emailed to: 
+        </p>
+        <div class="email-hightlight">
+       {{email}}
+        </div>
+        <p>
+        If you do not see our email in your inbox, please check your junk or spam folder.
+        </p>
+    </div><!-- End .login-page -->
+</div><!-- End .verify-wrap -->

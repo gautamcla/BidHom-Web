@@ -1,0 +1,297 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+
+  <div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <span class="line"></span>
+                <h3>
+                  Meet the
+                </h3>
+                <h1>
+                  Team
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+
+    <section class="agent-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 ">
+            <div class="agent-result">
+              <div class="item" id="total">
+                  {% if total %}
+                   {{total}}
+                   {% else %}
+                   0
+                  {% endif %}
+                  Search results
+              </div>
+              <div class="item">
+                <div class="blog-search">
+                  <div class="search-icon"><i class="fas fa-search" role="presentation"></i></div>
+                  <input type="text" class="form-control sugesstion_input" placeholder="Enter Agent First or Last Name" id="agent_search_text" name="agent_search_text">
+                  <button role="button" class="btn btn-secondary" id="btn_search" onclick="getresult(1,'','','');">Search</button>
+                </div>
+              </div>
+            </div><!-- End .blog-result -->
+
+            <div class="agent-detail-wrap">
+              <div class="agent-wrap">
+                <ul class="agent-list" id="agent_list">
+                  {% if agent_list|length > 0 %}
+                      {% for agent in agent_list %}
+                          <li>
+                            <div class="item">
+                                <figure>
+                                  <img src="{% static 'theme-4/images/transparent.png' %}" alt="real estate sales">
+                                  <img class="article-pic" src="{% if agent.image.doc_file_name %}{{ aws_url }}{{ agent.image.bucket_name }}/{{ agent.image.doc_file_name }}{% else %}{% static 'theme-4/images/no_photo.png' %}{% endif %}" alt="real estate sales">
+                                </figure>
+                                <figcaption>
+                                <h6>
+                                    {{ agent.first_name|title|default:'' }} {{agent.last_name|title|default:''}}
+                                    <span>
+                                        {{ agent.company_name|title|default:'' }}
+                                    </span>
+                                </h6>
+                                <ul class="info">
+                                    <li>
+                                    <a href="javascript:void(0)" role="button" tabindex="1" aria-label="phone">
+                                        <span class="icon icon-call" role="presentation"></span>
+                                        {{ agent.phone_no|default:''|format_phone }}
+                                    </a>
+                                    </li>
+                                    {% if agent.mobile_no and agent.mobile_no != "" %}
+                                    <li>
+                                      <a href="javascript:void(0)" role="button" tabindex="2" aria-label="phone">
+                                          <span class="icon icon-ph" role="presentation"></span>
+                                          {{ agent.mobile_no|default:''|format_phone }}
+                                      </a>
+                                      </li>
+                                    {% endif %}
+                                    <li>
+                                      <a role="button" href="{% if agent.email != '' %}mailto:{{ agent.email }}{% endif %}" tabindex="3" aria-label="mail">
+                                        <span class="icon icon-email" role="presentation"></span> {{ agent.email|default:'' }}
+                                      </a>
+                                    </li>
+                                    {% if agent.licence_no and agent.licence_no != "" %}
+                                    <li>
+                                      <a href="javascript:void(0)" role="button" tabindex="4" aria-label="mail">
+                                        <span class="icon icon-id" role="presentation"></span> {{ agent.licence_no|upper|default:'' }}
+                                      </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                                <div class="buttons">
+                                    <div class="chat-btn">
+                                      <a role="button" tabindex="5" href="{% if sess_user_id %}javascript:void(0);{% else %}{% url 'login' %}?next=/our-agents/{% endif %}" {% if sess_user_id %}onclick="chattoagent({{ agent.user_id|default:'' }}, {{ sess_user_id|default:'' }});"{% endif %} class="btn btn-secondary btn-sm chattoagent" data-agent_id="{{ agent.user_id|default:'' }}">Chat</a>
+                                    </div>
+                                    <div class="list-btn">
+                                      <a role="button" tabindex="6" href="{% if agent.property_count != 0 %}/our-listing/?agent_id={{agent.user_id|default:''}}{% else %}javascript:void(0){% endif %}" class="btn btn-primary btn-sm"><span>{{ agent.property_count|default:'0' }}</span> View My Listings </a>
+                                    </div>
+                                </div><!-- End .buttons -->
+                                </figcaption>
+                            </div>
+                          </li>
+                      {% endfor %}
+                  {% else %}
+                  <li class="text-center text-danger" style="width:100%;">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class="center mb0" role="img" alt="real estate sales" />
+                  </li>
+                  {% endif %}
+                </ul>
+
+                <div class="pagination-wrap">
+                    <ul>
+                      <li class="page-item">Result Per Page:</li>
+                      <li class="page-item">
+                        <select class="select form-control" aria-label="Result" name="pagi" id="pagi" onchange="getresult(1,'','','');">
+                          <option value="12">12</option>
+                          <option value="24">24</option>
+                          <option value="36">36</option>
+                          <option value="48">48</option>
+                        </select>
+                      </li>
+                    </ul>
+                  <ul id="agent_listing_pagination_list">
+                    {{ pagination_html }}
+                  </ul>
+                </div><!-- End .pagination-wrap -->
+
+              </div><!-- End .blog-wrap -->
+
+            </div><!-- End .blog-detail-wrap -->
+
+
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </section> <!-- End .blog-wrapper -->
+
+  </div><!-- end .body-content -->
+
+
+
+<div class="overlay" style="display:none;">
+  <div class="loader">Loading...</div>
+</div>
+
+<div id="chatagentModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+      <div class="modal-header">
+          <h5 class="modal-title">Chat With Agent</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <form name="chatAgentFrm" id="chatAgentFrm" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="agent_id" id="agent_id"/>
+          <input type="hidden" name="user_id" id="user_id"/>
+      <div class="modal-body">
+          <div class="form-group">
+              <label for="user_message" class="pb10">Enter your message</label>
+              <textarea name="user_message" id="user_message" cols="30" rows="10" class="form-control bdr" placeholder="Type a message"></textarea>
+          </div>
+          <div class="center">
+              <button role="button" type="submit" class="btn btn-primary-fill width100">Send</button>
+          </div>
+      </div>
+      </form>
+      </div>
+  </div>
+  </div><!-- End .chatagentModal -->
+
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-4/js/autosuggestion.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/our_agent_js.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/agent_pagination.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script>
+  $(document).ready(function() {
+    // $('#pagi').chosen();
+    $(document).on('keyup', '#agent_search_text', function(e){
+          var x = document.getElementById(this.id + "autocomplete-list");
+          if (x) x = x.getElementsByTagName("div");
+          if (e.keyCode == 40) {
+            /*If the arrow DOWN key is pressed,
+            increase the currentFocus variable:*/
+            currentFocus++;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 38) { //up
+            /*If the arrow UP key is pressed,
+            decrease the currentFocus variable:*/
+            currentFocus--;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 13) {
+            /*If the ENTER key is pressed, prevent the form from being submitted,*/
+            e.preventDefault();
+            if (currentFocus > -1) {
+              /*and simulate a click on the "active" item:*/
+              if (x) x[currentFocus].click();
+            }
+          }else{
+            var search = $(this).val();
+            $.ajax({
+                url: '/agent-search-suggestion/',
+                type: 'post',
+                dateType: 'json',
+                cache: false,
+                data: {'search': search},
+                beforeSend: function(){
+
+                },
+                success: function(response){
+                    if(response.error == 0 && response.status == 200){
+                        autocomplete("agent_search_text", response.suggestion_list);
+                    }else{
+                        closeAllSuggestions('autocomplete-items');
+                    }
+                }
+            });
+          }
+
+  });
+  });
+  //getresult(1, '', '', '','');
+</script>
+<script type="text/javascript">
+  function chattoagent(agent_id, user_id){
+      $('#agent_id').val(agent_id);
+      $('#user_id').val(user_id);
+      $('#chatagentModal').modal('show');
+  }
+  $(document).ready(function(){
+      $('#chatAgentFrm').validate({
+          errorElement: 'p',
+          rules: {
+              user_message:{
+                  required: true
+              }
+          },
+          messages: {
+              user_message:{
+                  required: "Message is required."
+              }
+          },
+          submitHandler:function(){
+              var flag = true;
+  
+              if(flag == true){
+                  $.ajax({
+                      url: '/chat-to-agent/',
+                      type: 'post',
+                      dateType: 'json',
+                      cache: false,
+                      data: $('#chatAgentFrm').serialize(),
+                      beforeSend: function(){
+                          $('.overlay').show();
+                      },
+                      success: function(response){
+                          $('.overlay').hide();
+                          console.log(response);
+                          if(response.error == 0){
+                              try{
+                                  $('#chatAgentFrm #user_message').val('');
+                              }catch(ex){
+                                  console.log(ex);
+                              }
+                              $('#chatagentModal').modal('hide');
+                              $.growl.notice({title: "Enquiry ", message: response.msg, size: 'large'});
+                              /*window.setTimeout(function () {
+                                  jQuery.noConflict();
+                              $('#chatagentModal').modal('hide');
+                              }, 2000);*/
+                          }else{
+                              window.setTimeout(function () {
+                                  $.growl.error({title: "Enquiry ", message: response.msg, size: 'large'});
+                              }, 2000);
+                          }
+                      }
+                  });
+              }
+  
+          }
+      });
+  });
+  </script>
+{% endblock %} 

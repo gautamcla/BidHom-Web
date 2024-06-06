@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="119" viewBox="0 0 17 119">
+  <g id="Group_77" data-name="Group 77" transform="translate(3173 1140)">
+    <g id="Rectangle_871" data-name="Rectangle 871" transform="translate(-3173 -1140)" fill="#fff" stroke="#e0e0e0" stroke-width="1">
+      <rect width="17" height="17" stroke="none"/>
+      <rect x="0.5" y="0.5" width="16" height="16" fill="none"/>
+    </g>
+    <rect id="Rectangle_872" data-name="Rectangle 872" width="17" height="17" transform="translate(-3173 -1089)" fill="#0079D0"/>
+    <g id="tick_3_" data-name="tick (3)" transform="translate(-3169.69 -1151.643)">
+      <g id="Group_475" data-name="Group 475" transform="translate(0 67.997)">
+        <path id="Path_631" data-name="Path 631" d="M10.23,68.15a.519.519,0,0,0-.734,0l-6.22,6.219L.886,71.978a.519.519,0,0,0-.734.734L2.909,75.47a.519.519,0,0,0,.734,0l6.586-6.586a.519.519,0,0,0,0-.734Z" transform="translate(0 -67.997)" fill="#fff" stroke="#fff" stroke-width="0.5"/>
+      </g>
+    </g>
+    <g id="Rectangle_871-2" data-name="Rectangle 871" transform="translate(-3173 -1038)" fill="#fff" stroke="#0079D0" stroke-width="1">
+      <rect width="17" height="17" stroke="none"/>
+      <rect x="0.5" y="0.5" width="16" height="16" fill="none"/>
+    </g>
+  </g>
+</svg>

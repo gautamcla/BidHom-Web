@@ -1,0 +1,575 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+        <div class="row">
+          <form name="property_map_view_frm" id="property_map_view_frm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="property_id" id="property_id" value="{{ request.GET.property_id }}" />
+            <input type="hidden" name="next_url" id="next_url" value="" />
+            <input type="hidden" name="step" id="step" value="2" />
+            <input type="hidden" name="actual_address" id="actual_address" value="" />
+            <input type="hidden" name="latitude" id="latitude" value="{{ property_details.latitude|default:0 }}" />
+            <input type="hidden" name="longitude" id="longitude" value="{{ property_details.longitude|default:0 }}" />
+
+            <input type="hidden" name="default_latitude" id="default_latitude" value="{{ property_details.latitude|default:0 }}" />
+            <input type="hidden" name="default_longitude" id="default_longitude" value="{{ property_details.longitude|default:0 }}" />
+          <div class="col-md-12 col-sm-12">
+            <div class="table-heading">
+              <div class="item">
+                <h6>
+                  <strong>Add Listing </strong>
+                </h6>
+              </div>
+            </div>
+
+            <div class="website-plan">
+              <div class="steps">
+                <ul class="progressbar">
+                  <li class="active">
+                    <a href="{% if request.GET.property_id %}/admin/listing-property-info/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon property-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Property Information</span>
+                  </li>
+                  <li class="active">
+                    <a href="{% if request.GET.property_id %}/admin/property-map-view/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon map-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Map & Street View</span>
+                  </li>
+                  <li>
+                    <a href="{% if request.GET.property_id %}/admin/property-photo-video/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon photos-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Property Photos & Videos</span>
+                  </li>
+                  <li>
+                    <a href="{% if request.GET.property_id %}/admin/property-document/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon document-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Due Diligence Vault</span>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .website-plan -->
+
+            <div class="customscroll bidder-accordian">
+              <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                              Property Map & Street View
+                              <span class="icon"></span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                      <div class="panel-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="property_map_address">Address</label>
+                              <input type="text" class="form-control" name="property_map_address" id="property_map_address" placeholder="Enter address" value="{{ property_details.address_one }}, {{ property_details.city }}, {{ property_details.state }}, {{ property_details.postal_code }}" readonly>
+
+                            </div>
+                          </div>
+
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="enable_arial_view" class="pb20">Enable Arial View <a href="#" data-toggle="tooltip" data-placement="left" title="Enable Arial View" class="tooltip-icon"><i class="fas fa-question-circle"></i></a>
+                              <label class="switch small">
+                                <input type="checkbox" name="enable_arial_view" id="enable_arial_view" value="1" {% if property_details.is_arial_view == True %}checked{% endif %}>
+                                <span class="slide round"></span>
+                              </label></label>
+                              <div class="map-area mb10" id="ariel-view-map" style="height:350px;">
+                                <img src="{% static 'admin/images/Image_35.png' %}" alt="">
+                              </div>
+                              <p><strong>Is this the correct property location?</strong> Drag the marker to change it. We recommend the marker to the front door.</p>
+                            </div>
+                            <ul class="lat_long_show">
+                              <li class="show_latitude"><strong>Latitude:</strong> <span id="show_latitude">{{ property_details.latitude|default:0 }}</span></li>
+                              <li class="show_longitude"><strong>Longitude:</strong> <span id="show_longitude">{{ property_details.longitude|default:0 }}</span></li>
+                              {% if property_details.latitude and property_details.longitude%}
+                              <li class="make_default_address" onclick="make_default_address()">Reset Marker</li>
+                              {% endif %}
+                            </ul>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="enable_street_view" class="pb20">Enable Street View <a href="#" data-toggle="tooltip" data-placement="left" title="Enable Street View" class="tooltip-icon"><i class="fas fa-question-circle"></i></a>
+                              <label class="switch small">
+                                <input type="checkbox" name="enable_street_view" id="enable_street_view" value="1" {% if property_details.is_street_view == True %}checked{% endif %} />
+                                <span class="slide round"></span>
+                              </label></label>
+                              <div id="map"></div>
+                              <div class="map-area" id="street-view" style="height:350px;">
+                                <img src="{% static 'admin/images/Mask_Group_2.png' %}" alt="">
+                              </div>
+
+                            </div>
+                          </div>
+                          <div class="clearfix"></div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="enable_map_view" class="pb20">Enable Map View <a href="#" data-toggle="tooltip" data-placement="left" title="Enable Map View" class="tooltip-icon"><i class="fas fa-question-circle"></i></a>
+                              <label class="switch small">
+                                <input type="checkbox" name="enable_map_view" id="enable_map_view" value="1" {% if property_details.is_map_view == True %}checked{% endif %} />
+                                <span class="slide round"></span>
+                              </label></label>
+                              <div class="map-area" id="map-view-map" style="height:350px;">
+                                <img src="{% static 'admin/images/Rectangle_614.png' %}" alt="">
+                              </div>
+
+                            </div>
+                          </div>
+
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="property_map_address">Virtual Tour Url</label>
+                              <input type="text" class="form-control" name="map_url" id="map_url" placeholder="Enter Url" value="{{ property_details.map_url|default:'' }}">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div><!-- End .panel -->
+
+              </div><!-- panel-group -->
+            </div><!-- End .customscroll -->
+
+            <div class="clearfix pt30">
+              <button type="button" name="property_map_submit_next_btn" id="property_map_submit_next_btn" value="Next" class="btn btn-primary">Next</button><button type="button" name="property_map_submit_exit_btn" id="property_map_submit_exit_btn" value="save_exit" class="btn btn-primary">Save & Exit</button><a href="/admin/listing/" class="btn btn-primary-bdr">Cancel</a>
+            </div>
+
+          </div><!-- End .col-md-10 -->
+          </form>
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/ckeditor/ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/properties.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.1"></script>
+  <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+      <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+  <!--<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>-->
+  <script
+      src="https://maps.googleapis.com/maps/api/js?key={{site_detail.google_map_key}}&callback=initmap&libraries=&v=weekly"
+      async
+    ></script>
+
+
+<script>
+
+  var latitude = '{{ property_details.latitude|default:0 }}';
+  var longitude = '{{ property_details.longitude|default:0 }}';
+  console.log(latitude+"====="+longitude);
+  //var latitude = '33.1835506';
+  //var longitude = '-117.3277711';
+    $(function() {
+      //init_ariel_view();
+      $('#datetimepicker1, #datetimepicker2').datetimepicker({
+
+      });
+    $('[data-toggle="tooltip"]').tooltip();
+    });
+    $('.select').chosen();
+
+/*function initmap() {
+      if(latitude && longitude){
+        const fenway = { lat: parseFloat(latitude), lng: parseFloat(longitude) };
+
+        const map = new google.maps.Map(document.getElementById("map-view-map"), {
+          center: fenway,
+          zoom: 14,
+        });
+        const panorama = new google.maps.StreetViewPanorama(
+          document.getElementById("street-view"),
+          {
+            position: fenway,
+            pov: {
+              heading: 34,
+              pitch: 10,
+            },
+          }
+        );
+        map.setStreetView(panorama);
+
+        const ariel_map = new google.maps.Map(
+          document.getElementById("ariel-view-map"),
+          {
+            center: fenway,
+            zoom: 15,
+            mapTypeId: "satellite",
+          }
+        );
+        ariel_map.setTilt(45);
+        var image="/static/admin/images/pin-icon.png";
+        var property_map_address = $('#property_map_address').val();
+        new google.maps.Marker({
+          position: fenway,
+          label: property_map_address,
+          map,
+          title: property_map_address,
+          icon: {
+            url: image,
+            scaledSize: new google.maps.Size(30, 45), // scaled size
+            origin: new google.maps.Point(0,0), // origin
+            anchor: new google.maps.Point(0, 0) // anchor
+          }
+        });
+      }
+}*/
+
+
+function initmap() {
+      if(latitude && longitude){
+        const fenway = { lat: parseFloat(latitude), lng: parseFloat(longitude) };
+        myLatlng = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
+
+        var myOptions = {
+          zoom: 19,
+          zoomControl: true,
+          center: myLatlng,
+          mapTypeId: 'satellite'
+        };
+        const map = new google.maps.Map(document.getElementById("map-view-map"), {
+          center: fenway,
+          zoom: 18,
+        });
+        const panorama = new google.maps.StreetViewPanorama(
+          document.getElementById("street-view"),
+          {
+            position: fenway,
+            pov: {
+              heading: 34,
+              pitch: 10,
+            },
+          }
+        );
+        map.setStreetView(panorama);
+
+        const ariel_map = new google.maps.Map(document.getElementById("ariel-view-map"), myOptions);
+        ariel_map.setTilt(45);
+        var image="/static/admin/images/pin-icon.png";
+        var property_map_address = $('#property_map_address').val();
+        var image="/static/admin/images/pin-icon.png";
+
+        myMarker = new google.maps.Marker({
+          position: myLatlng,
+          draggable: true,
+          //label: property_map_address,
+          title: property_map_address,
+          icon: {
+            url: image,
+            scaledSize: new google.maps.Size(30, 45), // scaled size
+            origin: new google.maps.Point(0,0), // origin
+            //anchor: new google.maps.Point(0, 0) // anchor
+          }
+        });
+        myMarker.setMap(ariel_map);
+        google.maps.event.addListener(myMarker, 'dragend', function() {
+          //geocodePosition(myMarker.getPosition());
+          getPosition(myMarker);
+        });
+        /*google.maps.event.addListener(myMarker, 'click', function() {
+          if (myMarker.formatted_address) {
+            infowindow.setContent(myMarker.formatted_address + "<br>coordinates: " + myMarker.getPosition().toUrlValue(6));
+          } else {
+            infowindow.setContent(address + "<br>coordinates: " + myMarker.getPosition().toUrlValue(6));
+          }
+          infowindow.open(map, myMarker);
+        });*/
+
+        /*mapMarker = new google.maps.Marker({
+          position: myLatlng,
+          draggable: true,
+          //label: property_map_address,
+          title: property_map_address,
+          icon: {
+            url: image,
+            scaledSize: new google.maps.Size(30, 45), // scaled size
+            origin: new google.maps.Point(0,0), // origin
+            anchor: new google.maps.Point(0, 0) // anchor
+          }
+        });
+        mapMarker.setMap(map);
+        google.maps.event.addListener(mapMarker, 'dragend', function() {
+          geocodePosition(mapMarker.getPosition());
+        });
+        google.maps.event.addListener(mapMarker, 'click', function() {
+          if (mapMarker.formatted_address) {
+            infowindow.setContent(mapMarker.formatted_address + "<br>coordinates: " + mapMarker.getPosition().toUrlValue(6));
+          } else {
+            infowindow.setContent(address + "<br>coordinates: " + mapMarker.getPosition().toUrlValue(6));
+          }
+          infowindow.open(map, mapMarker);
+        });*/
+      }
+}
+function getPosition(pos) {
+      var latitude = pos.position.lat();
+      var longitude = pos.position.lng();
+      $('#latitude').val(latitude);
+      $('#longitude').val(longitude);
+      $('#show_latitude').text(latitude);
+      $('#show_longitude').text(longitude);
+      initGlmap(latitude, longitude);
+}
+
+function geocodePosition(pos) {
+        var geocoder = new google.maps.Geocoder();
+      geocoder.geocode({
+        latLng: pos
+      }, function(responses) {
+        if (responses && responses.length > 0) {
+          try{
+            myMarker.formatted_address = responses[0].formatted_address;
+            var latitude = responses[0].geometry.location.lat();
+            var longitude = responses[0].geometry.location.lng();
+            console.log(responses[0]);
+          }catch(ex){
+            console.log(ex);
+          }
+          try{
+            mapMarker.formatted_address = responses[0].formatted_address;
+          }catch(ex){
+            console.log(ex);
+          }
+
+          var latitude = responses[0].geometry.location.lat();
+          var longitude = responses[0].geometry.location.lng();
+          var new_address = responses[0].formatted_address;
+            //$('#property_map_address').val(new_address);
+            //$('#property_map_address').val(new_address);
+            $('#actual_address').val(new_address);
+            $('#latitude').val(latitude);
+            $('#longitude').val(longitude);
+            $('#show_latitude').text(latitude);
+            $('#show_longitude').text(longitude);
+            initGlmap(latitude, longitude);
+          } else {
+          myMarker.formatted_address = 'Cannot determine address at this location.';
+          mapMarker.formatted_address = 'Cannot determine address at this location.';
+          }
+        //infowindow.setContent(myMarker.formatted_address + "<br>coordinates: " + myMarker.getPosition().toUrlValue(6));
+        //infowindow.open(map, myMarker);
+      });
+    }
+
+function make_default_address(){
+  var default_latitude = $("#default_latitude").val();
+  var default_longitude = $("#default_longitude").val();
+  $("#latitude").val(default_latitude);
+  $("#longitude").val(default_longitude);
+  $("#actual_address").val("");
+  initgmap(default_latitude, default_longitude);
+}
+
+function initgmap(latitude, longitude) {
+      if(latitude && longitude){
+        const fenway = { lat: parseFloat(latitude), lng: parseFloat(longitude) };
+        myLatlng = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
+
+        var myOptions = {
+          zoom: 19,
+          zoomControl: true,
+          center: myLatlng,
+          mapTypeId: 'satellite'
+        };
+        const map = new google.maps.Map(document.getElementById("map-view-map"), {
+          center: fenway,
+          zoom: 18,
+        });
+        const panorama = new google.maps.StreetViewPanorama(
+          document.getElementById("street-view"),
+          {
+            position: fenway,
+            pov: {
+              heading: 34,
+              pitch: 10,
+            },
+          }
+        );
+        map.setStreetView(panorama);
+
+        const ariel_map = new google.maps.Map(document.getElementById("ariel-view-map"), myOptions);
+        ariel_map.setTilt(45);
+        var image="/static/admin/images/pin-icon.png";
+        var property_map_address = $('#property_map_address').val();
+        var image="/static/admin/images/pin-icon.png";
+
+        myMarker = new google.maps.Marker({
+          position: myLatlng,
+          draggable: true,
+          //label: property_map_address,
+          title: property_map_address,
+          icon: {
+            url: image,
+            scaledSize: new google.maps.Size(30, 45), // scaled size
+            origin: new google.maps.Point(0,0), // origin
+            //anchor: new google.maps.Point(0, 0) // anchor
+          }
+        });
+        myMarker.setMap(ariel_map);
+        google.maps.event.addListener(myMarker, 'dragend', function() {
+          //geocodePosition(myMarker.getPosition());
+          getPosition(myMarker);
+        });
+        /*google.maps.event.addListener(myMarker, 'click', function() {
+          if (myMarker.formatted_address) {
+            infowindow.setContent(myMarker.formatted_address + "<br>coordinates: " + myMarker.getPosition().toUrlValue(6));
+          } else {
+            infowindow.setContent(address + "<br>coordinates: " + myMarker.getPosition().toUrlValue(6));
+          }
+          infowindow.open(map, myMarker);
+        });*/
+
+        /*mapMarker = new google.maps.Marker({
+          position: myLatlng,
+          draggable: true,
+          //label: property_map_address,
+          title: property_map_address,
+          icon: {
+            url: image,
+            scaledSize: new google.maps.Size(30, 45), // scaled size
+            origin: new google.maps.Point(0,0), // origin
+            anchor: new google.maps.Point(0, 0) // anchor
+          }
+        });
+        mapMarker.setMap(map);
+        google.maps.event.addListener(mapMarker, 'dragend', function() {
+          geocodePosition(mapMarker.getPosition());
+        });
+        google.maps.event.addListener(mapMarker, 'click', function() {
+          if (mapMarker.formatted_address) {
+            infowindow.setContent(mapMarker.formatted_address + "<br>coordinates: " + mapMarker.getPosition().toUrlValue(6));
+          } else {
+            infowindow.setContent(address + "<br>coordinates: " + mapMarker.getPosition().toUrlValue(6));
+          }
+          infowindow.open(map, mapMarker);
+        });*/
+      }
+}
+
+function initGlmap(latitude, longitude) {
+      if(latitude && longitude){
+        const fenway = { lat: parseFloat(latitude), lng: parseFloat(longitude) };
+        myLatlng = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
+
+        var myOptions = {
+          zoom: 19,
+          zoomControl: true,
+          center: myLatlng,
+          mapTypeId: 'satellite'
+        };
+        const map = new google.maps.Map(document.getElementById("map-view-map"), {
+          center: fenway,
+          zoom: 18,
+        });
+        const panorama = new google.maps.StreetViewPanorama(
+          document.getElementById("street-view"),
+          {
+            position: fenway,
+            pov: {
+              heading: 34,
+              pitch: 10,
+            },
+          }
+        );
+        map.setStreetView(panorama);
+
+        //const ariel_map = new google.maps.Map(document.getElementById("ariel-view-map"), myOptions);
+        ariel_map.setTilt(45);
+        var image="/static/admin/images/pin-icon.png";
+        var property_map_address = $('#property_map_address').val();
+        var image="/static/admin/images/pin-icon.png";
+
+        myMarker = new google.maps.Marker({
+          position: myLatlng,
+          draggable: true,
+          //label: property_map_address,
+          title: property_map_address,
+          icon: {
+            url: image,
+            scaledSize: new google.maps.Size(30, 45), // scaled size
+            origin: new google.maps.Point(0,0), // origin
+            //anchor: new google.maps.Point(0, 0) // anchor
+          }
+        });
+        myMarker.setMap(ariel_map);
+        google.maps.event.addListener(myMarker, 'dragend', function() {
+          //geocodePosition(myMarker.getPosition());
+          getPosition(myMarker);
+        });
+        /*google.maps.event.addListener(myMarker, 'click', function() {
+          if (myMarker.formatted_address) {
+            infowindow.setContent(myMarker.formatted_address + "<br>coordinates: " + myMarker.getPosition().toUrlValue(6));
+          } else {
+            infowindow.setContent(address + "<br>coordinates: " + myMarker.getPosition().toUrlValue(6));
+          }
+          infowindow.open(map, myMarker);
+        });*/
+
+        /*mapMarker = new google.maps.Marker({
+          position: myLatlng,
+          draggable: true,
+          //label: property_map_address,
+          title: property_map_address,
+          icon: {
+            url: image,
+            scaledSize: new google.maps.Size(30, 45), // scaled size
+            origin: new google.maps.Point(0,0), // origin
+            anchor: new google.maps.Point(0, 0) // anchor
+          }
+        });
+        mapMarker.setMap(map);
+        google.maps.event.addListener(mapMarker, 'dragend', function() {
+          geocodePosition(mapMarker.getPosition());
+        });
+        google.maps.event.addListener(mapMarker, 'click', function() {
+          if (mapMarker.formatted_address) {
+            infowindow.setContent(mapMarker.formatted_address + "<br>coordinates: " + mapMarker.getPosition().toUrlValue(6));
+          } else {
+            infowindow.setContent(address + "<br>coordinates: " + mapMarker.getPosition().toUrlValue(6));
+          }
+          infowindow.open(map, mapMarker);
+        });*/
+      }
+}
+</script>
+<script
+      src="https://maps.googleapis.com/maps/api/js?key={{site_detail.google_map_key}}&callback=initmap&libraries=&v=weekly"
+      async
+    ></script>
+{% endblock %}

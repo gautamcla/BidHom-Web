@@ -1,0 +1,275 @@
+{% extends "admin/layouts/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %} Subscription Types {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>Subscription Types</h3>
+        </div>
+        <button type="button" class="btn btn-primary" style="float:right;" data-toggle="modal" data-target=".add-subscription"><i class="fa fa-plus-circle"></i> Add Subscription Plan</button>
+
+      <div class="clearfix"></div>
+
+      <div class="row">
+        
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_content">
+
+              {% if messages %}
+              {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+              <div class="table-responsive">
+                <table class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">
+                      <th class="column-title">ID </th>
+                      <th class="column-title">Name </th>
+                      <th class="column-title" style="width:30%;">Description</th>
+                      {% comment %} <th class="column-title">Cost</th> {% endcomment %}
+                      <th class="column-title">Status </th>
+                      <th class="column-title no-link last"><span class="nobr">Action</span>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {% if data %}
+                        {% for plan in data %}
+                        <tr class="even pointer">
+                        <td class=" ">{{ forloop.counter }}</td>
+                        <td class=" ">{{plan.plan_name}}</td>
+                        <td class=" ">
+                            {% autoescape off %}
+                            {{ plan.plan_desc|striptags|truncatewords:"10" }}
+                            {% if plan.plan_desc|striptags|wordcount > 10 %}
+                            <a href="javascript:;" class="text-primary" data-toggle="tooltip" title="{{ plan.plan_desc|striptags|safe}}">view more</a>
+                            {% endif %}
+                            {% endautoescape %}
+                            
+                        </td>
+                        {% comment %} <td class=" ">${{plan.cost|intcomma}}</td> {% endcomment %}
+                        <td class=" ">
+                          {% if plan.is_active %}
+                          <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{plan.id}}">Active</button> 
+                          {% else %}
+                          <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{plan.id}}">Inactive</button> 
+                           {% endif %}
+                        </td>
+                        <td class="last">
+                          <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                            <button type="button" data-id="{{plan.id}}" data-name="{{plan.plan_name}}" data-desc="{{plan.plan_desc}}" data-cost="{{plan.cost}}" data-status="{{plan.is_active}}" class="btn btn-xs btn-round btn-primary edit-subscription"><i class="fa fa-edit"></i> Edit</button>
+                            <form method="post" data-id="{{plan.id}}" action="{% url 'admin-subscriptions-status-change' %}" class="ActiveInactive">
+                              {% csrf_token %}
+                              <input type="hidden" name="subscription_id" value="{{plan.id}}">
+                              <input type="hidden" class="status-change" name="status" value="{{plan.is_active|yesno:"0,1"}}">
+                              {% if plan.is_active %}
+                                <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                              {% else %}
+                                <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                              {% endif %}
+                            </form>
+                          </div>
+
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>  <td class=" ">No subscription types added </td></tr>
+                    {% endif %}
+                    
+                  </tbody>
+                </table>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Add plan modal -->
+  <div class="modal fade add-subscription" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Add Subscription Type</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate class="form-horizontal form-label-left form-subs">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="plan_name">Plan Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" name="plan_name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            {% comment %}
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="cost">Plan Cost ($) <span class="required">*</span> <br>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="number" step="0.01" data-parsley-type="number" data-parsley-trigger="keyup" name="cost" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+             <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="plan_type">Plan Type <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" name="plan_type" required="required" >
+                <option value="">Choose available plan</option>
+                {% for plan in plantypelist %}
+                {% if plan.is_active %}
+                <option value="{{plan.id}}">{{plan.type_name}}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              </div>
+              <a href="{% url 'admin-plan' %}#add-plan" target="_blank" type="button" class="btn btn-primary btn-round"> Add Plan <i class="fa fa-external-link"></i></a>
+
+            </div> {% endcomment %}
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="plan_desc">Plan Description<span class="required">*</span>
+              </label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <textarea class="form-control description" name="plan_desc" required="required" rows="3" placeholder="Enter plan description..." style="height: 120px;" spellcheck="true"></textarea>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+            
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+  <!--Edit plan Modal-->
+  <div class="modal fade edit-plan-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Edit Subscription Type</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate class="form-horizontal form-label-left form-subs">
+            {% csrf_token %}
+            <input type="hidden" id="subscription_id" name="subscription_id" >
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="plan_name">Plan Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="plan_name" name="plan_name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            {% comment %}
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="cost">Plan Cost ($) <span class="required">*</span> <br>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="number" step="0.01" data-parsley-type="number" data-parsley-trigger="keyup" name="cost" id="cost" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+             <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="plan_type">Plan Type <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" id="plan_type" name="plan_type" required="required" >
+                <option value="">Choose available plan</option>
+                {% for plan in plantypelist %}
+                {% if plan.is_active %}
+                <option value="{{plan.id}}">{{plan.type_name}}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              </div>
+              <a href="{% url 'admin-plan' %}#add-plan" target="_blank" type="button" class="btn btn-primary btn-round"> Add Plan <i class="fa fa-external-link"></i></a>
+
+            </div> {% endcomment %}
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="plan_desc">Plan Description<span class="required">*</span>
+              </label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <textarea class="form-control description" id="plan_desc" name="plan_desc" required="required" rows="3" placeholder="Enter plan description..." style="height: 120px;" spellcheck="true"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="plan_is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" id="plan_is_active" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End modal-->
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+
+      // hit add subscription modal
+      if(window.location.hash && window.location.hash == '#add-subscription' ) {
+          var hash = window.location.hash;
+          window.history.pushState({}, "", window.location.href.split("#")[0]);
+          $('.' + hash.split('#')[1]).modal('show');
+      }
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/subscription-plans.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/tinymce/tinymce.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+
+{% endblock javascripts %}

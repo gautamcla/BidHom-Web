@@ -1,0 +1,688 @@
+@mixin breakpoint($point) {
+  @if $point == laptop {
+    @media (max-width: 1500px) {
+      @content;
+    }
+  } @else if $point == lg {
+    @media (max-width: 1280px) {
+      @content;
+    }
+  } @else if $point == md {
+    @media (max-width: 1199px) {
+      @content;
+    }
+  } @else if $point == sm {
+    @media (max-width: 991px) {
+      @content;
+    }
+  } @else if $point == xs {
+    @media (max-width: 767px) {
+      @content;
+    }
+  } @else if $point == xxs {
+    @media (max-width: 479px) {
+      @content;
+    }
+  }
+}
+
+.makeOfferModalwrap {
+  .modal-content {
+    background: #FFF;
+    border-radius: 0;
+    .modal-header {
+      border-bottom: none;
+      padding: 25px 50px;
+      @media screen and (max-width: 1366px) {
+        padding: 15px 30px;
+      }
+      @include breakpoint(xs) {
+        padding: 10px 30px 10px 10px;
+      }
+      h4 {
+        font-family: 'PT Serif';
+        line-height: 24px;
+        font-weight: 600;
+        font-size: 28px;
+        color: $secondary;
+        text-align: center;
+        margin-bottom: 0px;
+        @media (max-width: 1367px) {
+          font-size: 20px;
+          line-height: 30px;
+        }
+        @include breakpoint(md) {
+          font-size: 18px;
+          line-height: 24px;
+        }
+        @include breakpoint(xs) {
+          font-size: 16px;
+        }
+      }
+      
+    }
+    .modal-body {
+      padding: 0 50px 0;
+      @media screen and (max-width: 1366px) {
+        padding: 0 30px 0;
+      }
+      @include breakpoint(xs) {
+        padding: 0 10px 0;
+      }
+      h6 {
+        color: $gray;
+        font-size: $fontMedium;
+        font-weight: normal;
+        line-height: 22px;
+        text-align: center;
+        padding: 0 50px 20px;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #E8E8E8;
+        @media screen and (max-width: 1366px) {
+          padding: 0 30px 20px;
+        }
+        @include breakpoint(xs) {
+          padding: 0 10px 0;
+          font-size: $fontMiddle;
+        }
+      }
+      .input-group {
+        width: 100%;
+        .input-group-addon {
+          padding: 0;
+          background: transparent;
+          border: none;
+          position: absolute;
+          right: 0px;
+          width: 20px;
+          z-index: 9;
+          top: 10px;
+        }
+      }
+      .bidder-state {
+        .error {
+          z-index: 1;
+          bottom: -16px;
+        }
+        .chosen-container-single .chosen-single {
+          color: $black;
+        }
+      }
+    }
+    .modal-footer {
+      padding: 10px 50px 30px;
+      border: none;
+      @media screen and (max-width: 1366px) {
+        padding: 10px 30px 20px;
+      }
+      @include breakpoint(xs) {
+        padding: 10px;
+      }
+    }
+    .list-price {    
+      .price-limit-box {
+        border-bottom: 1px solid #687480;
+        position: relative;
+        .price-limit {
+          display: table;
+          position: relative;
+        }
+        .form-control {
+          padding-left: 10px;
+          width: auto;
+          border-bottom: none;
+        }
+        .dollar {
+          position: absolute;
+          left: 0;
+          top: 14px;
+          z-index: 1;
+          color: $black;
+        }
+        a {
+          position: absolute;
+          right: -10px;
+          top: 16px;
+        }
+      }
+    }
+    
+    .listing-type {
+      display: flex;
+      align-items: center;
+      padding-top: 10px;
+      &.center {
+        justify-content: center;
+      }
+      li {
+        padding-right: 60px;
+        @media screen and (max-width: 1366px) {
+          padding-right: 30px;
+        }
+        @include breakpoint(sm) {
+          padding-right: 20px;
+        }
+        @include breakpoint(xs) {
+          padding-right: 10px;
+        }
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+    }
+
+  }
+}
+
+.personalModalwrap {
+  .modal-content {
+    background: #FFF;
+    border-radius: 0;
+    .modal-header {
+      border-bottom: none;
+      h5 {
+        line-height: 24px;
+        font-weight: 500;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.confirmModalwrap {
+  .modal-content {
+    background: $white;
+    border-radius: 0;
+    .modal-header {
+      border-bottom: none;
+      text-align: center;
+      h4 {
+        font-family: 'PT Serif';
+        line-height: 37px;
+        color: $secondary;
+        font-size: 28px;
+        font-weight: 600;
+        text-align: center;
+        @media (max-width: 1367px) {
+          font-size: 20px;
+          line-height: 30px;
+        }
+        @include breakpoint(md) {
+          font-size: 18px;
+          line-height: 24px;
+        }
+        @include breakpoint(xs) {
+          font-size: 16px;
+        }
+      }
+    }
+    .modal-body {
+      h4 {
+        line-height: 32px;
+        color: $black;
+        font-weight: 500;
+        margin-bottom: 5px;
+        text-align: center;
+      }
+      h5 {
+        text-align: center;
+        line-height: 24px;
+        color: rgba($color: $black, $alpha: 0.7);
+        padding-bottom: 20px;
+      }
+      .agent-btn {
+        border: 1px solid $secondary;
+        padding: 10px 30px;
+        color: $secondary;
+        @include border-radius (20px);
+        @include breakpoint(xs) {
+          padding: 10px;
+          display: block;
+        }
+        &:hover, &:focus {
+          border: 1px solid $secondary;
+          background: $secondary;
+          color: $white;
+        }
+      }
+    }
+  }
+}
+
+.viewBidModalwrap {
+  .modal-content {
+    background: #F5F6FA;
+    border-radius: 0;
+    .modal-header {
+      border-bottom: none;
+      text-align: center;
+      h4 {
+        font-family: 'PT Serif';
+        line-height: 30px;
+        color: rgba($color: $black, $alpha: 0.7);
+        font-weight: 400;
+        text-align: left;
+      }
+    }
+    .modal-body {
+      h4 {
+        line-height: 32px;
+        color: $black;
+        font-weight: 500;
+        margin-bottom: 5px;
+        text-align: center;
+      }
+      h5 {
+        text-align: center;
+        line-height: 24px;
+        color: rgba($color: $black, $alpha: 0.7);
+        padding-bottom: 20px;
+      }
+    }
+  }
+}
+
+.personModalwrap {
+  .modal-content {
+    background: $white;
+    border-radius: 0;
+    .modal-header {
+      border-bottom: none;
+      h5 {
+        line-height: 24px;
+        font-weight: 500;
+        text-align: center;
+      }
+    }
+    
+  }
+  .input-group {
+    border: 1px solid #707070;
+    .form-control {
+      border-bottom: none;
+      padding: 0 10px;
+    }
+    .input-group-addon {
+      padding: 0 10px 0 0;
+      background: transparent;
+      border: none;
+    }
+  }
+  .person-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px 30px;
+    background: #F2F2F2;
+    margin-bottom: 20px;
+    li {
+        color: $black;
+        line-height: 30px;
+        i {
+          padding-right: 5px;
+        }
+        a {
+          color: $black;
+        }
+    }
+  }
+}
+
+.innovation-popup {
+  .modal-header {
+    border-bottom: none;
+    padding: 0;
+  }
+  .modal-head {
+    h2 {
+      @include font-bold();
+      color: $secondary;
+      span {
+        font-size: 80%;
+      }
+      em {
+        @include font-regular();
+        color: rgba($color: #242424, $alpha: 0.9);
+        font-style: normal;
+        font-size: $fontExtraLarge;
+      }
+    }
+  }
+  .modal-bottom {
+    h4 {
+      color: #000;
+      @include font-bold();
+    }
+    a {
+      color: #103ab1;
+    }
+    ul {
+      margin-bottom: 20px;
+      li {
+          padding: 0 0 5px 25px;
+          color: #000;
+          list-style: none;
+          position: relative;
+          @media screen and (max-width: 1600px) {
+              font-size: $fontExtraLarge;
+          }
+          &:before {
+              content: "";
+              position: absolute;
+              left: 0;
+              top: 15px;
+              width: 6px;
+              height: 6px;
+              background: #949494;
+              @include border-radius(100%);
+          }
+          &:last-child {
+              padding-bottom: 0;
+              margin-bottom: 0;
+          }
+      }
+    }
+    .pink-box {
+      background: #c2103a;
+      padding: 30px;
+      color: $white;
+      margin-top: 20px;
+      @include border-radius(10px);
+      .table {
+        padding-bottom: 20px;
+        .table-cell {
+          vertical-align: middle;
+          h2 {
+            @include font-black();
+            span {
+              @include font-semi();
+            }
+          }
+          &:first-child {
+            width: 30%;
+            border-right: 2px solid #8b0e2c;
+          }
+          &:last-child {
+            padding-left: 30px;
+          }
+        }
+      }
+      ul {
+        margin-bottom: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        li {
+          color: $white;
+          padding: 0;
+          list-style: none;
+          &:before {
+            content: none;
+          }
+        }
+      }
+    }
+  }
+  .scroll {
+    max-height: 550px;
+  }
+}
+
+
+#viewOfferDocumentModal {
+  .document-list {
+    margin: 0;
+    padding: 0;
+    max-height: 420px;
+    overflow-y: auto;
+    li {
+      display: flex;
+      align-items: center;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #DDD;
+      &:last-child {
+        padding-bottom: 0;
+        margin-bottom: 0;
+        border-bottom: none;
+      }
+      figure {
+        width: 25px;
+      }
+      figcaption {
+        width: calc(100% - 25px);
+        word-break: break-word;
+        h6 {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+#viewCurrentOfferModal {
+  .modal-header {
+    padding: 10px 30px 15px 10px;
+  }
+  .modal-body {
+    padding-top: 20px;
+  }
+  .offerd-list {
+    margin-bottom: 20px;
+    li {
+        padding: 3px 0;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 500;
+        span {  
+          text-align: right; 
+            font-weight: 400; 
+            width: 60%;
+        }
+    }
+  }
+}
+
+
+
+
+.counterOfferModal {
+  .modal-header {
+      padding: 10px 20px;
+      text-align: center;
+      h5 {
+          font-weight: $semibold;
+      }
+  }
+  .modal-body {
+      padding: 20px;      
+      h5 {
+          font-size: $fontExtraLarge;
+          padding: 0 0 10px;  
+          border-bottom: 1px solid #DDD;
+      }
+      .info-detail {
+          display: flex;
+          align-items: center;
+          padding-bottom: 20px;
+          figure {
+              width: 60px;
+              height: 60px;
+              img {
+                  max-width: 100;
+                  max-height: 100%;
+                  @include border-radius (100%);
+              }
+          }
+          figcaption {    
+              width: calc(100% - 60px);
+              padding-left: 20px;
+              h6 {
+                  color: #333;    
+                  margin-bottom: 3px;
+                  font-size: $fontLarge;
+                  span {
+                      font-size: 85%;
+                      display: block;
+                      opacity: 0.8;   
+                  }
+              }   
+              h5 {    
+                  border-bottom: none;
+                  padding: 0;
+                  margin: 0;
+                  font-size: $fontExtraLarge;
+              }
+              
+          }
+      }
+      .offerd-list {
+          margin-bottom: 20px;
+          ul {
+            display: flex;
+            flex-wrap: wrap;
+            li {
+              width: 50%;
+              padding: 3px 0;
+              font-weight: 500;
+              @include breakpoint(md) {
+                width: 100%;
+              }
+              &:nth-child(2n+1){
+                padding-right: 20px;
+                @include breakpoint(md) {
+                  padding-right: 0;
+                }
+              }
+              &.fullwidth {
+                width: 100%;
+                padding-right: 0;
+              }
+              span {  
+                font-weight: 400;
+              }
+              .form-group label i {
+                color: #8590A8;
+              }
+              a.chosen-single {
+                color: #333;
+              }
+              .chosen-results {
+                display: inherit;
+                li {
+                  width: 100%;
+                  padding: 10px 20px;
+                  font-weight: 400;
+                }
+              }
+            }
+          }
+          
+      }
+      
+  }
+}
+
+
+#chatagentModal {
+  .modal-body {
+    .chat-attach {
+      display: flex;
+      align-items: center;
+    }
+    .dropzone {
+      min-height: auto;
+      padding: 10px;
+      .dz-default {
+        margin: 0;
+        .block {
+          &:nth-child(2){
+            font-size: $fontMiddle;
+            padding: 10px 0 5px;
+            color: rgba($color: #000000, $alpha: 0.5);
+          }
+          h6 {
+            margin-bottom: 0;
+            font-size: $fontLarge;
+            span {
+              font-size: $fontXS;
+              display: block;
+              color: rgba($color: #000000, $alpha: 0.5);
+            }
+          }
+        }
+      }
+    }
+    .doc-show-list {
+      clear: both;
+      margin-bottom: 30px;
+      overflow: auto;
+      max-height: 210px;
+      ul {
+          margin: 0;
+          li {
+              padding: 0 0 10px;
+              margin: 0 0 10px;
+              position: relative;
+              display: flex;
+              align-items: center;
+              border-bottom: 1px solid #D1D1D1;
+              &:last-child {
+                  margin-bottom: 0;
+                  border-bottom: none;
+                  padding-bottom: 0;
+              }
+              figure {
+                  width: 25px;
+                  i {
+                      font-size: 22px;
+                  }
+              }
+              figcaption {
+                  width: calc(100% - 25px);
+                  padding-left: 10px;
+                  display: flex;
+                  align-items: center;
+                  .actions-btn {
+                      display: flex;
+                      width: 35px;
+                      justify-content: space-between;
+                  }
+                  .close-btn {
+                      color: $secondary;
+                      line-height: 15px;
+                      font-size: $fontMiddle;
+                  }
+                  .badge-success {
+                      color: $green;
+                      line-height: 15px;
+                      font-size: $fontMiddle;
+                  }
+              }
+              h6 {
+                  margin-bottom: 0;
+                  line-height: 20px;
+                  font-size: $fontMedium;
+                  font-weight: 400;
+                  padding-right: 10px;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  overflow: hidden;
+              }
+              p {
+                  display: none;
+                  margin-bottom: 0;
+              }
+          }
+      }
+    }
+  }
+}
+
+
+
+#roundOneModal, #roundTwoModal {
+  .round-success {
+    text-align: center;
+  }
+}

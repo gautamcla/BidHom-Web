@@ -1,0 +1,91 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if user_list %}
+                  {% if user_list|length > 3 %}
+                    {% define_var user_list|length|add:'-1' as first_row %}
+                    {% define_var user_list|length as second_row %}
+                  {% else %}
+                    {% define_var 0 as first_row %}
+                    {% define_var 0 as second_row %}
+                  {% endif %}
+                {% for user in user_list %}
+
+                <div class="block-item user_details {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}" data-href="/admin/user-details/?user_id={{user.id}}" id="user_row_{{ user.id }}" data-user_id="{{ user.id }}">
+                  <!-- <div class="item">
+                    <a href="#"><i id="icon_{{ user.id }}" class="far fa-plus-square"></i></a>
+                  </div> -->
+                  <div class="item">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    <div class="user-pics agent-pics">
+                      {% if user.described_by == 3 %}
+                        <div class="tooltipp"><i class="fas fa-info-circle"></i>
+                          <span class="tooltipp__content user-tip-tool right">Brokerage Name: {{ user.other_brokerage_name }}<br/>License No.: {{ user.other_licence_number }} </span>
+                        </div>
+                        {% endif %}
+                      <span class="user-pic"><img src="{% if user.profile_image.doc_file_name %}{{ aws_url }}{{ user.profile_image.bucket_name }}/{{ user.profile_image.doc_file_name }}{% else %}{% static 'admin/images/no-image.jpg' %}{% endif %}" alt=""></span>
+                      <h6>
+                        <span>{{ user.first_name|default:"" }} {{ user.last_name|default:"" }}
+                          
+                        </span>
+                      </h6>
+                    </div>
+                  </div>
+                  <div class="item">
+                    {{ user.email|default:"" }}
+                  </div>
+                  <div class="item">
+                    {{ user.phone_no|default:''|format_phone }}
+                  </div>
+                  <div class="item">
+                    {{ user.bids|default:'0' }}
+                  </div>
+                  <div class="item">
+                    <span class="badge {% if user.status == 2 %} badge-danger{% elif user.status == 4 %} badge-warning{% else %}badge-success{% endif %}">
+                      {{ user.status_name|default:'' }}
+                    </span>
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ user.added_on|default:'' }}">
+                    {{ user.added_on }}
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ user.last_login|default:'' }}">
+                    {{ user.last_login }}
+                  </div>
+                  <div class="item center">
+                      <div class="action_dropdown {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}dropup{% endif %}{% endif %}">
+                    <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </a>
+                    <ul role="menu" class="dropdown-header-top author-log dropdown-menu right">
+                        <li><a href="javascript:void(0)" onclick="get_popup_user_details({{ user.id }})"><i class="fas fa-edit"></i> Edit</a>
+                        </li>
+                        <li><a href="javascript:void(0)" onclick="user_delete_confirmation({{ user.id }})"><i class="fas fa-trash"></i> Delete</a>
+                        </li>
+                        <li><a href="javascript:void(0)" onclick="get_make_agent_details({{ user.id }})"><i class="fas fa-long-arrow-alt-up"></i> Upgrade to agent</a>
+                        </li>
+                      <!--<li><a href="javascript:void(0)" onclick="change_password_user({{ user.id }})"><i class="fas fa-lock"></i> Change Password</a>-->
+<!--                      <li><a href="javascript:void(0)" onclick="reset_password_user({{ user.id }})"><i class="fas fa-share"></i> Reset Password</a>-->
+                      <li><a href="javascript:void(0)" onclick="send_reset_password_link({{ user.id }})"><i class="fas fa-share"></i> Reset Password</a>
+                    </ul>
+                  </div>
+                  </div>
+                </div><!-- End .block-item -->
+                <div class="block-item item-expand">
+                  <div class="item fullwidth list_details" id="user_details_{{ user.id }}">
+                    
+                  </div>
+                </div><!-- End .block-item -->
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+
+                  </div>
+                </div>
+                {% endif %}
+    <!-- <script type="text/javascript" src="{% static 'admin/js/users.js' %}?v=4.6"></script> -->
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.6"></script>
+{% endblock %}

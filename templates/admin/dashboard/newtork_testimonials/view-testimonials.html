@@ -1,0 +1,303 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+{% endblock %}
+{% load tz %}
+{% block content %}
+{% load humanize %}
+<div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Testimonials</strong>
+                </h6>
+              </div>
+              <div class="block rgt">
+                <form action="" class="search-field">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" name="testimonials_article_search" placeholder="Search" id="testimonials_article_search" class="form-control input-sm sugesstion_input" value="{{ request.GET.search|default:'' }}"><button type="button" id="testimonialsSearchArticleBtn" class="btn btn-primary btn-sm pl20">Search</button>
+                </form>
+                <a href="/admin/add-testimonial/" class="btn btn-secondary btn-sm"><i class="fas fa-plus"></i> New Testimonials</a>
+              </div>
+              <div class="block filters">
+                <ul>
+                  <li>
+                    <span class="text">
+                      <i class="fas fa-filter"></i> Filters
+                    </span>
+                  </li>
+                  <li>
+                    <select name="testimonials_filter_status" id="testimonials_filter_status" class="select form-control">
+                      <option value="">All Status</option>
+<!--                      <option value="active" {% if request.GET.status and request.GET.status == 'active' %}selected{% endif %}>Active</option>-->
+                      <option value="active" selected >Active</option>
+                      <option value="inactive" {% if request.GET.status and request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                  </li>
+                  <li>
+                    <select name="testimonials_num_record" id="testimonials_num_record" class="select form-control">
+                      <option value="">Record Per Page</option>
+                      <option value="10" {% if request.GET.perpage and request.GET.perpage == 10 %}selected{% endif %}>10</option>
+                      <option value="20" {% if request.GET.perpage and request.GET.perpage == 20 %}selected{% endif %}>20</option>
+                      <option value="30" {% if request.GET.perpage and request.GET.perpage == 30 %}selected{% endif %}>30</option>
+                      <option value="40" {% if request.GET.perpage and request.GET.perpage == 40 %}selected{% endif %}>40</option>
+                      <option value="50" {% if request.GET.perpage and request.GET.perpage == 50 %}selected{% endif %}>50</option>
+                    </select>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .listing-top -->
+
+            <div class="listing-table" id="testimonials_list">
+              {% if testimonial_list %}
+              {% for article in testimonial_list %}
+              <div class="parcel_blocks" id="article_{{ article.id }}">
+                <ul class="bottom">
+                  <li>
+                    No : {{ forloop.counter0|add:sno }}
+                  </li>
+                  <li>
+                    Created Date |  
+                    <span class="date-block {% if article.added_on == None %}  {% else %} convert_to_local_date_time_single_line {% endif%}" data-value="{{ article.added_on|default:'' }}">
+                      {% if article.added_on == None %}  {% else %} {{ article.added_on }} {% endif%}
+                    </span>    
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li>
+                    <h6 class="name">
+                      {{ article.type|default:'' }}
+                      <span>
+                        Type
+                      </span>
+                    </h6>
+                  </li>
+                  <li>
+                    <div class="buyer-name">
+                      <i class="fa-solid fa-user"></i>
+                      <h6>
+                        {{ article.author_name|default:'' }}
+                        <span>
+                          Author Name
+                        </span>
+                      </h6>
+                    </div>
+                  </li>
+                  <li>
+                    <span class="badge {% if article.status|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                      {{ article.status|default:'' }}
+                    </span>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                      <a href="/admin/add-testimonial/?id={{ article.id }}" >Edit</a>
+                    </div>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endfor %}
+              {% else %}
+              <div class="parcel_blocks">
+                <ul class="bottom">
+                  <li>
+                    No data Available
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li class="fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}"/>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endif %}
+            </div><!-- End .listing-table -->
+
+
+            <!-- <div class="default-table blog-table">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Type
+                </div>
+                <div class="item">
+                  Author Name
+                </div>
+                <div class="item">
+                  Created Date
+                </div>
+                <div class="item">
+                  Status
+                </div>
+                <div class="item">
+                  Action
+                </div>
+              </div>
+              <div class="block sscroll" id="testimonials_list">
+                {% if testimonial_list %}
+                {% for article in testimonial_list %}
+                <div class="block-item" id="article_{{ article.id }}">
+                  <div class="item">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    {{ article.type|default:'' }}
+                  </div>
+                  <div class="item">
+                    <div class="user-pics agent-pics">
+                      <h6>
+                        <span>{{ article.author_name|default:'' }}</span>
+                      </h6>
+                    </div>
+                  </div>
+                  <div class="item date-block {% if article.added_on == None %}  {% else %} convert_to_local_date_time_single_line {% endif%}" data-value="{{ article.added_on|default:'' }}">
+                    {% if article.added_on == None %}  {% else %} {{ article.added_on }} {% endif%}
+                  </div>
+                  <div class="item">
+                    <span class="badge {% if article.status|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                      {{ article.status|default:'' }}
+                    </span>
+                  </div>
+                  <div class="item">
+                    <a href="/admin/add-testimonial/?id={{ article.id }}" class="badge badge-info"><i class="far fa-edit"></i></a>
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                  <div class="block-item">
+                    <div class="item fullwidth">
+                        <img src="{% static 'admin/images/no-data-image.png' %}"/>
+
+                      </div>
+                  </div>
+                {% endif %}
+
+              </div>
+            </div> -->
+            
+            
+            <div class="pagination" id="article_listing_pagination">
+              <ul id="testimonials_listing_pagination_list">
+                {{ pagination_html }}    
+              </ul>
+            </div><!-- End .pagination -->
+              
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+  <div id="confirmArticleDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button class="btn btn-primary-bdr del_article_btn" id="del_article_false">No</button> <button class="btn btn-primary del_article_btn" id="del_article_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=2.0"></script>
+    <script type="text/javascript" src="{% static 'admin/js/article.js' %}?v=1.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=3.8"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+    <script>
+      var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }
+
+      $('[data-toggle="tooltip"]').tooltip();
+
+      function article_delete_confirmation(row_id){
+          $('.personalModalwrap').modal('hide');
+          $('#confirmArticleDeleteModal').modal('show');
+          $('.del_article_btn').attr('rel_id', row_id);
+      }
+      $('.select').chosen();
+
+      $(document).on('keypress', '#testimonials_article_search', function(e){
+              var x = document.getElementById(this.id + "autocomplete-list");
+              if (x) x = x.getElementsByTagName("div");
+              if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+              } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+              } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                  /*and simulate a click on the "active" item:*/
+                  if (x) x[currentFocus].click();
+                }
+              }else{
+                var search = $(this).val();
+                $.ajax({
+                    url: '/admin/testimonials-search-suggestion/',
+                    type: 'post',
+                    dateType: 'json',
+                    cache: false,
+                    data: {'search': search},
+                    beforeSend: function(){
+
+                    },
+                    success: function(response){
+                        if(response.error == 0 && response.status == 200){
+                            autocomplete("testimonials_article_search", response.suggestion_list);
+                        }else{
+                            closeAllSuggestions('autocomplete-items');
+                        }
+                    }
+                });
+              }
+
+      });
+    </script>
+{% endblock %}

@@ -1,0 +1,55 @@
+// Import Bootstrap Compass integration
+@import "bootstrap-scss/bootstrap-compass";
+
+// Import custom Bootstrap variables
+@import "bootstrap-scss/bootstrap-variables";
+
+// Import Bootstrap for Sass
+@import "bootstrap-scss/bootstrap";
+
+@import "custom-scss/resetcss";
+
+
+//Import custom varialbles
+@import "custom-scss/custom-variable";
+
+// Import custom-mixing scss
+@import "custom-scss/custom-mixing";
+
+// Import common scss
+@import "custom-scss/common"; 
+
+// Import header scss
+@import "custom-scss/header"; 
+
+// Import footer scss
+@import "custom-scss/footer";
+
+// Import Plugins scss
+
+@import "plugin-scss/animate.scss";
+@import "plugin-scss/scrollCSS.scss";
+@import "plugin-scss/checkbox.scss";
+@import "plugin-scss/popup-page.scss";
+@import "plugin-scss/nav.scss";
+@import "plugin-scss/hamburger.scss";
+@import "plugin-scss/testimonial.scss";
+@import "plugin-scss/tooltip.scss";
+@import "plugin-scss/chosen-select.scss";
+@import "plugin-scss/slick.scss"; 
+@import "plugin-scss/slick-theme.scss"; 
+@import "plugin-scss/slick-lightbox.scss"; 
+
+//Import "inner pages scss"
+
+@import "custom-scss/home-page";
+@import "custom-scss/inner-page";
+@import "custom-scss/listing-page";
+@import "custom-scss/detail-page";
+@import "custom-scss/blog-page";
+@import "custom-scss/agent-page";
+@import "custom-scss/bidding-page";
+@import "custom-scss/buyer-page";
+@import "custom-scss/login-page";
+@import "custom-scss/best-page";
+@import "custom-scss/propertybot-page";

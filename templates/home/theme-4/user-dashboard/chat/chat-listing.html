@@ -1,0 +1,23 @@
+{% load static %}
+{% for chat in chat_listing %}
+
+<li class="chat_rooms {% if chat.unread_msg_cnt > 0 %}unread{% endif %}" onclick="active_chatroom(this)" data-id="{{ chat.id }}" data-name="{{ chat.name }}" data-msg="{{ chat.last_message }}" data-email="{{ chat.email }}" data-phone="{{ chat.phone_no }}" data-property="{{ chat.property_data.id|default:'' }}" data-property-name="{{ chat.property_data.name|default:'' }}">
+
+  <figure>
+  <img src="{% if chat.image.doc_file_name %}{{ aws_url }}{{ chat.image.bucket_name }}/{{ chat.image.doc_file_name }}{% else %}{% static 'theme-4/user-dashboard/images/no-image.jpg' %}{% endif %}" alt="real estate sales">
+</figure>
+<figcaption>
+  <h6>
+    {{ chat.name }} <span class="user-type">({{ chat.user_type }})</span>
+  </h6>
+  <p>
+    {{ chat.last_message|truncatechars:30 }}
+  </p>
+  <div class="timer convert_to_local_date_message" data-value="{{ chat.last_message_date|default:'' }}">
+    Loading...
+  </div>
+  <div class="circle" style="{% if chat.unread_msg_cnt > 0 %}{% else %}display:none;{% endif %}">{{ chat.unread_msg_cnt|default:'' }}</div>
+</figcaption>
+</li>
+{% endfor %}
+<script type="text/javascript" src="{% static '/theme-common/js/common.js' %}"></script>

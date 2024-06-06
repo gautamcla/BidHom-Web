@@ -1,0 +1,38 @@
+.chosen-container {
+  padding-top: 0;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+  @include border-radius (8px);
+  .chosen-drop {
+    .selectallSection {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      font-size: $font14;
+    }
+  }
+  .chosen-results li {
+    font-size: $font14;
+    .checkBox {
+      margin-right: 10px;
+    }
+  }
+}
+.chosen-container-multi .chosen-choices {
+  line-height: 45px !important;
+}
+.chosen-container-single {
+  .chosen-single {
+    padding: 0 25px 0 10px;
+    text-align: left;
+    line-height: 37px;
+    @include border-radius (8px);
+    div {
+      right: 10px !important;
+    }
+  }
+}
+
+.chosen-container .chosen-results li.new-feature {
+  border-bottom: 1px solid #ddd;
+}

@@ -1,0 +1,314 @@
+{% load static %}
+{% load dashboard_extra %}
+{% block content %}
+{% load humanize %}
+{% if offer_listing %}
+  {% for offer in offer_listing %}
+  <li>
+    <div class="block">
+      <div class="offer-top">
+        <figure>
+          <a href="/asset-details/?property_id={{ offer.id }}" target="_blank">
+            <img class="slide-fixed" src="{% static 'theme-4/user-dashboard/images/transparent.png' %}" alt="real estate sales">
+            <img class="slide-img" src="{% if offer.property_image.image %}{{ aws_url }}{{ offer.property_image.bucket_name }}/{{ offer.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+          </a>
+        </figure>
+        <figcaption>
+          <span class="badge badge-info" {% if offer.offer_status|lower == 'counter offer by seller' %}onclick="view_seller_counter_details('{{ offer.id|default:'' }}')"{% endif %} style="{% if offer.offer_status|lower == 'counter offer by seller' %}{% else %}cursor: initial;{% endif %}">{% if not offer.offer_status %}Drafted{% else %}{{ offer.offer_status }}{% endif %}</span>
+          <h6 class="name">
+            <a href="/asset-details/?property_id={{ offer.id }}" target="_blank">
+            {{ offer.address_one }} {{ offer.city }}, {{ offer.state }}, {{ offer.postal_code }}
+            </a>
+          </h6>
+          <h6 class="price">
+            {% if offer.your_offer_price %}${{ offer.your_offer_price|convert_num|intcomma|default:'' }}{% endif %} 
+          </h6>
+          <div class="offer-links">
+            <ul>
+              <li class="{% if offer.status != 1 %}btn_disable{% endif %}" style="{% if offer.status != 1 %}cursor: not-allowed;{% endif %}">
+                <a href="{% if offer.status == 1 %}/submit-loi/?property_id={{ offer.id|default:'' }}{% else %}javascript:void(0){% endif %}" {% if offer.status != 1 %}disabled{% endif %} style="{% if offer.status != 1 %}cursor: not-allowed;{% endif %}">
+                  <i class="fa-solid fa-pen-to-square"></i> Edit Offer
+                </a>
+              </li>
+              <li class="{% if not offer.can_accept %}btn_disable{% endif %}" style="{% if not offer.can_accept %}cursor: not-allowed;{% endif %}">
+                <a href="javascript:void(0)" {% if offer.can_accept %}onclick="buyer_select_best_offer('{{ offer.id|default:'' }}','{{ offer.user_data.negotiation_id|default:'' }}', '{{ offer.user_data.first_name|default:'' }}', '{{ offer.user_data.last_name|default:'' }}', '{{ offer.user_data.phone_no|format_phone|default:'' }}','{{ offer.asking_price|default:'' }}','{{ offer.your_offer_price|default:'' }}', '{{ offer.earnest_deposit_type|default:'' }}', '{{ offer.earnest_money_deposit|convert_float|intcomma|default:'0' }}', '{{ offer.earnest_money_deposit_percent|convert_num|intcomma|default:'0' }}', '{{ offer.user_data.due_diligence_period|default:'' }}','{{ offer.user_data.closing_period|default:'' }}','{{ request.session.user_type_name|default:'' }}')"{% endif %} style="{% if not offer.can_accept %}cursor: not-allowed;{% endif %}">
+                  <i class="fa-regular fa-circle-check"></i> Select
+                </a>
+              </li>
+              <li class="{% if not offer.can_reject %}btn_disable{% endif %}" style="{% if not offer.can_reject %}cursor: not-allowed;{% endif %}">
+                <a href="javascript:void(0)" {% if offer.can_reject %}onclick="confirm_buyer_reject_best_offer('{{ offer.id|default:'' }}','{{ offer.user_data.negotiation_id|default:'' }}')"{% endif %} style="{% if not offer.can_reject %}cursor: not-allowed;{% endif %}">
+                  <i class="fa-regular fa-circle-xmark"></i> Decline
+                </a>
+              </li>
+              <li class="{% if not offer.can_counter %}btn_disable{% endif %}" style="{% if not offer.can_counter %}cursor: not-allowed;{% endif %}">
+                <a href="javascript:void(0)" {% if offer.can_counter %}onclick="counter_best_offer('{{ offer.id|default:'' }}','{{ offer.user_data.negotiation_id|default:'' }}')"{% endif %} style="{% if not offer.can_counter %}cursor: not-allowed;{% endif %}">
+                  <i class="fa-solid fa-right-left"></i> Counter
+                </a>
+              </li>
+              <li>
+                <a href="/download-loi/?property={{ offer.id|default:'' }}">
+                  <i class="fa-solid fa-download"></i> Download Offer
+                </a>
+              </li>
+              <li>
+                <div class="show-more more" id="show_more_{{ offer.id }}" onclick="show_more({{ offer.id }},this)">
+                  Show More
+                </div>
+              </li>
+            </ul>
+          </div>
+        </figcaption>
+      </div>
+      <div class="table-responsive">
+        <table class="text show-more-height" id="show_more_tbl_{{ offer.id }}" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td>
+              Name
+            </td>
+            <td>
+              {{ offer.user_data.first_name|default:'' }} {{ offer.user_data.last_name|default:'' }}
+            </td>
+            <td>
+              Email
+            </td>
+            <td>
+              {{ offer.user_data.email|default:'' }}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Phone
+            </td>
+            <td>
+              {{ offer.user_data.phone_no|format_phone|default:'' }}
+            </td>
+            <td>
+              Address
+            </td>
+            <td>
+              {{ offer.user_data.address_first|default:'' }}, {{ offer.user_data.city|default:'' }}, {{ offer.user_data.state|default:'' }}, {{ offer.user_data.postal_code|default:'' }}
+            </td>
+          </tr>
+          {% if offer.user_data.user_type == 4 and offer.user_data.behalf_of_buyer == True %}
+            <tr>
+              <td>
+                Buyer's Name
+              </td>
+              <td>
+                {{ offer.user_data.buyer_first_name|default:'' }} {{ offer.user_data.buyer_last_name|default:'' }}
+              </td>
+              <td>
+                Buyer's Email
+              </td>
+              <td>
+                {{ offer.user_data.buyer_email|default:'-' }}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Buyer's Phone
+              </td>
+              <td>
+                {{ offer.user_data.buyer_phone_no|format_phone|default:'-' }}
+              </td>
+              <td>
+                Buyer's Company/Entity
+              </td>
+              <td>
+                {{ offer.user_data.buyer_company|default:'-' }}
+              </td>
+            </tr>
+          {% endif %}
+          <tr>
+            <td>
+              Status
+            </td>
+            <td>
+              {{ offer.offer_status|default:'' }}
+            </td>
+            <td>
+              Auction Type
+            </td>
+            <td>
+              {{ offer.auction_type|default:'' }}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Loan Type
+            </td>
+            <td>
+              {{ offer.user_data.financing|default:'' }}
+            </td>
+            <td>
+
+              Down Payment
+            </td>
+            <td>
+              {% if offer.user_data.down_payment %}
+                ${{ offer.user_data.down_payment|convert_num|intcomma|default:'' }}
+              {% else %}
+              -
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Earnest Money Deposit
+            </td>
+            <td>
+
+              {% if offer.user_data.earnest_money_deposit %}
+                ${{ offer.earnest_money_deposit|convert_float|intcomma|default:'0' }} or {{ offer.earnest_money_deposit_percent|convert_num|intcomma|default:'0' }} %
+              {% else %}
+              -
+              {% endif %}
+            </td>
+            <td>
+              Inspection Contingency
+            </td>
+            <td>
+              {{ offer.user_data.due_diligence_period|default:'-' }}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Financing Contingency
+            </td>
+            <td>
+              {{ offer.user_data.offer_contingent|default:'-' }}
+            </td>
+            <td>
+
+              Appraisal Contingency
+            </td>
+            <td>
+              {% if offer.user_data.appraisal_contingent == True %}
+                Yes
+              {% elif offer.user_data.appraisal_contingent == False %}
+                No
+              {% else %}
+              -
+              {% endif %}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Property Sale Contingency
+            </td>
+            <td>
+              {% if offer.user_data.sale_contingency == True %}
+                Yes
+              {% elif offer.user_data.sale_contingency == False %}
+                No
+              {% else %}
+              -
+              {% endif %}
+            </td>
+            <td>
+              Closing Date
+            </td>
+            <td>
+              {{ offer.user_data.closing_period|default:'-' }}
+            </td>
+
+          </tr>
+
+          <tr>
+            <td>
+              Closing Costs
+            </td>
+            <td colspan="3">
+              {% if offer.user_data.closing_cost == 1 %}
+                Buyer agrees to pay for all loan-related closing costs and half of the transaction closing costs.
+              {% elif offer.user_data.closing_cost == 2 %}
+                Buyer agrees to pay for all loan-related closing costs and all of the transaction closing costs.
+              {% elif offer.user_data.closing_cost == 3 %}
+                Seller to pay for all loan-related closing costs and all of the transaction closing costs.
+              {% else %}
+              -
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="move">
+        <div class="text-block">
+          <span class="blue-text">Use to move pending offers into the highest offer position.</span>
+        </div>
+        <div class="text-block">
+          <button type="button" class="btn btn-primary btn-sm pl20" id="show_history_btn_{{ offer.id }}" onclick="toggle_history({{ offer.id }},this)">Show History</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table width="100%" class="table table-scroll offerdetailTable history_table" id="history_table_{{ offer.id }}" style="display:none;">
+          <thead>
+            <tr>
+              <th>
+                User
+              </th>
+              <th>
+                Offer Amount
+              </th>
+              <th>
+                Status
+              </th>
+              <th>
+                Action
+              </th>
+              <th>
+                Date
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% if offer.offer_history|length > 0 %}
+              {% for history in offer.offer_history %}
+            <tr>
+              <td>
+                {% if history.offer_by == 1 %}
+                  You
+                {% else %}
+                  {{ history.first_name }} {{ history.last_name }}
+                {% endif %}
+              </td>
+              <td>
+                {{ history.offer_price|convert_float|intcomma|default:'0' }} USD
+              </td>
+              <td>
+                <span class="badge {% if history.status|lower == 'offer declined' %}badge-danger{% else %}badge-success{% endif %}">
+                  {{ history.status }}
+                </span>
+              </td>
+              <td>
+                <a href="javascript:void(0)" onclick="{% if history.status|lower == 'offer declined' %}get_declined_history_details('{{ offer.id|default:'' }}','{{ history.id|default:'' }}'){% else %}get_best_offer_history_details('{{ offer.id|default:'' }}','{{ history.id|default:'' }}'){% endif %}" class="blue-text" title="View Details">View Details</a>
+              </td>
+              <td class="convert_to_local_date_time" data-value="{{ history.added_on|default:'' }}">
+                {{ history.added_on|default:'' }}
+              </td>
+            </tr>
+          {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5">
+                <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+      
+    </div>
+  </li>
+{% endfor %}
+{% else %}
+<li>
+  <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+</li>
+{% endif %}
+{% endblock %}

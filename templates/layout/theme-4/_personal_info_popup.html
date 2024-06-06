@@ -1,0 +1,38 @@
+{% load static %}
+<div id="logoutModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Logout Confirmation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="font15 center">
+            Are you sure you want to logout now?
+          </p>
+          <div class="clearfix center">
+            <button class="btn btn-primary-bdr" id="logout_false" onclick="confirm_logout(0)">No</button> <button class="btn btn-primary" id="logout_true" onclick="confirm_logout(1)">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .logoutModal -->
+<div class="overlay" style="display:none;">
+  <div class="loader">Loading...</div>
+</div>
+
+<!--<script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>-->
+<script>
+  //end show_hide_popup
+  function confirm_logout(flag){
+    jQuery.noConflict();
+    if(flag){
+      jQuery('.personalModalwrap').modal('hide');
+      window.location.href='/logout/';
+    }else{
+      jQuery('.personalModalwrap').modal('hide');
+    }
+  }
+</script>

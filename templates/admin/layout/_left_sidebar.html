@@ -1,0 +1,385 @@
+{% load static %}
+<div id="sidebar" class="sidebar collapsed">
+  <a id="btn-collapse" class="sidebar-collapser"><i class="fa-solid fa-chevron-left"></i></a>
+  <div class="sidebar-layout">
+    <div class="logo">
+      <img class="logo_full" src="{% static 'admin/images/bidhome.png' %}" alt="">
+      <img class="logo_icon" src="{% static 'admin/images/bidhome-icon.png' %}" alt="">
+    </div>
+    <div class="sidebar-content">
+      <nav class="menu open-current-submenu">
+        <ul>
+          <li class="menu-item">
+            <a href="/admin/dashboard/" class="{% if active_menu == 'regbidder'%}active{% endif%}">
+              <span class="menu-icon">
+                <i class="fa-solid fa-gauge-high"></i>
+              </span>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+
+          {% if 7 in access_permission_list or 3 in access_permission_list %}
+          <li class="menu-item sub-menu">
+            <a href="#" class="{% if active_menu == 'site setting' %}active{% endif%}">
+              <span class="menu-icon">
+                <i class="fa-solid fa-gear"></i>
+              </span>
+              <span class="menu-title">Settings</span>
+            </a>
+            <div class="sub-menu-list">
+              <ul>
+                {% if 7 in access_permission_list %}
+                <li class="menu-item">
+                  <a href="/admin/business-info/" class="{% if active_submenu == 'business'%}active{% endif%}">
+                    <span class="menu-title">Business Info</span>
+                  </a>
+                </li>
+                {% endif %}
+                {% if 3 in access_permission_list %}
+                <li class="menu-item">
+                  <a href="/admin/website/" class="{% if active_submenu == 'website'%}active{% endif%}">
+                    <span class="menu-title">Website</span>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+          </li>
+          {% endif %}
+
+          {% if 1 in access_permission_list or 4 in access_permission_list %}
+          <li class="menu-item sub-menu">
+            <a href="#" class="{% if active_menu == 'user setting' %}active{% endif%}">
+              <span class="menu-icon">
+                <i class="fas fa-user"></i>
+              </span>
+              <span class="menu-title">User Management</span>
+            </a>
+            <div class="sub-menu-list">
+              <ul>
+                {% if 1 in access_permission_list %}
+                  <li class="menu-item">
+                    <a href="/admin/sub-admin/" class="{% if active_submenu == 'sub-admin' %}active{% endif %}">
+                      <span class="menu-title">Sub Admin</span>
+                    </a>
+                  </li>
+                {% endif %}
+
+                {% if 4 in access_permission_list %}
+                  <li class="menu-item">
+                    <a href="/admin/users/" class="{% if active_submenu == 'users'%}active{% endif%}">
+                      <span class="menu-title">Users</span>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+          </li>
+          {% endif %}
+
+          {% if 6 in access_permission_list %}
+          <li class="menu-item sub-menu">
+            <a href="#" class="{% if active_menu == 'listing setting' %}active{% endif%}">
+              <span class="menu-icon">
+                <i class="fa-solid fa-rectangle-list"></i>
+              </span>
+              <span class="menu-title">Listing Management</span>
+            </a>
+
+            <div class="sub-menu-list">
+              <ul>
+                <li class="menu-item">
+                  <a href="/admin/listing/" class="{% if active_submenu == 'listing'%}active{% endif%}">
+                    <span class="menu-title">Listings</span>
+                  </a>
+                </li>
+
+                <li class="menu-item">
+                  <a href="/admin/listing-property-info/" class="{% if active_submenu == 'add_listing'%}active{% endif%}">
+                    <span class="menu-title">Add Listing</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          {% endif %}
+
+          {% if 6 in access_permission_list %}
+          <li class="menu-item sub-menu">
+            <a href="#" class="{% if active_menu == 'listing_monitor' %}active{% endif%}">
+              <span class="menu-icon">
+                <i class="fa fa-desktop"></i>
+              </span>
+              <span class="menu-title">Listing Monitor</span>
+            </a>
+            <div class="sub-menu-list">
+              <ul>
+                <li class="menu-item">
+                  <a href="/admin/auction-dashboard/" class="{% if active_submenu == 'auction-dashboard'%}active{% endif%}">
+                    <span class="menu-title">Classic Auction Monitor</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/admin/insider-auction-dashboard/" class="{% if active_submenu == 'insider-auction-dashboard'%}active{% endif%}">
+                    <span class="menu-title">Insider Auction Monitor</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          {% endif %}
+
+          {% if 2 in access_permission_list %}
+          <li class="menu-item">
+            <a href="/admin/bidder-registration/" class="{% if active_menu == 'regbidder'%}active{% endif%}">
+              <span class="menu-icon">
+                <i class="fas fa-hammer"></i>
+              </span>
+              <span class="menu-title">Bidder Registration</span>
+            </a>
+          </li>
+          {% endif %}
+
+          <!-- {% if 19 in access_permission_list %}
+            <li class="menu-item">
+              <a href="/admin/property-estimator-list/" class="{% if active_menu == 'estimator_list'%}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="fas fa-robot"></i>
+                </span>
+                <span class="menu-title">Property Estimators </span>
+              </a>
+            </li>
+          {% endif %} -->
+
+          {% if 20 in access_permission_list %}
+            <li class="menu-item">
+              <a href="/admin/portfolio-list/" class="{% if active_menu == 'portfolio_list'%}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="fas fa-briefcase"></i>
+                </span>
+                <span class="menu-title">Multiple Parcel </span>
+              </a>
+            </li>
+          {% endif %}
+
+          {% if 17 in access_permission_list %}
+            <li class="menu-item sub-menu">
+              <a href="#" class="{% if active_menu == 'site setting' %}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="fa-solid fa-gears"></i>
+                </span>
+                <span class="menu-title">General Settings</span>
+              </a>
+              <div class="sub-menu-list">
+                <ul>
+                  <li class="menu-item">
+                    <a href="/admin/settings/property-features/?f_type=property_type" class="{% if active_submenu == 'property-features'%}active{% endif%}">
+                      <span class="menu-title">Property Features</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/lookup-object-status/?o_type=3" class="{% if active_submenu == 'lookup-object-status'%}active{% endif%}">
+                      <span class="menu-title">Lookup Objects Status</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/lookup-objects/" class="{% if active_submenu == 'lookup-objects'%}active{% endif%}">
+                      <span class="menu-title">Lookup Objects</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/lookup-status/" class="{% if active_submenu == 'lookup-status'%}active{% endif%}">
+                      <span class="menu-title">Lookup Status</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/user-types/" class="{% if active_submenu == 'user-types'%}active{% endif%}">
+                      <span class="menu-title">User Types</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/permissions/" class="{% if active_submenu == 'permissions'%}active{% endif%}">
+                      <span class="menu-title">User Permissions</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/auction-types/" class="{% if active_submenu == 'auction-types'%}active{% endif%}">
+                      <span class="menu-title">Auction Types</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/document-types/" class="{% if active_submenu == 'document-types'%}active{% endif%}">
+                      <span class="menu-title">Document Types</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/blog-categories/" class="{% if active_submenu == 'blog-categories'%}active{% endif%}">
+                      <span class="menu-title">Blog Categories</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/address-types/" class="{% if active_submenu == 'address-types'%}active{% endif%}">
+                      <span class="menu-title">Address Types</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/event-types/" class="{% if active_submenu == 'event-types'%}active{% endif%}">
+                      <span class="menu-title">Event Types</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/upload-steps/" class="{% if active_submenu == 'upload-steps'%}active{% endif%}">
+                      <span class="menu-title">Upload Steps</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/site-settings/" class="{% if active_submenu == 'site-settings'%}active{% endif%}">
+                      <span class="menu-title">Site Settings</span>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="/admin/settings/time-zones/" class="{% if active_submenu == 'time-zones'%}active{% endif%}">
+                      <span class="menu-title">Time Zones</span>
+                    </a>
+                  </li>
+
+                </ul>
+              </div>
+            </li>
+          {% endif %}
+
+          {% if 16 in access_permission_list %}
+            <li class="menu-item sub-menu">
+              <a href="#" class="{% if active_menu == 'site setting' %}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="fa-regular fa-file-lines"></i>
+                </span>
+                <span class="menu-title">Content Management</span>
+              </a>
+              <div class="sub-menu-list">
+                <ul>
+                  <li class="menu-item">
+                    <a href="/admin/cms-list/" class="{% if active_submenu == 'cms-list'%}active{% endif%}">
+                      <span class="menu-title">CMS Management</span>
+                    </a>
+                  </li>
+
+                  <li class="menu-item">
+                    <a href="/admin/blogs/" class="{% if active_submenu == 'blogs'%}active{% endif%}">
+                      <span class="menu-title">Blog Management</span>
+                    </a>
+                  </li>
+
+                  <li class="menu-item">
+                    <a href="/admin/faq-list/" class="{% if active_submenu == 'blog-list'%}active{% endif%}">
+                      <span class="menu-title">FAQ Management</span>
+                    </a>
+                  </li>
+
+                  <li class="menu-item">
+                    <a href="/admin/video-list/" class="{% if active_submenu == 'blog-list'%}active{% endif%}">
+                      <span class="menu-title">Video Tutorials</span>
+                    </a>
+                  </li>
+                  
+                  <li class="menu-item">
+                    <a href="/admin/email-template-list/" class="{% if active_submenu == 'blog-list'%}active{% endif%}">
+                      <span class="menu-title">Email Templates</span>
+                    </a>
+                  </li>
+
+                </ul>
+              </div>
+            </li>
+          {% endif %}
+
+          {% if 19 in access_permission_list %}
+            <li class="menu-item sub-menu">
+              <a href="#" class="{% if active_menu == 'pages' %}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="fas fa-robot"></i>
+                </span>
+                <span class="menu-title">Property Estimators</span>
+              </a>
+              <div class="sub-menu-list">
+                <ul>
+                  <li class="menu-item">
+                    <a href="/admin/estimator-category-list/" class="{% if active_submenu == 'estimator-category-list'%}active{% endif%}">
+                      <span class="menu-title">Categories</span>
+                    </a>
+                  </li>
+
+                  <li class="menu-item">
+                    <a href="/admin/estimator-question-list/" class="{% if active_submenu == 'estimator-question-list'%}active{% endif%}">
+                      <span class="menu-title">Questions</span>
+                    </a>
+                  </li>
+
+                  <li class="menu-item">
+                    <a href="/admin/estimator-list/" class="{% if active_submenu == 'estimator-list'%}active{% endif%}">
+                      <span class="menu-title">Estimator List</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          {% endif %}
+
+          {% if 22 in access_permission_list %}
+            <li class="menu-item">
+              <a href="/admin/advertisement-list/" class="{% if active_menu == 'advertisement-list'%}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="glyphicon glyphicon-bullhorn"></i>
+                </span>
+                <span class="menu-title">Advertisement <div id="adminDashboardChatCount" class="circle" style="display:none;">5</div></span>
+              </a>
+            </li>
+          {% endif %}
+
+          {% if 18 in access_permission_list %}
+            <li class="menu-item">
+              <a href="/admin/chat/" class="{% if active_menu == 'chat'%}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="fas fa-comments"></i>
+                </span>
+                <span class="menu-title">Chat <div id="adminDashboardChatCount" class="circle" style="display:none;">5</div></span>
+              </a>
+            </li>
+          {% endif %}
+          
+          {% if 21 in access_permission_list %}
+            <li class="menu-item sub-menu">
+              <a href="#" class="{% if active_menu == 'pages' %}active{% endif%}">
+                <span class="menu-icon">
+                  <i class="far fa-address-card"></i>
+                </span>
+                <span class="menu-title">Inquiry</span>
+              </a>
+              <div class="sub-menu-list">
+                <ul>
+                  <li class="menu-item">
+                    <a href="/admin/contact-listing/" class="{% if active_submenu == 'contact_listing'%}active{% endif%}">
+                      <span class="menu-title">Contact Us</span>
+                    </a>
+                  </li>
+
+                  <li class="menu-item">
+                    <a href="/admin/schedule-tour-list/" class="{% if active_submenu == 'schedule_tours'%}active{% endif%}">
+                      <span class="menu-title">Schedule Tours</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          {% endif %}
+
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div><!-- End .sidebar -->
+
+<div id="overlay" class="overlay2"></div>
+<a id="btn-toggle" href="#" class="sidebar-toggler break-point-sm">
+  <i class="ri-menu-line ri-xl"></i>
+</a>

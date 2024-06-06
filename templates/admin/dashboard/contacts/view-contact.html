@@ -1,0 +1,244 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+
+<div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Contact Us: <span id="contact_total">{{ contact_total }}</span></strong>
+                </h6>
+              </div>
+              <div class="block">
+                <form action="" class="search-field last ui-widget">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" name="user_search" placeholder="Search" id="contact_search" class="form-control input-sm sugesstion_input" value="{{ request.GET.search|default:'' }}"><button type="button" id="searchContactBtn" class="btn btn-primary btn-sm pl20" onclick="contactSearch()">Search</button>
+                </form>
+              </div>
+              <div class="block filters">
+                <ul>
+                  <li>
+                    <span class="text">
+                      <i class="fas fa-filter"></i> Filters
+                    </span>
+                  </li>
+                  <li>
+                    <select name="contact_user_type" id="contact_user_type" class="select form-control" onchange="contactSearch()">
+                      <option value="">All User Type</option>
+                      <option value="buyer" {% if user_type|lower == 'buyer' %}selected{% endif %}>Buyer</option>
+                      <option value="seller" {% if user_type|lower == 'seller' %}selected{% endif %}>Seller</option>
+                      <option value="agent" {% if user_type|lower == 'agent' %}selected{% endif %}>Agent</option>
+                    </select>
+                  </li>
+                  <li>
+                    <select name="contact_num_record" id="contact_us_num_record" class="select form-control" onchange="contactSearch()">
+                      <option value="10">10 Contacts</option>
+                      <option value="20">20 Contacts</option>
+                      <option value="30">30 Contacts</option>
+                      <option value="40">40 Contacts</option>
+                      <option value="50">50 Contacts</option>
+                    </select>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .listing-top -->
+
+            <div class="listing-table" id="contact_listing">
+              {% if contact_list %}
+              {% for contact in contact_list %}
+              <div class="parcel_blocks" id="contact_row_{{ contact.id }}">
+                <ul class="bottom">
+                  <li>
+                    No :  {{ forloop.counter0|add:sno }}
+                  </li>
+                  <li>
+                      Submit Date |
+                      <span class="item convert_to_local_date_time date-block" data-value="{{ contact.added_on|default:'' }}">
+                        {{ contact.added_on }}
+                      </span>
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li>
+                    <h6 class="name">
+                      {{ contact.first_name|default:"" }}
+                      <span>
+                        Name
+                      </span>
+                    </h6>
+                  </li>
+                  <li>
+                    <div class="buyer-name">
+                      <i class="fa-solid fa-user"></i>
+                      <h6>
+                        {{ contact.user_type|default:'' }}
+                        <span>
+                          User Type
+                        </span>
+                      </h6>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-envelope"></i>
+                      {{ contact.email|default:"" }}
+                    </div>
+                    <div class="email-text">
+                      <i class="fa-solid fa-phone"></i>
+                      {{ contact.phone_no|default:''|format_phone }}
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-comment-dots"></i>
+                      <a href="javascript:void(0)" onclick="contact_detail({{ contact.id }})">View Message</a>
+                    </div>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endfor %}
+              {% else %}
+
+              <div class="parcel_blocks">
+                <ul class="bottom">
+                  <li>
+                    No data Available
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li class="fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class=""/>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endif %}
+            </div><!-- End .listing-table -->
+            
+            <!-- <div class="default-table contact-table">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Name
+                </div>
+                <div class="item">
+                  Phone
+                </div>
+                <div class="item">
+                  Email Address
+                </div>
+                <div class="item">
+                  User Type
+                </div>
+                <div class="item">
+                  Message
+                </div>
+                <div class="item">
+                  Submit Date
+                </div>
+              </div>
+              <div class="block sscroll" id="contact_listing">
+                {% if contact_list %}
+                {% for contact in contact_list %}
+                <div class="block-item" id="contact_row_{{ contact.id }}">
+                  <div class="item">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    {{ contact.first_name|default:"" }}
+                  </div>
+                  <div class="item">
+                    {{ contact.phone_no|default:''|format_phone }}
+                  </div>
+                  <div class="item">
+                    {{ contact.email|default:"" }}
+                  </div>
+                  <div class="item">
+                    {{ contact.user_type|default:'' }}
+                  </div>
+                  <div class="item center">
+                    <a href="javascript:void(0)" class="badge badge-info" onclick="contact_detail({{ contact.id }})"><i class="fas fa-eye"></i></a>
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ contact.added_on|default:'' }}">
+                    {{ contact.added_on }}
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <p class="custom_error center mb0"><img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" /></p>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div> -->
+
+
+            <div class="pagination">
+              {{ pagination_html }}
+            </div>
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+
+<div id="contactDetailModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Message</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <div id="message" class="message"></div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block js_content %}
+
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/tableHeadFixer.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/pagination.js' %}?v=1.0"></script>
+    <script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=2.0"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.6"></script>
+    <script type="text/javascript" src="{% static 'admin/js/contact_us.js' %}?v=4.6"></script>
+      <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+      <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+  <script>
+    $("#phone_no").inputmask('(999) 999-9999');
+    function contact_detail(contact_id){
+        contactDetail(contact_id)
+    }
+  </script>
+{% endblock %}

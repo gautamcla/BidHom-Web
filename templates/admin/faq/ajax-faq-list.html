@@ -1,0 +1,93 @@
+{% load static %}
+
+<div class="table-responsive">
+<table class="table table-striped jambo_table bulk_action">
+    <thead>
+    <tr class="headings" style="white-space: nowrap;">
+        <th class="column-title">ID </th>
+        <th class="column-title" style="width:12%">Domain Name </th>
+        <th class="column-title">Question </th>
+        <th class="column-title">Answer </th>
+        <th class="column-title">Added On </th>
+        <th class="column-title">Status </th>
+        <th class="column-title no-link last" style="width:10%"><span class="nobr">Action</span></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% if data.total > 0 %}
+        {% for faq in data.data %}
+        <tr class="even pointer" style="white-space: nowrap;">
+        <td class=" ">{{ forloop.counter|add:start_index }}</td>
+        <td>
+            {{faq.domain_name|default:'-'}}
+        </td>
+        <td class=" ">
+            {% autoescape off %}
+            {{ faq.question|striptags|truncatewords:"10" }}
+            {% if faq.question|striptags|wordcount > 10 %}
+            <a href="javascript:;" class="text-primary" data-toggle="tooltip" title="{{ faq.question|striptags|safe}}">view more</a>
+            {% endif %}
+            {% endautoescape %}
+        </td>
+        <td class=" ">
+            {% autoescape off %}
+            {{ faq.answer|striptags|truncatewords:"10" }}
+            {% if faq.answer|striptags|wordcount > 10 %}
+            <a href="javascript:;" class="text-primary" data-toggle="tooltip" title="{{ faq.answer|striptags|safe}}">view more</a>
+            {% endif %}
+            {% endautoescape %}
+        </td>
+        <td class="convert_to_local_date" data-value="{{ faq.added_on|default:'' }}">{{faq.added_on|parse_iso|date:'m-d-Y g:i A'}}</td>
+        <td class=" ">
+            <a type="button" class="btn  btn-xs btn-round {% if faq.status == 1 %} btn-success {% elif faq.status == 5 %} btn-danger {% else %} btn-warning {% endif %}" id="statusText{{faq.id}}">{{faq.status_name}} </a> 
+        </td>
+
+        <td class="last">
+            <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+            <a href="{% url 'admin-edit-faq' faq.id %}" type="button" class="btn btn-xs btn-round btn-primary edit-faq"><i class="fa fa-edit"></i> Edit</a>
+            </div>
+
+        </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>  <td class=" ">No FAQ available </td></tr>
+    {% endif %}
+    
+    </tbody>
+</table>
+</div>
+
+{% if data.total > 0 %}
+<nav aria-label="Page navigation example" style="float:right;">
+  <ul class="pagination justify-content-end">
+    {{pagination|safe}}
+  </ul>
+</nav>
+{% endif %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+      $('#totalCount').html('{{data.total}}');
+
+      $('.convert_to_local_date').each(function(){
+        try{
+            var added_on = $(this).attr('data-value');
+            if(added_on.trim() != "" && added_on.trim() != "None"){
+                var local_date = getLocalDate(added_on.trim(), 'mm/dd/yyyy','ampm');
+                var actual_date = local_date.split(" ");
+                actual_date = actual_date[0]+' '+actual_date[1]+' '+actual_date[2];
+                $(this).html(actual_date);
+            }else{
+                $(this).html('-');
+            }
+        }catch(ex){
+            console.log(ex);
+        }
+    });
+  });
+  </script>
+{% endblock js_content %}

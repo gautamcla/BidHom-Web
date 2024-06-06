@@ -1,0 +1,13 @@
+.chosen-container {
+  border: none !important;
+  border-bottom: 1px solid #5d5d5d !important;
+}
+.chosen-container-single {
+  .chosen-single {
+    padding: 0 !important;
+    text-align: left;
+    div {
+      right: 0 !important;
+    }
+  }
+}

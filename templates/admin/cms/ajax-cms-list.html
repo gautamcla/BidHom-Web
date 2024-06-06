@@ -1,0 +1,104 @@
+{% load static %}
+
+<div class="table-responsive">
+<table class="table table-striped jambo_table bulk_action">
+    <thead>
+    <tr class="headings">
+     <th class="column-title">ID </th>
+        <th class="column-title" style="width:10%">Domain Name </th>
+        <th class="column-title">Page Title </th>
+        {% comment %} <th class="column-title">Page Description </th> {% endcomment %}
+        <th class="column-title">Meta Title </th>
+        <th class="column-title">Meta Keyword </th>
+        {% comment %} <th class="column-title" >Meta Description </th> {% endcomment %}
+        <th class="column-title">Status </th>
+        <th class="column-title no-link last" style="width:14%"><span class="nobr">Action</span>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% if data.total > 0 %}
+        {% for cms in data.data %}
+        <tr class="even pointer">
+        <td class=" ">{{ forloop.counter|add:start_index }}</td>
+        <td>
+            {{cms.site_domain|default:'-'}}
+        </td>
+        <td class=" ">
+            {% autoescape off %}
+            {{ cms.page_title|striptags|truncatewords:"10" }}
+            {% if cms.page_title|striptags|wordcount > 10 %}
+            <a href="javascript:;" class="text-primary" data-toggle="tooltip" title="{{ cms.page_title|striptags|safe}}">view more</a>
+            {% endif %}
+            {% endautoescape %}
+        </td>
+        <td class=" ">
+            {% autoescape off %}
+            {{ cms.meta_title|striptags|truncatewords:"10" }}
+            {% if cms.meta_title|striptags|wordcount > 10 %}
+            <a href="javascript:;" class="text-primary" data-toggle="tooltip" title="{{ cms.meta_title|striptags|safe}}">view more</a>
+            {% endif %}
+            {% endautoescape %}
+        </td>
+        <td class=" ">{{cms.meta_key_word}}</td>
+        <td class=" ">
+            <a type="button" class="btn  btn-xs btn-round {% if cms.status == 1 %} btn-success {% elif cms.status == 5 %} btn-danger {% else %} btn-warning {% endif %}" id="statusText{{cms.id}}">{{cms.status_name}}</a> 
+        </td>
+        <td class="last">
+            <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+            <a href="{% url 'admin-edit-cms' cms.id %}" type="button" class="btn btn-xs btn-round btn-primary edit-cms"><i class="fa fa-edit"></i> Edit</a>
+            <form method="post" action="{% url 'admin-cms-status-change' %}" data-id="{{cms.id}}" action="" class="ActiveInactive" >
+                {% csrf_token %}
+                <input type="hidden" name="cms_id" value="{{cms.id}}">
+                <input type="hidden" class="status-change" name="status" value="{% if cms.status == 1 %}2{% else %}1{% endif %}">
+                {% if cms.status == 1 %}
+                <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                {% else %}
+                <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                {% endif %}
+            </form>
+            </div>
+
+        </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>  <td class=" ">No CMS available </td></tr>
+    {% endif %}
+    
+    </tbody>
+</table>
+</div>
+
+{% if data.total > 0 %}
+<nav aria-label="Page navigation example" style="float:right;">
+  <ul class="pagination justify-content-end">
+    {{pagination|safe}}
+  </ul>
+</nav>
+{% endif %}
+
+
+
+{% block js_content %}
+  <script>
+  $(function() {
+    $('#totalCount').html('{{data.total}}')
+    $('.convert_to_local_date').each(function(){
+        try{
+            var added_on = $(this).attr('data-value');
+            if(added_on.trim() != "" && added_on.trim() != "None"){
+                var local_date = getLocalDate(added_on.trim(), 'mm/dd/yyyy','ampm');
+                var actual_date = local_date.split(" ");
+                actual_date = actual_date[0]+' '+actual_date[1]+' '+actual_date[2];
+                $(this).html(actual_date);
+            }else{
+                $(this).html('-');
+            }
+        }catch(ex){
+            console.log(ex);
+        }
+    });
+  });
+  </script>
+{% endblock %}

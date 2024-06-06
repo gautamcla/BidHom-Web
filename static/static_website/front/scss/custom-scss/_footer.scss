@@ -1,0 +1,145 @@
+.footer {
+  clear: both;
+  padding: 40px 0;
+  background: $gray;
+  color: $white;
+
+  @include breakpoint(xs) {
+    padding: 30px 0;
+  }
+
+  .footer-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border-bottom: 1px solid #0a457a;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+
+    .block {
+      &:first-child {
+        @include breakpoint(xs) {
+          padding-bottom: 10px;
+        }
+      }
+    }
+  }
+
+  .address {
+    display: flex;
+    flex-wrap: wrap;
+
+    li {
+      padding: 0 30px 0 45px;
+      font-size: $fontExtraLarge;
+      font-weight: 300;
+      display: flex;
+      position: relative;
+
+      @include breakpoint(sm) {
+        font-size: $fontLarge;
+        padding: 0 20px 15px 30px;
+      }
+
+      @include breakpoint(xxs) {
+        font-size: $fontMiddle;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
+
+      .icon {
+        position: absolute;
+        left: 0;
+        @include iconBg();
+        background-color: transparent;
+        width: 30px;
+        height: 31px;
+
+        &.home-icon {
+          background-position: -380px -245px;
+        }
+
+        &.email-icon {
+          background-position: -448px -245px;
+        }
+
+        &.ph-icon {
+          background-position: -515px -245px;
+        }
+
+      }
+    }
+  }
+
+  .social-links {
+    display: flex;
+
+    li {
+      margin: 0 15px 0 0;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .footer-middle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    @include breakpoint(xs) {
+      display: block;
+    }
+
+    .block {
+      width: 20%;
+      padding: 0 15px;
+
+      @include breakpoint(xs) {
+        width: 100%;
+        padding: 0 0 15px;
+      }
+
+      &:first-child {
+        padding-left: 0;
+
+        @include breakpoint(xs) {
+          width: 100%;
+        }
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
+
+      h6 {
+        border-bottom: 1px solid $white;
+        display: inline-block;
+        font-weight: 400;
+      }
+
+      .copyright {
+        color: #d2d0c4;
+      }
+
+      ul.links {
+        li {
+          padding: 5px 0;
+
+          a {
+            color: $white;
+            font-weight: 300;
+
+            &:hover {
+              color: rgba($color: #FFF, $alpha: 0.5);
+            }
+          }
+        }
+      }
+    }
+  }
+
+}

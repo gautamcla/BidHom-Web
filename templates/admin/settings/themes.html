@@ -1,0 +1,221 @@
+{% extends "admin/layouts/layout.html" %}
+{% load static %}
+
+{% block title %} Themes {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>Themes <small>Some available themes for Broker/Agent</small></h3>
+        </div>
+        <button type="button" class="btn btn-primary" style="float:right;" data-toggle="modal" data-target=".add-theme"><i class="fa fa-plus-circle"></i> Add Theme</button>
+
+      <div class="clearfix"></div>
+
+      <div class="row">
+        
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_content">
+
+              {% if messages %}
+              {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+              <div class="table-responsive">
+                <table class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">
+                      <th class="column-title">ID </th>
+                      <th class="column-title">Theme Name </th>
+                      <th class="column-title">Theme Directory </th>
+                      <th class="column-title">Status </th>
+                      <th class="column-title no-link last"><span class="nobr">Action</span>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {% if data %}
+                        {% for theme in data %}
+                        <tr class="even pointer">
+                        <td class=" ">{{ forloop.counter }}</td>
+                        <td class=" ">{{theme.theme_name}}</td>
+                        <td class=" ">{{theme.theme_dir}}</td>
+                        <td class=" ">
+                          {% if theme.is_active %}
+                          <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{theme.id}}">Active</button> 
+                          {% else %}
+                          <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{theme.id}}">Inactive</button> 
+                           {% endif %}
+                        </td>
+                        <td class="last">
+                          <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                            <button type="button" data-id="{{theme.id}}" data-name="{{theme.theme_name}}" data-dir="{{theme.theme_dir}}" data-status="{{theme.is_active}}" class="btn btn-xs btn-round btn-primary edit-theme"><i class="fa fa-edit"></i> Edit</button>
+                            <form method="post" data-id="{{theme.id}}" action="{% url 'admin-theme-status-change' %}" class="ActiveInactive">
+                              {% csrf_token %}
+                              <input type="hidden" name="theme_id" value="{{theme.id}}">
+                              <input type="hidden"class="status-change" name="status" value="{{theme.is_active|yesno:"0,1"}}">
+                              {% if theme.is_active %}
+                                <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                              {% else %}
+                                <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                              {% endif %}
+                            </form>
+                          </div>
+
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>  <td class=" ">No Theme selected </td></tr>
+                    {% endif %}
+                    
+                  </tbody>
+                </table>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Add theme modal -->
+  <div class="modal fade add-theme" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Add Theme</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate name="admin_login_frm" id="admin_login_frm" class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Theme Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="theme_dir">Theme Directory <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" id="theme_dir" name="theme_dir" required="required" >
+                <option value="">Choose available theme</option>
+                {% for list in themelist %}
+                  {% if list != 'download' %}
+                    <option value="{{list}}">{{list}}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit_theme_is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+  <!--Edit thene Modal-->
+  <div class="modal fade edit-theme-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Edit Theme</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate name="admin_login_frm" id="admin_login_frm" class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <input type="hidden" id="theme_id" name="theme_id" >
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit_name">Theme Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="edit_name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit_theme_dir">Theme Directory <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="form-control" id="edit_theme_dir" name="theme_dir" required="required" >
+                  <option value="">Choose available theme</option>
+                  {% for list in themelist %}
+                    {% if list != 'download' %}
+                      <option value="{{list}}">{{list}}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit_theme_is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" id="edit_theme_is_active" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End modal-->
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/themes.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+
+{% endblock javascripts %}

@@ -1,0 +1,535 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+
+<div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Users</strong>
+                </h6>
+              </div>
+              <div class="block">
+                <form action="" class="search-field last ui-widget">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" name="user_search" placeholder="Search" id="user_search" class="form-control input-sm sugesstion_input" value="{{ request.GET.search|default:'' }}"><button type="button" id="searchUserBtn" class="btn btn-primary btn-sm pl20" onclick="userListingSearch(1);">Search</button>
+                </form>
+              </div>
+              <div class="block filters">
+                <ul>
+                  <li>
+                    <span class="text">
+                      <i class="fas fa-filter"></i> Filters
+                    </span>
+                  </li>
+                  <li>
+                    <select name="user_filter_status" id="user_filter_status" class="select form-control" onchange="userListingSearch(1);">
+                      <option value="">All Status</option>
+                      <option value="active" {% if request.GET.status and request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                      <option value="inactive" {% if request.GET.status and request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                  </li>
+                  <li>
+                    <select name="user_num_record" id="user_num_record" class="select form-control" onchange="userListingSearch(1);">
+                      <option value="">Record Per Page</option>
+                      <option value="10" {% if request.GET.perpage and request.GET.perpage == 10 %}selected{% endif %}>10</option>
+                      <option value="20" {% if request.GET.perpage and request.GET.perpage == 20 %}selected{% endif %}>20</option>
+                      <option value="30" {% if request.GET.perpage and request.GET.perpage == 30 %}selected{% endif %}>30</option>
+                      <option value="40" {% if request.GET.perpage and request.GET.perpage == 40 %}selected{% endif %}>40</option>
+                      <option value="50" {% if request.GET.perpage and request.GET.perpage == 50 %}selected{% endif %}>50</option>
+                    </select>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .listing-top -->
+            
+            <div class="default-table user-table">
+              <div class="block">
+                
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Name
+                </div>
+                <div class="item">
+                  Email Address
+                </div>
+                <div class="item">
+                  Phone
+                </div>
+                <div class="item">
+                  Bid
+                </div>
+                <div class="item">
+                  Status
+                </div>
+                <div class="item">
+                  Created Date
+                </div>
+                <div class="item">
+                  Last Login
+                </div>
+                <div class="item">
+                  Action
+                </div>
+              </div><!-- End .block -->
+              <div class="block sscroll" id="user_listing">
+                  {% if user_list %}
+                {% if user_list|length > 3 %}
+                    {% define_var user_list|length|add:'-1' as first_row %}
+                    {% define_var user_list|length as second_row %}
+                  {% else %}
+                    {% define_var 0 as first_row %}
+                    {% define_var 0 as second_row %}
+                  {% endif %}
+                {% for user in user_list %}
+
+                <div class="block-item user_details {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}" data-href="/admin/user-details/?user_id={{user.id}}" id="user_row_{{ user.id }}" data-user_id="{{ user.id }}">
+                  <!-- <div class="item">
+                    <a href="#"><i id="icon_{{ user.id }}" class="far fa-plus-square"></i></a>
+                  </div> -->
+                  <div class="item">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    <div class="user-pics agent-pics">
+                      <a href="/admin/user-details/?user_id={{user.id}}">
+                        {% if user.described_by == 3 %}
+                        <div class="tooltipp"><i class="fas fa-info-circle"></i>
+                          <span class="tooltipp__content user-tip-tool right">Brokerage Name: {{ user.other_brokerage_name }}<br/>License No.: {{ user.other_licence_number }} </span>
+                        </div>
+                        {% endif %}
+                        <span class="user-pic"><img src="{% if user.profile_image.doc_file_name %}{{ aws_url }}{{ user.profile_image.bucket_name }}/{{ user.profile_image.doc_file_name }}{% else %}{% static 'admin/images/no-image.jpg' %}{% endif %}" alt=""></span>
+                        <h6>
+                          <span>{{ user.first_name|default:"" }} {{ user.last_name|default:"" }}
+                            
+                          </span>
+                        </h6>
+                      </a>
+                    </div>
+                  </div>
+                  <div class="item">
+                    {{ user.email|default:"" }}
+                  </div>
+                  <div class="item">
+                    {{ user.phone_no|default:''|format_phone }}
+                  </div>
+                  <div class="item">
+                    {{ user.bids|default:'0' }}
+                  </div>
+                  <div class="item">
+                    
+                    <span class="badge {% if user.status == 2 %} badge-danger{% elif user.status == 4 %} badge-warning{% else %}badge-success{% endif %}">
+                      {{ user.status_name|default:'' }}
+                    </span>
+                    
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ user.added_on|default:'' }}">
+                    {{ user.added_on }}
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ user.last_login|default:'' }}">
+                    {{ user.last_login }}
+                  </div>
+                  <div class="item center">
+                      <div class="action_dropdown {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}dropup{% endif %}{% endif %}">
+                    <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </a>
+                    <ul role="menu" class="dropdown-header-top author-log dropdown-menu right">
+                        <li><a href="javascript:void(0)" onclick="get_popup_user_details({{ user.id }})"><i class="fas fa-edit"></i> Edit</a>
+                        </li>
+                        <li><a href="javascript:void(0)" onclick="user_delete_confirmation({{ user.id }})"><i class="fas fa-trash"></i> Delete</a>
+                        </li>
+                        <li><a href="javascript:void(0)" onclick="get_make_agent_details({{ user.id }})"><i class="fas fa-long-arrow-alt-up"></i> Upgrade to agent</a>
+                        </li>
+                      <!--<li><a href="javascript:void(0)" onclick="change_password_user({{ user.id }})"><i class="fas fa-lock"></i> Change Password</a>-->
+<!--                      <li><a href="javascript:void(0)" onclick="reset_password_user({{ user.id }})"><i class="fas fa-share"></i> Reset Password</a>-->
+                          <li><a href="javascript:void(0)" onclick="send_reset_password_link({{ user.id }})"><i class="fas fa-share"></i> Reset Password</a>
+                    </ul>
+                  </div>
+                  </div>
+                </div><!-- End .block-item -->
+
+                <!-- <div class="block-item item-expand">
+                  <div class="item fullwidth list_details" id="user_details_{{ user.id }}">
+                    
+                  </div>
+                </div> -->
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+
+                  </div>
+                </div>
+                {% endif %}
+              </div><!-- End .block -->
+            </div><!-- End .create-table -->
+
+
+            <div class="pagination" id="user_listing_pagination">
+              <ul id="user_listing_pagination_list">
+                {{ pagination_html }}
+              </ul>
+            </div><!-- End .pagination -->
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+        <div id="confirmDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button class="btn btn-primary-bdr del_user_btn" id="del_user_false">No</button> <button class="btn btn-primary del_user_btn" id="del_user_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+
+<div id="userChangePaaswordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Change Password</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            <div class="block">
+              <form name="updateUserPasswordPopupFrm" id="updateUserPasswordPopupFrm" method="post">
+                {% csrf_token %}
+              <input type="hidden" name="change_pass_user_id" id="change_pass_user_id" value=""/>
+              <div class="form-group">
+                <label class="form-label" for="user_current_password">Current Password</label>
+                <input type="password" class="form-input" name="user_current_password" id="user_current_password" placeholder="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="user_new_password">New Password</label>
+                <input type="password" class="form-input"  name="user_new_password" id="user_new_password" placeholder="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="user_confirm_password">Confirm Password</label>
+                <input type="password" class="form-input" name="user_confirm_password" id="user_confirm_password" placeholder="">
+              </div>
+              <!--<ul class="security-list">
+                <li>
+                  Include at least 1 uppercase letter
+                </li>
+                <li>
+                  Include at least 1 lower case letter
+                </li>
+               <li>
+                Include at least 1 number
+               </li>
+              </ul>-->
+              <div class="pt10 clearfix">
+                <button type="button" class="btn btn-primary-bdr" class="close" data-dismiss="modal" aria-label="Close">Cancel</button> <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+              </form>
+
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- End .securityModal -->
+
+<div id="userResetModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset Password</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            <div class="block">
+              <form name="userResetPasswordPopupFrm" id="userResetPasswordPopupFrm" method="post">
+                {% csrf_token %}
+              <input type="hidden" name="reset_user_id" id="reset_user_id" value=""/>
+              <div class="form-group">
+                <label class="form-label" for="user_pass">New Password</label>
+                <input type="password" class="form-input" name="user_pass" id="user_pass" placeholder="">
+              </div>
+              <!--<ul class="security-list">
+                <li>
+                  Include at least 1 uppercase letter
+                </li>
+                <li>
+                  Include at least 1 lower case letter
+                </li>
+               <li>
+                Include at least 1 number
+               </li>
+              </ul>-->
+              <div class="pt10 clearfix">
+                <button type="button" class="btn btn-primary-bdr" class="close" data-dismiss="modal" aria-label="Close">Cancel</button> <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+              </form>
+
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- End .securityModal -->
+
+  <div id="upgradeAgentModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Upgrade to agent</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="make_agent_frm" id="make_agent_frm" method="post">
+          {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+              <input type="hidden" name="agent_id" id="agent_id" value=""/>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="agent_first_name">First Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg alphaAccpt" name="agent_first_name" id="agent_first_name" placeholder="Enter first name" maxlength="40">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="agent_last_name">Last Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg alphaAccpt" name="agent_last_name" id="agent_last_name" placeholder="Enter last name" maxlength="40">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="usr_phone_no">Phone <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg" name="usr_phone_no" id="usr_phone_no" placeholder="Enter phone number" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="user_email">Email <span class="text-danger">*</span></label>
+                  <input type="email" name="user_email" id="user_email" class="form-control no-bg" placeholder="Enter email">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="agent_company">Company <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg" name="agent_company" id="agent_company" placeholder="Enter company name">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="agent_license_no">Agent License Number</label>
+                  <input type="text" class="form-control no-bg" name="agent_license_no" id="agent_license_no" placeholder="Enter agent license number">
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="agent_address">Office address <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg" name="agent_address" id="agent_address" placeholder="Enter office address">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="zip_code">Zip Code <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg" name="zip_code" id="zip_code" placeholder="Enter Zip Code" maxlength="10">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group no-bg">
+                  <label for="agent_state">State <span class="text-danger">*</span></label>
+                  <select class="form-control agent_state" name="agent_state" id="agent_state">
+                    <option value="">Select</option>
+                      {% for state in state_list %}
+                        <option value="{{ state.id }}" data-short-code="{{ state.iso_name }}" {% if state.id == agent_details.state %}selected{% endif %}>{{ state.state_name }}</option>
+                      {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <input type="hidden" name="total_permission" id="total_permission" value="" />
+              <div class="col-md-12">
+                <div class="permission-btn">
+                  <h6>
+                    Permissions
+                  </h6>
+                  <ul>
+                    <li>
+                      <div class="block">
+                        <label for="check_all_permission">Allow All Module Access</label>
+                        <label class="switch small">
+                          <input type="checkbox" id="check_all_permission">
+                          <span class="slide round"></span>
+                        </label>
+                      </div>
+                    </li>
+                  </ul>
+                  <ul id="make_agent_perm_list">
+
+
+                  </ul>
+                </div><!-- End .permission-btn -->
+              </div>
+            </div>
+            
+            <div class="pt20 center">
+              <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary-bdr cancel_popup_action" id="cancel_agent_popup">Cancel</button> <button type="submit" id="make_agent_submit_btn" class="btn btn-primary">Save</button>
+            </div>
+            
+        </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .personalModal -->
+
+  <div id="updateEditUserModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="update_user_frm" id="update_user_frm" method="post">
+          {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+              <input type="hidden" name="update_user_id" id="update_user_id" value=""/>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="user_first_name">First Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg alphaAccpt" name="user_first_name" id="user_first_name" placeholder="Enter first name" maxlength="40">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="user_last_name">Last Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg alphaAccpt" name="user_last_name" id="user_last_name" placeholder="Enter last name" maxlength="40">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="user_phone_no">Phone <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control no-bg" name="user_phone_no" id="user_phone_no" placeholder="Enter phone number" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="usr_email">Email <span class="text-danger">*</span></label>
+                  <input type="email" name="usr_email" id="usr_email" class="form-control no-bg" placeholder="Enter email">
+                </div>
+              </div>
+
+              <div class="col-md-12 user-pic-upload">
+                <label>
+                  User Image
+                </label>
+                <div class="upload-fav">
+                  <div class="item">
+                    <!--<form action="/upload-target" class="dropzone" id="favicon_img" name="favicon_img"></form>-->
+                    <div class="dropzone dz-clickable" id="editUserImgFrm">
+                      <input type="hidden" id="user_img_id" name="user_img_id" value="{{ website_details.custom_site_settings.favicon.upload_id|default:'' }}"/>
+                      <input type="hidden" name="user_img_name" id="user_img_name" value="{{ website_details.custom_site_settings.favicon.image_name|default:'' }}"/>
+                      <div class="dz-default dz-message" data-dz-message="">
+
+                        <div class="block">
+                          <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Photos</button>
+                        </div>
+                        <div class="block">
+                          or
+                        </div>
+                        <div class="block">
+                          <h6>
+                            Drag & Drop Docs
+                            <span>Supported Files:  .png, .jpeg, .jpg</span>
+                          </h6>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="item" id="editUserImgDiv">
+                    <div class="fav-icon">
+                      <figure>
+                        <img src="" id="editUserImg" alt="" style="display:none;">
+                      </figure>
+
+                      <a href="javascript:void(0)" class="confirm_image_delete" data-image-id="{{ website_details.custom_site_settings.favicon.upload_id|default:'' }}" data-image-name="{{ website_details.custom_site_settings.favicon.image_name|default:'' }}" data-image-section="{{ website_details.custom_site_settings.favicon.bucket_name }}" data-count="" id="editUserImageDelBtn" style="display:none;"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                    <!--<div class="tooltipp"><i class="fas fa-question-circle"></i>
+                      <span class="tooltipp__content">Favicon is also known as tab icon, URL
+                        icon, or bookmark icon. It is a small, iconic
+                        image that represents your website.
+                        Preferred image size is 32x32 px <br><img src="{% static 'admin/images/tooltip/favicon.png' %}" alt=""></span>
+                    </div>-->
+                  </div>
+
+                </div><!-- End .uplaod-fav -->
+              <p id="edit_user_image_error"  class="custom_image_error" style="display:none;">Image is required.</p>
+            </div>
+            </div>
+
+            <div class="pt20 center">
+              <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary-bdr cancel_popup_action" id="cancel_update_user_popup">Cancel</button> <button type="submit" id="user_submit_btn" class="btn btn-primary">Save</button>
+            </div>
+
+        </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .personalModal -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+
+{% block js_content %}
+
+    <script type="text/javascript" src="{% static 'admin/js/tableHeadFixer.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <!--<script type="text/javascript" src="{% static 'admin/js/pagination.js' %}?v=1.0"></script>-->
+    <script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=2.0"></script>
+
+<script type="text/javascript" src="{% static 'admin/js/users.js' %}?v=3.1"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.6"></script>
+    <!--<script type="text/javascript" src="{% static 'admin/js/agent.js' %}?v=3.1"></script>-->
+
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+    <!--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+
+{% endblock %}

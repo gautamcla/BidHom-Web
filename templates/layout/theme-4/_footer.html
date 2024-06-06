@@ -1,0 +1,132 @@
+{% load static %}
+
+<footer class="footer" role="Footer">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+
+        <div class="footer-top">
+          <div class="block">
+            <ul class="address">
+              {% if site_detail.business_address|length > 0 %}
+                  {% for addr in site_detail.business_address %}
+              <li>
+                <span class="icon home-icon" role="presentation"></span>
+                {{ addr.site_address|default:'205 S. Main , Smith Center, Kansas, 66967' }}
+                <br>
+              </li>
+              {% endfor %}
+              {% else %}
+              <li>
+                <span class="icon home-icon" role="presentation"></span>
+                <br>
+                205 S. Main , Smith Center, Kansas, 66967
+              </li>
+              {% endif %}
+              <li>
+                <span class="icon email-icon" role="presentation"></span>
+                {{ site_detail.company_email|default:'info@gsa.com' }}
+              </li>
+              <li>
+                <span class="icon ph-icon" role="presentation"></span>
+                {{ site_detail.phone|default:'(646) 421-8637' }}
+              </li>
+              <!-- <li>
+                <span class="icon book-icon"></span>
+                {{ site_detail.licence_no|default:'A14578' }}
+              </li> -->
+            </ul>
+            
+          </div>
+          <div class="block">
+            <ul class="social-links">
+              {% for item in pre_social_account_list %}
+              <li class="{{ item.title }}">
+                <a role="button" href="{{ item.url }}" target="_blank" aria-label="Social links" tabindex="21">
+                  <img src="{% static item.icon %}" alt="Social">
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div><!-- End .footer-top -->
+
+        <div class="footer-middle">
+          <div class="block">
+            <h6 aria-level="6">
+              Search
+            </h6>
+            <ul class="links">
+              <li>
+                <a role="button" href="/our-listing/" tabindex="22">Our Listing</a>
+              </li>
+              <li>
+                <a role="button" href="javascript:void(0)" tabindex="23">Nationwide Listing</a>
+              </li>
+              <li>
+                <a role="button" href="javascript:void(0)" tabindex="24">Sold Properties</a>
+              </li>
+            </ul>
+          </div><!-- End .block -->
+          <div class="block">
+            <h6 aria-level="6">
+              Our Office
+            </h6>
+            <ul class="links">
+              <li>
+                <a role="button" href="/our-agents" tabindex="25">Our Agents</a>
+              </li>
+              <li>
+                <a role="button" href="/about-us" tabindex="26">About Us</a>
+              </li>
+              <li>
+                <a role="button" href="/contact-us" tabindex="27">Contact Us</a>
+              </li>
+            </ul>
+          </div><!-- End .block -->
+          <div class="block">
+            <h6 aria-level="6">
+              Discover
+            </h6>
+            <ul class="links">
+              <li>
+                <a role="button" href="/buyers/" tabindex="28">Buyers</a>
+              </li>
+              <li>
+                <a role="button" href="/sellers/" tabindex="29">Sellers</a>
+              </li>
+              <li>
+                <a role="button" href="javascript:void(0)" tabindex="30">Agents</a>
+              </li>
+            </ul>
+          </div><!-- End .block -->
+          <div class="block">
+            <h6 aria-level="6">
+              Help
+            </h6>
+            <ul class="links">
+              <li>
+                <a role="button" href="/faq/" tabindex="31">FAQ's</a>
+              </li>
+              <li>
+                <a role="button" href="/auction-type/" tabindex="32">Auction Types</a>
+              </li>
+              <li>
+                <a role="button" href="/video-tutorials/" tabindex="33">Video Tutorials</a>
+              </li>
+            </ul>
+          </div><!-- End .block -->
+          <div class="block">
+            <p>
+              <img role="img" area-label="logo" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-4/images/default_img.svg' %}{% endif %}" alt="real estate sales">
+            </p>
+            <div class="copyright">
+              © Copyright {% now "Y" %} All rights reserved.
+            </div>
+          </div><!-- End .block -->
+        </div><!-- End .footer-top -->
+
+      </div><!-- End .col-md-12 -->
+    </div><!-- End .row -->
+  </div><!-- End .container -->
+</footer><!-- End .footer -->

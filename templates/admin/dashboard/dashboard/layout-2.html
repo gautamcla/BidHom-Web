@@ -1,0 +1,1018 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <title>REBA - Home Page</title>
+  <!-- Meta Tags -->
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="format-decetion" content="telephone=no" />
+  <!-- links -->
+  <link rel="icon" href="{% if site_detail.favicon.image_name %}{{ aws_url}}{{ site_detail.favicon.bucket_name }}/{{ site_detail.favicon.image_name }}{% else %}{% static 'theme-2/images/favicon.png' %}{% endif %}" type="image/png" sizes="16x16">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" media="screen" rel="stylesheet" type="text/css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <link href="{% static 'admin/layout-2/css/style.css' %}" type="text/css" rel="stylesheet" />
+  <link href="{% static 'admin/layout-2/css/all.css' %}?v=3" type="text/css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.css" type="text/css" rel="stylesheet" />
+  
+  
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--about-us.html-->
+
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  <!--[if lte IE 7]> <html class="ie7"> <![endif]-->
+  <!--[if IE 8]>     <html class="ie8"> <![endif]-->
+  <!--[if IE 9]>     <html class="ie9"> <![endif]-->
+  <!--[if !IE]><!-->
+  
+</head>
+
+<body class="homepage">
+
+  <header id="header" class="header homepage-header fixed-header">
+    <div class="header-ani">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table">
+              <div class="table-cell">
+                <a href="javascript:void(0)">
+                  <img class="logo" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-2/images/default_img.svg' %}{% endif %}" alt="Open property">
+                  <img class="logo-icon" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-2/images/default_img.svg' %}{% endif %}" alt="">
+                </a>
+              </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <a href="javascript:void(0)" class="nav-button">Menu</a>
+                <a href="javascript:void(0)" class="nav-close">Close Menu</a>
+                <nav class="nav">
+                  <ul>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)">Search</a>
+                      <ul>
+                        <li><a href="javascript:void(0)">Our Listings</a></li>
+                        <li><a href="javascript:void(0)">Sold Listings</a></li>
+                        <li><a href="javascript:void(0)">Nationwide Listings</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)">Buy & Sell</a>
+                      <ul>
+                        <li>
+                          <a href="javascript:void(0)">Buyers Guide</a>
+                        </li>
+                        <li>
+                          <a href="javascript:void(0)">Sellers Guide</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)">Company</a>
+                      <ul>
+                        <li><a href="javascript:void(0)">About Us</a></li>
+                        <li><a href="javascript:void(0)">Our Team</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)">Learn</a>
+                      <ul>
+                        <li><a href="javascript:void(0)">How To Bid</a></li>
+                        <li><a href="javascript:void(0)">Our Auction Types</a></li>
+                        <li><a href="javascript:void(0)">Auction Video Tutorials</a></li>
+                        <li><a href="javascript:void(0)">FAQs</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)">Resources</a>
+                      <ul>
+                        <li><a href="javascript:void(0)">Property Value Estimator</a></li>
+                        <li><a href="javascript:void(0)">Buyers Agent</a></li>
+                        <li><a href="javascript:void(0)">Our Blog</a></li>
+                        <li><a href="javascript:void(0)">Terms & Conditions</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0)">Contact</a>
+                    </li>
+                  </ul>
+                </nav>
+               
+              </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <ul class="user-links">
+                  <li class="register-btn">
+                    <a href="javascript:void(0)">Create <span>Free</span> Account</a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">Login</a>
+                  </li>
+                  
+                </ul>
+              </div><!-- End .table-cell -->
+              
+            </div><!-- End .table -->
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .header-ani -->
+  </header><!-- End .header -->
+
+  <div class="clearfix"></div>
+
+  <div class="body-content">
+    <div class="social-icons">
+      <ul>
+        <li class="facebook">
+          <a href="javascript:void(0)">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+        </li>
+        <li class="twitter">
+          <a href="javascript:void(0)">
+            <i class="fab fa-twitter"></i>
+          </a>
+        </li>
+        <li class="youtube">
+          <a href="javascript:void(0)">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </li>
+        <li class="linkedin">
+          <a href="javascript:void(0)">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </li>
+        <li class="instagram">
+          <a href="javascript:void(0)">
+            <i class="fab fa-instagram"></i>
+          </a>
+        </li>
+      </ul>
+    </div><!-- End .social-icons -->
+    
+      <div class="banner">
+        
+        <div class="slider-content">
+          <div class="slider-lft">
+            <span class="name">{{site_detail.website_name|default:""}}</span>
+            <span class="line"></span>
+          </div>
+          <div class="slider-rgt fadeInRight">
+            <h1>Selling To The Highest Bidder</h1>
+            <a href="javascript:void(0)" class="buy-now-btn"><!--<span class="search-icon"></span>--> START BIDDING NOW</a>
+          </div>
+        </div>
+        
+        <div class="css-slider-wrapper">
+          <input type="radio" name="slider" class="slide-radio1" checked id="slider_1">
+          <input type="radio" name="slider" class="slide-radio2" id="slider_2">
+          <input type="radio" name="slider" class="slide-radio3" id="slider_3">
+          <input type="radio" name="slider" class="slide-radio4" id="slider_4">
+          <div class="slider-pagination">
+            <label for="slider_1" class="page1"></label>
+            <label for="slider_2" class="page2"></label>
+            <label for="slider_3" class="page3"></label>
+            <label for="slider_4" class="page4"></label>
+          </div>
+          <div class="slider slide-1">
+            <img src="{% static 'admin/layout-2/images/banner-1.jpg' %}" alt="">
+            
+            <div class="number-pagination">
+              <span>01<em>/04</em></span>
+            </div> 
+          </div>
+          <div class="slider slide-2">
+            <img src="{% static 'admin/layout-2/images/banner-2.jpg' %}" alt="">
+            
+            <div class="number-pagination">
+              <span>02<em>/04</em></span>
+            </div> 
+          </div>
+          <div class="slider slide-3">
+            <img src="{% static 'admin/layout-2/images/banner-3.jpg' %}" alt="">
+            
+            <div class="number-pagination">
+              <span>03<em>/04</em></span>
+            </div> 
+          </div>
+          <div class="slider slide-4">
+            <img src="{% static 'admin/layout-2/images/banner-4.jpg' %}" alt="">
+            <div class="number-pagination">
+              <span>04<em>/04</em></span>
+            </div> 
+          </div>
+        </div>
+      </div><!-- end .banner -->
+      
+      <div class="real-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="real-wrap-block">
+                <div class="item">
+                  <div class="heading">
+                    <span></span>
+                    <h3>
+                      RETHINK
+                    </h3>
+                    <h1>
+                      Real Estate Auctions
+                    </h1>
+                  </div>
+                  <h5>
+                    <strong>{{site_detail.website_name|default:""}} Solitude</strong> is revolutionizing the way real estate is sold.
+                  </h5>
+                  <h5>
+                    We took the best features from real estate auctions and traditional real estate and created an innovative multi auction platform that works better than any other selling methods in any market condition
+                  </h5>
+                </div>
+                <div class="item">
+                  <div class="real-sidebar">
+                    <span class="wwwu-inner-border-accent wow fadeInLeft"></span>
+                    <span class="wwwu-outer-border-accent wow fadeInRight"></span>
+                    <ul>
+                      <li class="active">
+                        <a href="javascript:void(0)">Classic Online Auction</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)">Live Event Auction</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)">Insider Online Auction</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)">Multiple Parcel Online Auction</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)">Highest and Best Offer</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)">Traditional Listing</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+            
+          </div>
+        </div>
+      </div><!-- End .real-wrap -->
+      
+      <div class="whoweare-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="inner-wrap">
+                <span class="wwwu-inner-border-accent wow fadeInLeft"></span>
+                <span class="wwwu-outer-border-accent wow fadeInRight"></span>
+                <div class="heading">
+                  <span></span>
+                  <h3>
+                    Welcome to
+                  </h3>
+                  <h1>
+                    {{site_detail.website_name|default:""}}
+                  </h1>
+                </div>
+                
+                <h5>
+                  <span class="red-text">{{site_detail.website_name|default:""}}</span> and his team's goal is to make the biggest transaction of your life a seamless process that maximizes your long-term investment. John has been a top Realtor in the Main Line and Philadelphia markets for 17 years and has leveraged his background in internet marketing to ensure highly visual and visible listings for his clients on the most highly trafficked real estate platforms.
+                </h5>
+                <h5>
+                  His digital marketing savvy combined with his expertise in the Main Line and Philadelphia marketplaces gives his clients a distinct competitive edge.
+                </h5>
+                <div class="clearfix pt20">
+                  <a href="javascript:void(0)" class="btn btn-primary line">Learn More</a>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div><!-- End .whoweare-wrap -->
+
+      <div class="experties-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="block">
+                <div class="item">
+                  <div class="heading">
+                    <span></span>
+                    <h3>
+                      Our Expertise
+                    </h3>
+                    <h1>
+                      Specializing In
+                    </h1>
+                  </div>
+                  <h5>
+                    {{site_detail.website_name|default:""}} Solitude is revolutionizing the way real estate is sold.
+                  </h5>
+                  <h5>
+                    We took the best features from real estate auctions and traditional real estate and created an innovative multi auction platform that works better than any other selling methods in any market condition
+                  </h5>
+                </div>
+                <div class="item">
+                  <ul>
+                    <li>
+                      <figure>
+                        <figcaption>
+                          <div class="icon resiicon-1"></div>
+                          <h4>
+                            Residential
+                          </h4>
+                        </figcaption>
+                      </figure>
+                    </li>
+                    <li>
+                      <figure>
+                        <figcaption>
+                          <div class="icon land-1"></div>
+                          <h4>
+                            Land
+                          </h4>
+                        </figcaption>
+                      </figure>
+                    </li>
+                    <li>
+                      <figure>
+                        <figcaption>
+                          <div class="icon commercial-1"></div>
+                          <h4>
+                            Commercial
+                          </h4>
+                        </figcaption>
+                      </figure>
+                    </li>
+                    <li>
+                      <figure>
+                        <figcaption>
+                          <div class="icon auction-1"></div>
+                          <h4>
+                            Auction
+                          </h4>
+                        </figcaption>
+                      </figure>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- End .experties-wrap -->
+      
+      <div class="featured-property">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="block">
+                <div class="item">
+                  <div class="heading">
+                    <span></span>
+                    <h3>
+                      Featured
+                    </h3>
+                    <h1>
+                      Properties
+                    </h1>
+                  </div>
+                </div>
+                <div class="item">
+                  <div class="customNavigation center">
+                    <a class="btn prev"><img src="{% static 'admin/layout-1/images/arrow-left.svg' %}" alt=""></a>
+                    <a class="btn next"><img src="{% static 'admin/layout-1/images/arrow-right.svg' %}" alt=""></a>
+                    <a href="javascript:void(0)" class="btn btn-primary line">View All Properties</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-12">
+              <div id="owl-demo" class="owl-carousel owl-theme">
+                <div class="item">
+                  <a href="javascript:void(0)">
+                    <figure>
+                      <img class="slide-fixed" src="{% static 'admin/layout-1/images/trans-feature.png' %}" alt="">
+                      <img class="slide-img" src="{% static 'admin/layout-1/images/features-1.jpg' %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <div class="bdr-left">
+                        <small>
+                          Commercial- (Direct Offer) Commercial- (Direct Offer)
+                        </small>
+                        <h5>
+                          de Young Museum
+                        </h5>
+                        <h6>
+                          <i class="fas fa-map-marker-alt"></i> 35 industrial rd, westfield, MA 014785
+                        </h6>
+                        <h2 class="price">
+                          $65,000
+                        </h2>
+                      </div>
+                    </figcaption>
+                  </a>
+                </div>
+                <div class="item">
+                  <a href="javascript:void(0)">
+                    <figure>
+                      <img class="slide-fixed" src="{% static 'admin/layout-1/images/trans-feature.png' %}" alt="">
+                      <img class="slide-img" src="{% static 'admin/layout-1/images/features-2.jpg' %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <div class="bdr-left">
+                        <small>
+                          Commercial- (Direct Offer)
+                        </small>
+                        <h5>
+                          de Young Museum
+                        </h5>
+                        <h6>
+                          <i class="fas fa-map-marker-alt"></i> 35 industrial rd, westfield, MA 014785
+                        </h6>
+                        <h2 class="price">
+                          $65,000
+                        </h2>
+                      </div>
+                    </figcaption>
+                  </a>
+                </div>
+                <div class="item">
+                  <a href="javascript:void(0)">
+                    <figure>
+                      <img class="slide-fixed" src="{% static 'admin/layout-1/images/trans-feature.png' %}" alt="">
+                      <img class="slide-img" src="{% static 'admin/layout-1/images/features-3.jpg' %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <div class="bdr-left">
+                        <small>
+                          Commercial- (Direct Offer)
+                        </small>
+                        <h5>
+                          de Young Museum
+                        </h5>
+                        <h6>
+                          <i class="fas fa-map-marker-alt"></i> 35 industrial rd, westfield, MA 014785
+                        </h6>
+                        <h2 class="price">
+                          $65,000
+                        </h2>
+                      </div>
+                    </figcaption>
+                  </a>
+                </div>
+                <div class="item">
+                  <a href="javascript:void(0)">
+                    <figure>
+                      <img class="slide-fixed" src="{% static 'admin/layout-1/images/trans-feature.png' %}" alt="">
+                      <img class="slide-img" src="{% static 'admin/layout-1/images/features-4.jpg' %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <div class="bdr-left">
+                        <small>
+                          Commercial- (Direct Offer)
+                        </small>
+                        <h5>
+                          de Young Museum
+                        </h5>
+                        <h6>
+                          <i class="fas fa-map-marker-alt"></i> 35 industrial rd, westfield, MA 014785
+                        </h6>
+                        <h2 class="price">
+                          $65,000
+                        </h2>
+                      </div>
+                    </figcaption>
+                  </a>
+                </div>
+                <div class="item">
+                  <a href="javascript:void(0)">
+                    <figure>
+                      <img class="slide-fixed" src="{% static 'admin/layout-1/images/trans-feature.png' %}" alt="">
+                      <img class="slide-img" src="{% static 'admin/layout-1/images/features-1.jpg' %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <div class="bdr-left">
+                        <small>
+                          Commercial- (Direct Offer)
+                        </small>
+                        <h5>
+                          de Young Museum
+                        </h5>
+                        <h6>
+                          <i class="fas fa-map-marker-alt"></i> 35 industrial rd, westfield, MA 014785
+                        </h6>
+                        <h2 class="price">
+                          $65,000
+                        </h2>
+                      </div>
+                    </figcaption>
+                  </a>
+                </div>
+                <div class="item">
+                  <a href="javascript:void(0)">
+                    <figure>
+                      <img class="slide-fixed" src="{% static 'admin/layout-1/images/trans-feature.png' %}" alt="">
+                      <img class="slide-img" src="{% static 'admin/layout-1/images/features-2.jpg' %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <div class="bdr-left">
+                        <small>
+                          Commercial- (Direct Offer)
+                        </small>
+                        <h5>
+                          de Young Museum
+                        </h5>
+                        <h6>
+                          <i class="fas fa-map-marker-alt"></i> 35 industrial rd, westfield, MA 014785
+                        </h6>
+                        <h2 class="price">
+                          $65,000
+                        </h2>
+                      </div>
+                    </figcaption>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- End .featured-property -->     
+
+      <div class="why-works">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12 col-md-12">
+              <div class="inner-wrap">
+                <div class="heading">
+                  <span></span>
+                  <h3>
+                    Why Work With Us
+                  </h3>
+                  <h1>
+                    Proven Performance
+                  </h1>
+                </div>
+                
+                <ul>
+                  <li>
+                    <div class="block">
+                      <span></span>
+                      <h1 class="count">
+                        10
+                      </h1>
+                      <h4>
+                        Best Downtown Locations
+                      </h4>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="block">
+                      <span></span>
+                      <h1 class="count">
+                        26
+                      </h1>
+                      <h4>
+                        Exceptional Properties
+                      </h4>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="block">
+                      <span></span>
+                      <h1 class="count">
+                        200
+                      </h1>
+                      <h4>
+                        Satisfied Buyer-Seller
+                      </h4>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="block">
+                      <span></span>
+                      <h1>
+                        +20K
+                      </h1>
+                      <h4>
+                        Email Subscriber
+                      </h4>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .col-md-12 -->
+          </div><!-- End .row -->
+        </div><!-- End .container -->
+      </div><!-- End .brokerage-works -->
+
+      <div class="property-value">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12 col-md-12">
+              <div class="block">
+                <div class="item-block">
+                  <img src="{% static 'admin/layout-2/images/property-value.png' %}" alt="">
+                </div><!-- End .item-block -->
+                <div class="item-block">
+                  <div class="heading">
+                    <span></span>
+                    <h3>
+                      Property Bot
+                    </h3>
+                    <h1>
+                      Property Value Estimator
+                    </h1>
+                  </div>
+                  
+                  <h3>
+                    How much is your <span>property worth?</span>
+                  </h3>
+                  <ul>
+                    <li>
+                      Enter the address and confirm details about your property
+                    </li>
+                    <li>
+                      Quality review by our specialist
+                    </li>
+                    <li>
+                      Your detailed property valuation report delivered in 24 hours
+                    </li>
+                  </ul>
+                  <a href="javascript:void(0)" class="btn btn-primary line">Estimate</a>
+                </div><!-- End .item-block -->
+                
+              </div><!-- End .block -->
+            </div><!-- End .col-md-12 -->
+          </div><!-- End .row -->
+        </div><!-- End .container -->
+      </div><!-- End .modern-business -->
+
+      <div class="article-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="inner-wrap">
+
+                <div class="block">
+                  <div class="item">
+                    <div class="heading">
+                      <span></span>
+                      <h3>
+                        Our
+                      </h3>
+                      <h1>
+                        Blogs
+                      </h1>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <a href="javascript:void(0)" class="btn btn-primary line">View All</a>
+                  </div>
+                </div>
+                
+                
+                <ul>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <div class="item">
+                        <figure>
+                          <img src="{% static 'admin/layout-2/images/transparent.png' %}" alt="">
+                          <img class="article-pic" src="{% static 'admin/layout-2/images/article-1.jpg' %}" alt="">
+                          <small>
+                            Business
+                          </small>
+                        </figure>
+                        <figcaption>
+                          <h6>
+                            Remodeling Projects That Will Boost Your Home’s Value
+                          </h6>
+                          <div class="more">
+                            Read More
+                          </div>
+                        </figcaption>
+                      </div>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <div class="item">
+                        <figure>
+                          <img src="{% static 'admin/layout-2/images/transparent.png' %}" alt="">
+                          <img class="article-pic" src="{% static 'admin/layout-2/images/article-1.jpg' %}" alt="">
+                          <small>
+                            Business
+                          </small>
+                        </figure>
+                        <figcaption>
+                          <h6>
+                            Tips for First-Time Homebuyers
+                          </h6>
+                          <div class="more">
+                            Read More
+                          </div>
+                        </figcaption>
+                      </div>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <div class="item">
+                        <figure>
+                          <img src="{% static 'admin/layout-2/images/transparent.png' %}" alt="">
+                          <img class="article-pic" src="{% static 'admin/layout-2/images/article-1.jpg' %}" alt="">
+                          <small>
+                            Business
+                          </small>
+                        </figure>
+                        <figcaption>
+                          <h6>
+                            Signs that Now is the Time to Sell Your Home
+                          </h6>
+                          <div class="more">
+                            Read More
+                          </div>
+                        </figcaption>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- End .article-wrap -->
+
+      <div class="register-today">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-10 col-md-12 col-lg-offset-1">
+              <div class="register-today-wrap">
+                <h3>
+                  Why wait? Register today!
+<!--                  <span>-->
+<!--                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.-->
+<!--                  </span>-->
+                </h3>
+                <div class="button">
+                  <a href="javascript:void(0)" class="btn btn-primary line">Signup now</a>
+                </div>
+              </div>
+            </div><!-- End .col-md-12 -->
+          </div><!-- End .row -->
+        </div><!-- End .container-fluid -->
+      </div><!-- End .register-today -->
+    
+  </div><!-- end .body-content -->
+
+  <footer class="footer">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="footer-top">
+            <div class="block">
+              <p>
+<!--                <img src="{% static 'admin/layout-1/images/logo.svg' %}" alt="">-->
+                <img src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-1/images/default_img.svg' %}{% endif %}" alt="">
+              </p>
+              <ul class="address">
+                <li>
+                  <span class="icon home-icon"></span>
+                  {{ site_detail.business_address.0.site_address|default:'' }}
+                </li>
+                <li>
+                  <span class="icon email-icon"></span>
+                  {{ site_detail.company_email|default:'' }}
+                </li>
+                <li>
+                  <span class="icon ph-icon"></span>
+                  {{ site_detail.phone|default:'' }}
+                </li>
+                <li>
+                  <span class="icon book-icon"></span>
+                  {{ site_detail.licence_no|default:'' }}
+                </li>
+              </ul>
+            </div><!-- End .block -->
+            
+            <div class="block">
+              <h6>
+                Search
+              </h6>
+              <ul class="links">
+                <li>
+                  <a href="javascript:void(0)">Our Listing</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Nationwide Listing</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Sold Properties</a>
+                </li>
+              </ul>
+            </div><!-- End .block -->
+            <div class="block">
+              <h6>
+                Our Office
+              </h6>
+              <ul class="links">
+                <li>
+                  <a href="javascript:void(0)">Our Agents</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">About Us</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Contact Us</a>
+                </li>
+              </ul>
+            </div><!-- End .block -->
+            <div class="block">
+              <h6>
+                Discover
+              </h6>
+              <ul class="links">
+                <li>
+                  <a href="javascript:void(0)">Buyers</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Sellers</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Agents</a>
+                </li>
+              </ul>
+            </div><!-- End .block -->
+            <div class="block">
+              <h6>
+                Help
+              </h6>
+              <ul class="links">
+                <li>
+                  <a href="javascript:void(0)">FAQ's</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Auction Types</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Video Tutorials</a>
+                </li>
+              </ul>
+            </div><!-- End .block -->
+          </div><!-- End .footer-top -->
+
+          <div class="footer-middle">
+            {% if site_detail.footer_images|length > 6 %}
+              <div id="company-logo" data-logo-count="{% if site_detail.footer_images %}{{ site_detail.footer_images|length }}{% else %}0{% endif %}" class="owl-carousel owl-theme">
+            {% else %}
+            <div class="company-logo" data-logo-count="{% if site_detail.footer_images %}{{ site_detail.footer_images|length }}{% else %}0{% endif %}">
+              {% endif %}
+              {% if site_detail.footer_images %}
+                {% for footer in site_detail.footer_images %}
+                  <div>
+                    <img src="{% if footer.doc_file_name %}{{ aws_url}}{{ footer.bucket_name }}/{{ footer.doc_file_name }}{% else %}{% static 'theme-1/images/partner-1.png' %}{% endif %}" alt="">
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="footer-bottom">
+            <div class="block">
+              © Copyright {% now 'Y' %} All rights reserved.
+            </div><!-- End .block -->
+            <div class="block">
+              <ul>
+                <li>
+                  <a href="javascript:void(0)">Terms & Conditions</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Privacy Policy</a>
+                </li>
+              </ul>             
+            </div><!-- End .block -->
+                       
+          </div><!-- End .footer-bottom -->
+          
+        </div><!-- End .col-md-12 -->
+      </div><!-- End .row -->
+    </div><!-- End .container -->
+  </footer><!-- End .footer -->
+  <div class="copyright">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          Powered by <img src="{% static 'admin/layout-1/images/bidhom_logo_white.png' %}" alt="Reba logo" width="102">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <script type="text/javascript" src="{% static 'admin/layout-1/js/all.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/layout-1/js/homepage.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/layout-1/js/toggle-nav.js' %}"></script>
+  <script>
+      $('.nav').nav();
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" charset="utf-8"></script>
+  <script type="text/javascript" src="{% static 'admin/layout-1/js/slider.js' %}"></script>
+  
+  <script type="text/javascript" src="{% static 'admin/layout-1/js/owl.carousel.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/layout-1/js/owl.navigation.js' %}"></script>
+  <script>
+    $(document).ready(function() {
+      var owl = $("#owl-demo");
+      owl.owlCarousel({
+          margin:15,
+          dots: false,
+          // loop: !1,
+          loop: true,
+          rewind: !0,
+          rewindNav: 0,
+          rewindSpeed: 0,
+          lazyLoad: !0,
+          responsive : {
+              1199 : { items : 3 }, // from zero to 1199 screen width 3 items
+              768 : { items : 2  }, // from zero to 768 screen width 2 items
+              320 : { items : 1  } // from zero to 320 screen width 1 items
+          }
+      });
+
+      $('.next').click(function() {
+        owl.trigger('next.owl.carousel');
+        
+      })
+      $('.prev').click(function() {
+        owl.trigger('prev.owl.carousel', [300]);
+        
+      })
+
+      var Cowl = $("#company-logo");
+      Cowl.owlCarousel({
+          margin:30,
+          loop:true,
+          autoplay:true,
+          navigation: false,
+          autoplaySpeed: 500,
+          autoplayTimeout:2000,
+          autoplayHoverPause:true,
+          //items :6, //10 items above 1000px browser width
+          responsive : {
+              1280 : { items : 6 }, // from zero to 1199 screen width 3 items
+              1199 : { items : 4 }, // from zero to 1199 screen width 3 items
+              768 : { items : 3 }, // from zero to 768 screen width 2 items
+              320 : { items : 1 } // from zero to 320 screen width 1 items
+          }
+      });     
+    });
+  </script>
+
+  <script>
+    $(document).ready(function() {
+
+    var counters = $(".count");
+    var countersQuantity = counters.length;
+    var counter = [];
+
+    for (i = 0; i < countersQuantity; i++) {
+      counter[i] = parseInt(counters[i].innerHTML);
+    }
+
+    var count = function(start, value, id) {
+      var localStart = start;
+      setInterval(function() {
+        if (localStart < value) {
+          localStart++;
+          counters[id].innerHTML = localStart;
+        }
+      }, 40);
+    }
+
+    for (j = 0; j < countersQuantity; j++) {
+      count(0, counter[j], j);
+    }
+    });
+  </script>
+    
+</body>
+</html>

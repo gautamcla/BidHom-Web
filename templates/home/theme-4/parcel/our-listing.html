@@ -1,0 +1,161 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+  <div class="body-content listing-body">
+
+    <div class="search-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <h2>
+              Bid or Sell a Wide Range of Properties
+            </h2>
+            <div class="search-block">
+              <div class="input-group">
+                <input id="search" type="text" class="form-control" placeholder="Search City, State, Zip, Address">
+                <input id="parcel_id" type="hidden" class="form-control" value="{{parcel_id}}">
+                <button class="btn btn-secondary" onclick="getresult(1);"><i class="fas fa-search"></i> Search</button>
+              </div>
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .search -->
+    
+    <div class="product-listing">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="product-listing-wrap">
+              <div class="num-content">
+                <h2>
+                  {{portfolio_detail.name|safe|default:''}}
+                </h2>
+                <p>{{portfolio_detail.details|safe|default:''}}</p>
+                <p>{{portfolio_detail.terms|safe| default:''}}</p>
+                <p>{{portfolio_detail.contact|safe|default:''}}</p>
+              </div><!-- End .num-content -->
+
+              <div id="property_list" class="listing-table">
+                {% for property in property_list %}
+                <div class="listing_blocks">
+                  <ul class="top">
+                    <li>
+                      <figure>
+                        <img class="slide-fixed" src="{% static 'theme-4/images/transparent.png' %}" alt="real estate sales">
+                        <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <h6>
+                          <a href="/asset-details/?property_id={{property.property_id}}">
+                            <span class="blue-text">{{property.name}}</span>
+                            <i class="fas fa-map-marker-alt"></i> {{property.city}}, {{property.state_name}}
+                          </a>
+                        </h6>
+                        <h5 class="price">
+                          Starting Bid -  ${{ property.property_price |convert_num|intcomma|default:'0' }}
+                        </h5>
+                      </figcaption>
+                    </li>
+                    <li>
+                      <div class="block-status">
+                        <div class="item">
+                          <strong><label for="">Status</label></strong><br>
+                          <span class="badge badge-success">
+                            {{property.status}}
+                          </span>
+                        </div>
+                        <div class="item">
+                          <strong><label for="">Tags</label></strong><br>
+                          <span class="badge badge-danger">
+                            {{property.auction_type}}
+                          </span>
+                          <span class="badge badge-danger">
+                            {{property.property_asset}}
+                          </span>
+                        </div>
+                      </div>
+                      {% if property.bidding_start %}
+                      <div class="block-date">
+                        <div class="item">
+                          <strong><label for="">Start Date</label></strong>
+                        </div>
+                        <div class="item">
+                          <span class="time convert_to_local_date_time" data-value="{{ property.bidding_start|default:'' }}"></span>
+                        </div>
+                      </div>
+                      {% endif %}
+                      {% if property.bidding_end %}
+                      <div class="block-date">
+                        <div class="item">
+                          <strong><label for="">End Date</label></strong>
+                        </div>
+                        <div class="item">
+                          <span class="time convert_to_local_date_time" data-value="{{ property.bidding_end|default:'' }}"></span>
+                        </div>
+                      </div>
+                      {% endif %}
+                    </li>
+                    <li>
+                      <div class="center">
+                        {% if property.sale_by_type == '1' %}
+                          {% if property.registration_id %}
+                            <button class="btn btn-secondary btn-sm">{{property.registration_approval}}</button>
+                          {% elif property.status_id == '1' %}
+                            <a href="/bid-registration/?property={{property.property_id}}"><button class="btn btn-secondary btn-sm">Register to Bid</button></a>
+                          {% endif %}
+                        {% endif %}
+                      </div>
+                    </li>
+                  </ul>
+
+                </div><!-- End .block-item -->
+                {% endfor %}
+              </div><!-- End .create-table -->
+              <div class="pagination-wrap">
+                <ul>
+                  <li class="page-item">Result Per Page:</li>
+                  <li class="page-item">
+                    <select name="pagi" aria-label="Result" class="form-control" id="pagi" onchange="getresult(1);">
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="30">30</option>
+                      <option value="40">40</option>
+                    </select>
+                  </li>
+                </ul>
+                <ul class="pagination" id="prop_listing_pagination_list">
+                  {{ pagination_html }}
+                </ul>
+              </div><!-- End .pagination-wrap -->
+
+            </div><!-- End .product-listing-wrap -->
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .product-listing -->
+    
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script>
+
+</script>
+
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-4/js/autosuggestion.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/parcel.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/pagination.js' %}?v=1.1"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>-->
+<!--<script type="text/javascript" src="{% static 'theme-common/js/listing_socket.js' %}?v=1.1"></script>-->
+
+{% endblock %}  

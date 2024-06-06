@@ -1,0 +1,1069 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+
+<div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Property Estimator Details</strong>
+                </h6>
+              </div>
+              <div class="block">
+                
+              </div>
+              <!--<div class="item">
+                <form action="" class="search-field">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" placeholder="Registrant / Company / Email" class="form-control sugesstion_input" name="bidder_search" id="bidder_search">
+                  <button type="button" onclick="bidderListingSearch(1, '');" class="btn btn-primary pl20">Search</button>
+                </form>
+              </div>-->
+            </div>
+
+            <div class="table-tabs">
+              <ul class="tabs">
+                <li class="tab-link current" data-tab="property-address-question-list" id="property_address" onclick="filter_estimator_question_listing(this);">
+                  <a href="#">
+                    Property Address
+                  </a>
+                </li>
+                <li class="tab-link" data-tab="property-detail-question-list" id="property_details" onclick="filter_estimator_question_listing(this);">
+                  <a href="#">
+                    Property Details
+                  </a>
+                </li>
+                <li class="tab-link" data-tab="photo-document-question-list" id="photo_videos" onclick="filter_estimator_question_listing(this);">
+                  <a href="#">
+                    Photos & Document
+                  </a>
+                </li>
+                <li class="tab-link" data-tab="additional-question-list" id="additional_detail" onclick="filter_estimator_question_listing(this);">
+                  <a href="#">
+                    Additional Details
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="property-bot-wrap">
+              <div id="property-address-question-list" class="tab-content current">
+                <div class="bot-head">
+                  <figure>
+                    {% if user_profile_image %}
+                      <img src="{{aws_url}}{{user_profile_image}}" alt="">
+                    {% else %}
+                      <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                    {% endif %}
+                  </figure>
+                  <figcaption>
+                    <h6>
+                      {{user_first_name}}
+                    </h6>
+                  </figcaption>
+                </div>
+
+                <ul class="bot-chat" data-id="1" id="property_address_section" data-name="property_address_section" >
+
+              {% if address_question_list %}
+                {% for question in address_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="bot-content">
+                            <p>
+                              {{ question.question }}
+                            </p>
+                          </div>
+                          <div class="chat-time">
+                            01:55am
+                          </div>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                              {% if option.id == question.answer.answer|convert_num %}
+                              <div class="block">
+                                <input id="user_radio_answer_{{ forloop.counter }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.answer|convert_num %}checked{% endif %} {% if question.answer.id or question.answer.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ forloop.counter }}" class="radio-label">
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+                    <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption>
+                          <div class="bot-content">
+                            <p>
+                              {{ question.question }}
+                            </p>
+                          </div>
+                          <div class="chat-time">
+                            01:55am
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      {% if question.answer.id and question.answer.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                          <div class="chat-time">
+                            01:55am
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% if question.documents %}
+                                {% for doc in question.documents %}
+                                <li>
+                                  <figure>
+                                    <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}',this)">
+                                      <img id="userProfile_{{ forloop.counter }}{{ forloop.counter }}" src="{% if doc.doc_file_name %}{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}{% else %}{% static 'admin/images/default-img-lg.png' %}{% endif %}" alt="">
+                                    </a>
+                                  </figure>
+                                </li>
+                                {% endfor %}
+                                {% else %}
+                                  <li>
+                                    <figure>
+                                      <a href="javascript:void(0)" class="thumbnail">
+                                        <img id="userProfile_11" src="{% static 'admin/images/default-img-lg.png' %}" alt="">
+                                      </a>
+                                    </figure>
+                                  </li>
+                                {% endif %}
+                              </ol>
+                            </div>
+
+                          </div>
+                        </figcaption>
+                        <figure>
+                          {% if user_profile_image %}
+                            <img src="{{aws_url}}{{user_profile_image}}" alt="">
+                          {% else %}
+                            <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                          {% endif %}
+
+                        </figure>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 1 %}active{% endif %}" data-value="1" >
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 2 %}active{% endif %}" data-value="2">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 3 %}active{% endif %}" data-value="3">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 4 %}active{% endif %}" data-value="4">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num > 4 %}active{% endif %}" data-value="5">
+                            <i class="fa fa-star"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'admin/images/map-pic.png' %}" alt=""/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.id and not question.answer.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a href="javascript:void(0)" class="edit-link" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ forloop.counter }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+
+                          </div>
+                        </figcaption>
+                        <figure>
+                          {% if user_profile_image %}
+                            <img src="{{aws_url}}{{user_profile_image}}" alt="">
+                          {% else %}
+                            <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                          {% endif %}
+
+                        </figure>
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+
+
+            </ul>
+              </div><!-- End .tab-content -->
+
+              <div id="property-detail-question-list" class="tab-content">
+                <ul class="bot-chat" data-id="2" id="detail_section" data-name="detail_section" >
+
+              {% if details_question_list %}
+                {% for question in details_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                                {% if option.id == question.answer.answer|convert_num %}
+                              <div class="block">
+                                <input id="user_radio_answer_{{ forloop.counter }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.answer|convert_num %}checked{% endif %} {% if question.answer.id or question.answer.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ forloop.counter }}" class="radio-label">
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                            {% endif %}
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+                    <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      {% if question.answer.id and question.answer.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% if question.documents %}
+                                {% for doc in question.documents %}
+                                <li>
+                                  <figure>
+                                    <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}',this)">
+                                      <img id="userProfile_{{ forloop.counter }}{{ forloop.counter }}" src="{% if doc.doc_file_name %}{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}{% else %}{% static 'admin/images/default-img-lg.png' %}{% endif %}" alt="">
+                                    </a>
+                                  </figure>
+                                </li>
+                                {% endfor %}
+                                {% else %}
+                                  <li>
+                                    <figure>
+                                      <a href="javascript:void(0)" class="thumbnail">
+                                        <img id="userProfile_11" src="{% static 'admin/images/default-img-lg.png' %}" alt="">
+                                      </a>
+                                    </figure>
+                                  </li>
+                                {% endif %}
+                              </ol>
+                            </div>
+
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 1 %}active{% endif %}" data-value="1" >
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 2 %}active{% endif %}" data-value="2">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 3 %}active{% endif %}" data-value="3">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 4 %}active{% endif %}" data-value="4">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num > 4 %}active{% endif %}" data-value="5">
+                            <i class="fa fa-star"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'admin/images/map-pic.png' %}" alt=""/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.id and not question.answer.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a href="javascript:void(0)" class="edit-link" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ forloop.counter }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+
+                          </div>
+                        </figcaption>
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+
+
+            </ul>
+              </div><!-- End .tab-content -->
+              <div id="photo-document-question-list" class="tab-content">
+                <ul class="bot-chat" data-id="3" id="doc_section" data-name="doc_section" >
+
+              {% if doc_question_list %}
+                {% for question in doc_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                              {% if option.id == question.answer.answer|convert_num %}
+                              <div class="block">
+                                <input id="user_radio_answer_{{ forloop.counter }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.answer|convert_num %}checked{% endif %} {% if question.answer.id or question.answer.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ forloop.counter }}" class="radio-label">
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+                    <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      {% if question.answer.id and question.answer.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% if question.documents %}
+                                {% for doc in question.documents %}
+                                <li>
+                                  <figure>
+                                    <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}',this)">
+                                      <img id="userProfile_{{ forloop.counter }}{{ forloop.counter }}" src="{% if doc.doc_file_name %}{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}{% else %}{% static 'admin/images/default-img-lg.png' %}{% endif %}" alt="">
+                                    </a>
+                                  </figure>
+                                </li>
+                                {% endfor %}
+                                {% else %}
+                                  <li>
+                                    <figure>
+                                      <a href="javascript:void(0)" class="thumbnail">
+                                        <img id="userProfile_11" src="{% static 'admin/images/default-img-lg.png' %}" alt="">
+                                      </a>
+                                    </figure>
+                                  </li>
+                                {% endif %}
+                              </ol>
+                            </div>
+
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 1 %}active{% endif %}" data-value="1" >
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 2 %}active{% endif %}" data-value="2">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 3 %}active{% endif %}" data-value="3">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 4 %}active{% endif %}" data-value="4">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num > 4 %}active{% endif %}" data-value="5">
+                            <i class="fa fa-star"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'admin/images/map-pic.png' %}" alt=""/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.id and not question.answer.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a href="javascript:void(0)" class="edit-link" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="2" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ forloop.counter }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+
+                          </div>
+                        </figcaption>
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+
+
+            </ul>
+              </div><!-- End .tab-content -->
+              <div id="additional-question-list" class="tab-content">
+                <ul class="bot-chat" data-id="4" id="additional_section" data-name="additional_section" >
+
+              {% if additional_question_list %}
+                {% for question in additional_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                              {% if option.id == question.answer.answer|convert_num %}
+                              <div class="block">
+                                <input id="user_radio_answer_{{ forloop.counter }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.answer|convert_num %}checked{% endif %} {% if question.answer.id or question.answer.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ forloop.counter }}" class="radio-label">
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                            {% endif %}
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+
+                    <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                        </figure>
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      {% if question.answer.id and question.answer.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% if question.documents %}
+                                {% for doc in question.documents %}
+                                <li>
+                                  <figure>
+                                    <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}',this)">
+                                      <img id="userProfile_{{ forloop.counter }}{{ forloop.counter }}" src="{% if doc.doc_file_name %}{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}{% else %}{% static 'admin/images/default-img-lg.png' %}{% endif %}" alt="">
+                                    </a>
+                                  </figure>
+                                </li>
+                                {% endfor %}
+                                {% else %}
+                                  <li>
+                                    <figure>
+                                      <a href="javascript:void(0)" class="thumbnail">
+                                        <img id="userProfile_11" src="{% static 'admin/images/default-img-lg.png' %}" alt="">
+                                      </a>
+                                    </figure>
+                                  </li>
+                                {% endif %}
+                              </ol>
+                            </div>
+
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 1 %}active{% endif %}" data-value="1" >
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 2 %}active{% endif %}" data-value="2">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 3 %}active{% endif %}" data-value="3">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num >= 4 %}active{% endif %}" data-value="4">
+                            <i class="fa fa-star"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.answer|convert_num > 4 %}active{% endif %}" data-value="5">
+                            <i class="fa fa-star"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'admin/images/map-pic.png' %}" alt=""/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.id and not question.answer.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a href="javascript:void(0)" class="edit-link" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}" id="locationMap_{{ forloop.counter }}" data-counter="{{ forloop.counter }}" {% if not question.answer.id %}onclick="show_location_map(this)"{% elif question.answer.id and question.answer.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ forloop.counter }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'admin/images/bot-user.svg' %}" alt="">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ forloop.counter }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="2" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ forloop.counter }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.id or question.answer.answer %}disabled{% endif %}>{% if question.answer.id and not question.answer.answer %}Skipped{% else %}{{ question.answer.answer|default:'' }}{% endif %}</textarea>
+
+                          </div>
+                        </figcaption>
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+
+
+            </ul>
+              </div><!-- End .tab-content -->
+              <div class="pagination" id="bid_listing_pagination">
+              <ul id="bid_listing_pagination_list">
+                {{ pagination_html }}
+              </ul>
+            </div><!-- End .pagination -->
+
+            </div><!-- End .customscroll -->
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+<div id="BotMapModal" class="modal centered-modal bot-popup" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="location-map" id="location-map">
+
+          </div>
+        </div>
+            <div class="bot-btn">
+            
+              <div class="block">
+                <input type="hidden" name="map_question" id="mapQuestion" value=""/>
+                <input type="hidden" name="section" id="section" value=""/>
+                <input type="hidden" name="counter" id="counter" value=""/>
+                <input type="hidden" name="counter_id" id="counterId" value=""/>
+                <input type="hidden" id="latitude" value=""/>
+                <input type="hidden" id="longitude" value=""/>
+                <input type="text" name="map_answer" id="mapAnswer" class="form-control" placeholder="Address" disabled>
+              </div>
+            </div>
+          <div id="arielView" class="map_view" style="height: 500px; width: 100px; position: relative; overflow: hidden;">
+
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div><!-- End .counterOfferModal -->
+  <div id="lightbox" class="modal centered-modal lightbox-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog">
+
+      <div class="modal-header">
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+          <span aria-hidden="true">&times;</span>
+
+        </button>
+
+      </div>
+
+        <div class="modal-content">
+
+            <div class="modal-body">
+
+              <img id="popupThumbImg" src="images/about.jpg" alt="">
+
+            </div>
+
+        </div>
+
+    </div>
+
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.3"></script>
+<script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static 'admin/js/property-estimator.js' %}?v=6.1"></script>
+<script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{site_detail.google_map_key}}&libraries=&v=weekly" async></script>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if bid_history %}
+{% for bids in bid_history %}
+    <div class="block-item {% if bids.is_winner %}highlight{% endif %}">
+        <div class="item">
+          {{ forloop.counter|add:start_index }}
+        </div>
+        <div class="item winner-user">
+          {% if bids.is_winner %} <i class="fa fa-trophy"></i> {% endif %} {{ bids.first_name }} {{ bids.last_name }}
+        </div>
+        <div class="item">
+          {{ bids.user_type }}
+        </div>
+        <div class="item">
+          {{ bids.email|default:'' }}
+        </div>
+        <div class="item">
+          {{bids.phone_no|default:''|format_phone}}
+        </div>
+        <div class="item">
+          ${{bids.start_price|intcomma|default:'0'}}
+        </div>
+        <!-- <div class="item disableamount">
+          ${{bids.insider_decreased_price|intcomma|default:'0'}} <i class="fas fa-arrow-down"></i>
+        </div> -->
+        <div class="item bidamount">
+          ${{bids.bid_amount|intcomma|default:'0'}}
+        </div>
+        <div class="item">
+          {{bids.ip_address|default:''}}
+        </div>
+        <div class="item date-block convert_to_local_date_time" data-value="{{ bids.bidding_start_time|default:'' }}">
+          {{ bids.bidding_start_time|default:'' }}
+        </div>
+        <div class="item date-block convert_to_local_date_time" data-value="{{ bids.bidding_end_time|default:'' }}">
+          {{ bids.bidding_end_time|default:'' }}
+        </div>
+      </div><!-- End .block-item -->
+{% endfor %}
+{% else %}
+<div class="block-item">
+  <div class="item fullwidth">
+    <div class="item fullwidth">
+        <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% block js_content %}
+<script type="text/javascript" src="{% static 'admin/js/properties.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+{% endblock %}

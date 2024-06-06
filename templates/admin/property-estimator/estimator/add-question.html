@@ -1,0 +1,191 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% block title %} Add Estimator Question {% endblock title %}
+{% block style %}
+{% endblock %}
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>{% if question.id %}Edit{% else %}Add{% endif %} Estimator Question</h3>
+        </div>
+      <div class="clearfix"></div>
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_content">
+                {% comment %}
+            {% if messages %}
+              {% for message in messages %}
+                <div class="message_box alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+                {% endcomment %}
+                <div class="message_box alert alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+              <form method="post" id="addEstimatorQuestion" class="form-horizontal form-label-left" data-parsley-validate>
+                {% csrf_token %}
+                <input type="hidden" name="question_id" id="question_id" value="{{ question.id|default:'' }}"/>
+                <div class="item form-group">
+                  <label class="col-md-3 col-sm-3 col-xs-12" for="question_category">Choose Category <span class="required">*</span>
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                    <select class="form-control" id="question_category" name="question_category" required="required">
+                        <option value="">Choose Available Category</option>
+                        {% for obj in category_list %}
+                                <option value="{{obj.id}}" {% if obj.id == question.category %}selected{% endif %}>{{obj.name}}</option>
+                        {% endfor %}
+                    </select>
+                    </div>
+                    <a href="/admin/estimator-category-list/" target="_blank" type="button" class="btn btn-primary btn-round"> Add more <i class="fa fa-external-link"></i></a>
+                </div>
+
+                  <div class="form-group">
+                    <label class="col-md-3 col-sm-3 col-xs-12" for="question" >Property Asset <span class="required">*</span></label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                      {% for asset in asset_listing %}
+                          <input id="asset_type_{{ asset.id }}" data-parsley-multiple="asset_type" data-parsley-errors-container=".my_error_container" data-parsley-error-message="Please choose at least 1" {% if forloop.last %}data-parsley-trigger="keyup" data-parsley-checkmin="1" data-parsley-required="true" {% endif %} type="radio" name="asset_type" value="{{ asset.id }}" class="asset_type_radio flat" {% if asset.id == question.property_type %}checked{% endif %}>
+                          <label for="asset_type_{{ asset.id }}" class="asset_type_label"><img src="{%if asset.id == 1 %}{% static 'admin/images/land-icon.svg' %}{% elif asset.id == 2 %}{% static 'admin/images/commercial-icon.svg' %}{% elif asset.id == 3 %}{% static 'admin/images/residential-icon.svg' %}{% endif %}" alt=""> {{ asset.name }}</label>
+                          &nbsp; &nbsp; &nbsp;
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="my_error_container col-md-11 center-margin"></div>
+                <div class="item form-group">
+                  <label class="col-md-3 col-sm-3 col-xs-12" for="question">Question <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                      <input id="question" class="form-control col-md-7 col-xs-12" data-parsley-trigger="keyup" name="question" placeholder="Enter Question" required="required" type="text" value="{{ question.question|default:'' }}">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-md-3 col-sm-3 col-xs-12" for="question">Placeholder
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                      <input id="text_placeholder" class="form-control col-md-7 col-xs-12" data-parsley-trigger="keyup" name="text_placeholder" placeholder="Enter Placeholder" type="text" value="{{ question.placeholder|default:'' }}">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-md-3 col-sm-3 col-xs-12" for="question_category">Question Type <span class="required">*</span>
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                    <select class="form-control" id="option_type" name="option_type" required="required">
+                        <option value="" >Choose question Type</option>
+                        {% for obj in question_type_list %}
+                                <option value="{{obj.id}}" {% if obj.id == question.option_type %}selected{% endif %}>{{obj.name}}</option>
+                        {% endfor %}
+                    </select>
+                    </div>
+                </div>
+                <input type="hidden" name="total_option" id="total_option" value="{% if question.question_option|length > 0 %}{{ question.question_option|length }}{% else %}1{% endif %}"/>
+                <div id="option_value_section">
+                    {% if question.question_option %}
+                    {% for obj in question.question_option %}
+                    <div class="add_more_option_value" id="add_more_option_value_{{ forloop.counter0 }}" rel_position="{{ forloop.counter0 }}" style="{% if question.option_type == 2 or question.option_type == 3 %}display:block;{% else %}display:none;{% endif %}">
+                            <input type="hidden" class="row_id" name="row_id_{{ forloop.counter0 }}" id="row_id_{{ forloop.counter0 }}" value="{{ obj.id|default:'' }}"/>
+                            <div class="item form-group">
+                              <label class="col-md-3 col-sm-3 col-xs-12" for="option_value_{{ forloop.counter0 }}">Option Value <span class="required">*</span>
+                              </label>
+                              <div class="col-md-6 col-sm-6 col-xs-12">
+                                  <input id="option_value_{{ forloop.counter0 }}" class="form-control col-md-7 col-xs-12 option_value" {% if question.option_type == 2 or question.option_type == 3 %}data-parsley-trigger="keyup"{% endif %} name="option_value_{{ forloop.counter0 }}" placeholder="Enter Option Value" required="required" type="text" value="{{ obj.option|default:'' }}">
+                              </div>
+
+                              <div class="plus_option_div multi-btn col-md-1 col-sm-1 col-xs-12" style="{% if forloop.counter == 1 %}{% else %}display:none;{% endif %}">
+                                <button type="button" class="btn btn-secondary add_more"><i class="fas fa-plus"></i></button>
+                              </div>
+                              <div class="minus_option_div multi-btn col-md-1 col-sm-1 col-xs-12" style="{% if forloop.counter > 1 %}{% else %}display:none;{% endif %}">
+                                <button type="button" class="btn btn-secondary remove" onclick="confirm_delete_option(this)"><i class="fas fa-times"></i></button>
+                              </div>
+                          </div>
+                    </div><!-- End .add_more_option_value -->
+                    {% endfor %}
+                    {% else %}
+                    <!--<div class="add_more_option_value row" id="add_more_option_value_0" rel_position="0" style="display:none;">
+                        <input type="hidden" class="row_id" name="row_id_0" id="row_id_0" value=""/>
+                        <div class="item form-group ">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="option_value_0">Option Value <span class="required">*</span>
+                          </label>
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                              <input id="option_value_0" class="form-control col-md-7 col-xs-12 option_value" data-parsley-trigger="keyup" name="option_value_0" placeholder="Enter Option Value" required="required" type="text">
+                          </div>
+
+                        <div class="plus_option_div multi-btn col-md-1 col-sm-1 col-xs-12" style="">
+                          <button type="button" class="btn btn-secondary add_more"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="minus_option_div multi-btn col-md-1 col-sm-1 col-xs-12" style="display:none;">
+                          <button type="button" class="btn btn-secondary remove" onclick="confirm_delete_option(this)"><i class="fas fa-times"></i></button>
+                        </div>
+                      </div>
+                    </div>--><!-- End .add_more_option_value -->
+                    {% endif %}
+                </div>
+                <div class="item form-group">
+                  <label class="col-md-3 col-sm-3 col-xs-12" for="question_category">Choose Status <span class="required">*</span>
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                    <select class="form-control" id="question_status" name="question_status" required="required">
+                        <option value="">Choose Status</option>
+                        {% for obj in status_list %}
+                                <option value="{{obj.id}}" {% if obj.id == question.status %}selected{% endif %}>{{obj.name}}</option>
+                        {% endfor %}
+                    </select>
+                    </div>
+                </div>
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-md-offset-3">
+                    <button type="reset" class="btn btn-primary">Reset</button>
+                    <button id="submit" name="submit" type="submit" class="btn btn-success">{% if question.id %}Save{% else %}Add{% endif %}</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div id="confirmDateDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button"  class="btn btn-primary-bdr del_option_btn" id="del_option_false" del_element_id="">No</button> <button type="button" class="btn btn-primary del_option_btn" id="del_option_true" del_element_id="">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+  </div><!-- End .logoutModal -->
+</div>
+{% endblock %}
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/estimator-question.js' %}"></script>
+{% endblock %}

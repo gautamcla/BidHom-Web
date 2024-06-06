@@ -1,0 +1,113 @@
+{% load static %}
+
+<div class="table-responsive">
+<table class="table table-striped jambo_table bulk_action">
+    <thead>
+    <tr class="headings" style="white-space: nowrap;">
+        <th class="column-title">ID </th>
+        <th class="column-title">Author </th>
+        <th class="column-title" style="width:10%">Domain Name </th>
+        <th class="column-title">Category </th>
+        <th class="column-title">Title </th>
+        <th class="column-title">Added On </th>
+        <th class="column-title">Publish Date </th>
+        <th class="column-title">Status </th>
+        <th class="column-title no-link last" style="width:14%"><span class="nobr">Action</span>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% if data.total > 0 %}
+        {% for article in data.data %}
+        <tr class="even pointer" style="white-space: nowrap;">
+        <td class=" ">{{ forloop.counter|add:start_index }}</td>
+        <td class=" ">
+            <img src="{% if article.author_image and article.author_image.image_name %}{{aws_url}}{{article.author_image.bucket_name}}/{{article.author_image.image_name}}{% else %}{% static 'admin/images/no-image.jpg' %}{% endif %}" alt="" width="40" height="40"><br>
+            <b>{{article.author_name|default:'-'}}</b>
+        </td>
+        <td>
+            {% if article.domain %}
+            <a href={% url 'admin-edit-subdomain' article.domain %} class="text-primary" >{{article.domain_name}}</a>
+            {% else %}
+            -
+            {% endif %}        
+        </td>
+         <td>
+        {{article.category_name|default:'-'}}
+        </td>
+        <td class=" ">
+            {% autoescape off %}
+            {{ article.title|striptags|truncatewords:"8"|default:'-' }}
+            {% if article.title|striptags|wordcount > 8 %}
+            <a href="javascript:;" class="text-primary" data-toggle="tooltip" title="{{ article.title|striptags|safe}}">view more</a>
+            {% endif %}
+            {% endautoescape %}
+        </td>
+        <td class="convert_to_local_date" data-value="{{ article.added_on|default:'' }}">
+            {{article.added_on|parse_iso|date:'m-d-Y g:i A'}}
+        </td>
+        <td class="convert_to_local_date" data-value="{{ article.publish_date|default:'' }}">
+            {{article.publish_date|parse_iso|date:'m-d-Y g:i A'|default:'-'}}
+        </td>
+        <td class=" ">
+            <a type="button" class="btn  btn-xs btn-round {% if article.status == 1 %} btn-success {% elif article.status == 5 %} btn-danger {% else %} btn-warning {% endif %}" id="statusText{{article.id}}">{{article.status_name}} </a> 
+        </td>
+        <td class="last">
+            <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+            <a href="{% url 'admin-edit-blog' article.id %}" type="button" class="btn btn-xs btn-round btn-primary edit-article"><i class="fa fa-edit"></i> Edit</a>
+            <form method="post" action="{% url 'admin-blog-status-change' %}" data-id="{{article.id}}" action="" class="ActiveInactive" >
+                {% csrf_token %}
+                <input type="hidden" name="article_id" value="{{article.id}}">
+                <input type="hidden" class="status-change" name="status" value="{% if article.status == 1 %}2{% else %}1{% endif %}">
+                {% if article.status == 1 %}
+                <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                {% else %}
+                <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                {% endif %}
+            </form>
+            </div>
+
+        </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>  <td class=" ">No Blog available </td></tr>
+    {% endif %}
+    
+    </tbody>
+</table>
+</div>
+
+{% if data.total > 0 %}
+<nav aria-label="Page navigation example" style="float:right;">
+  <ul class="pagination justify-content-end">
+    {{pagination|safe}}
+  </ul>
+</nav>
+{% endif %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+      $('#totalCount').html('{{data.total}}')
+
+
+    $('.convert_to_local_date').each(function(){
+        try{
+            var added_on = $(this).attr('data-value');
+            if(added_on.trim() != "" && added_on.trim() != "None"){
+                var local_date = getLocalDate(added_on.trim(), 'mm/dd/yyyy','ampm');
+                var actual_date = local_date.split(" ");
+                actual_date = actual_date[0]+' '+actual_date[1]+' '+actual_date[2];
+                $(this).html(actual_date);
+            }else{
+                $(this).html('-');
+            }
+        }catch(ex){
+            console.log(ex);
+        }
+    });
+  });
+  </script>
+{% endblock %}

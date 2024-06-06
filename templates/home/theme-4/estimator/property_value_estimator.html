@@ -1,0 +1,1320 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+{% block styles %}
+<style>
+    .pac-container {
+        z-index: 10000 !important;
+    }
+</style>
+{% endblock %}
+
+  
+  <div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Property Bot
+                </h3>
+                <h1>
+                  Value Estimator
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <section class="property-bot-wrap">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 col-md-12" id="estimatorContent">
+            <div class="steps">
+              <ul class="progressbar">
+                <li id="cat_nav_li_1" class="property_tab_li {% if address_question_list|length != total_address_ans %}active{% endif %}">
+                  <a role="button" tabindex="1" aria-label="address" class="property_tab valid_nav_link" href="javascript:void(0)" id="cat_nav_a_1" data-id="1" data-name="property_address">
+                    <span class="number"><i class="fa fa-check" role="presentation"></i></span>
+                  </a>
+                  <span class="name">Property Address</span>
+                </li>
+                <li id="cat_nav_li_2" class="property_tab_li {% if address_question_list|length == total_address_ans and detail_question_list|length != total_detail_ans %}active{% endif %}">
+                  <a role="button" tabindex="2" aria-label="Detail" class="property_tab {% if address_question_list|length == total_address_ans %}valid_nav_link{% endif %}" href="javascript:void(0)" id="cat_nav_a_2" data-id="2" data-name="property_details">
+                    <span class="number">{% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans %}<i class="fa fa-check" role="presentation"></i>{% else %}2{% endif %}</span>
+                  </a>
+                  <span class="name">Property Details</span>
+                </li>
+                <li id="cat_nav_li_3" class="property_tab_li {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length != total_doc_ans %}active{% endif %}">
+                  <a role="button" tabindex="3" aria-label="Photo" class="property_tab {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans %}valid_nav_link{% endif %}" href="javascript:void(0)" id="cat_nav_a_3" data-id="3" data-name="photos_document">
+                    <span class="number">{% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans %}<i class="fa fa-check" role="presentation"></i>{% else %}3{% endif %}</span>
+                  </a>
+                  <span class="name">Photos & Documents</span>
+                </li>
+                <li id="cat_nav_li_4" class="property_tab_li {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length != total_additional_ans %}active{% endif %}">
+                  <a role="button" tabindex="4" aria-label="Question" class="property_tab {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans %}valid_nav_link{% endif %}" href="javascript:void(0)" id="cat_nav_a_4" data-id="4" data-name="additional_questions">
+                    <span class="number">{% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}<i class="fa fa-check" role="presentation"></i>{% else %}4{% endif %}</span>
+                  </a>
+                  <span class="name">Additional Questions</span>
+                </li>
+                <li id="cat_nav_li_5" class="property_tab_li {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}active{% endif %}">
+                  <a role="button" tabindex="5" aria-label="Completed" class="property_tab {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}valid_nav_link{% endif %}" href="javascript:void(0)" id="cat_nav_a_5" data-id="5" data-name="completed">
+                    <span class="number">{% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}<i class="fa fa-check" role="presentation"></i>{% else %}5{% endif %}</span>
+                  </a>
+                  <span class="name">Completed</span>
+                </li>
+              </ul>
+            </div><!-- End .steps -->
+            {% if address_question_list|length == total_address_ans or address_question_list|length != total_address_ans %}
+            <input type="hidden" id="toalAddressAnswer" value="{{ total_address_ans }}"/>
+            <ul class="bot-chat {% if address_question_list|length != total_address_ans %}active{% endif %} {% if address_question_list|length == total_address_ans %}valid_block{% endif %}" data-total="{{ address_question_list|length }}" data-id="1" id="property_address_section" data-name="property_address_section" data-total-unanswered="{{ total_address_not_ans|default:0 }}" data-total-answered="{{ total_address_ans|default:0 }}" style="{% if address_question_list|length != total_address_ans %}display:block;{% else %}display:none;{% endif %}">
+              <li style="{% if total_address_ans <= 0 %}display:none;{% else %}display:block;{% endif %}">
+                <div class="chat-align lft-chat">
+                  <figure>
+                    <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                  </figure>
+                  <figcaption>
+                    <div class="chat-time">
+                      <!--06-21-2021 <span>3:15 PM</span>-->
+                    </div>
+                    <p>
+                      Hi, Welcome to {{ domain_name }}! Ready to find out how much your Property is worth? Let's get started!
+                    </p>
+                  </figcaption>
+                </div>
+              </li>
+              {% if total_address_ans < address_question_list|length  %}
+                {% define_var total_address_ans|add:'1' as display_address_question_num %}
+              {% else %}
+                {% define_var total_address_ans as display_address_question_num %}
+              {% endif %}
+              {% if address_question_list %}
+                {% for question in address_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:none;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                              <div class="block" style="{% if not setting_list or option.id in setting_list %}display:block;{% else %}display:none;{% endif %}">
+                                <input id="user_radio_answer_{{ question.id }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.0.answer|convert_num %}checked{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ question.id }}" class="radio-label" data-question="{{ question.id }}" data-option-id="{{ option.id }}" {% if not question.answer.0.id and not question.answer.0.answer %} onclick="submit_radio_answer(this,'{{ option.id }}')"{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential" role="presentation"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial" role="presentation"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land" role="presentation"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+                    <li class="question_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      {% if question.answer.0.id and question.answer.0.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <input type="hidden" name="user_img_id" id="userImgId_{{ question.id }}" value="{{ question.all_ans|default:'' }}" />
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% for i in num_doc %}
+                                    {% get_list_value question.documents i 'id' as doc_id %}
+                                    {% get_list_value question.documents i 'bucket_name' as bucket_name %}
+                                    {% get_list_value question.documents i 'doc_file_name' as doc_name %}
+                                    {% if doc_id and bucket_name and doc_name %}
+                                      <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                        <figure>
+                                          <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ bucket_name }}/{{ doc_name }}',this)">
+                                            <img id="userProfile_{{ forloop.counter }}" src="{% if doc_name %}{{ aws_url }}{{ bucket_name }}/{{ doc_name }}{% else %}{% static 'theme-4/images/default-img-lg.png' %}{% endif %}" alt="real estate sales">
+                                          </a>
+                                          <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:block;" onclick="confirm_delete_bot_image(this,'{{ question.id|default:'' }}','{{ doc_id|default:'' }}','{{ doc_id|default:'' }}','photo_document_section','{{ forloop.counter }}','{{ doc_name }}','{{ question.id }}{{ forloop.counter }}','deleteImg_{{ question.id }}{{ forloop.counter }}')">
+                                            <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                          </div>
+                                        </figure>
+                                      </li>
+                                    {% else %}
+                                    <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                      <figure>
+                                        <img id="userProfile_{{ forloop.counter }}" src="{% static 'theme-4/images/default-img-lg.png' %}" data-counter="{{ forloop.counter }}" alt="real estate sales">
+                                        <div class="upload-pic">
+                                          <input class="user_image_id" type="hidden" id="userImgId_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" value=""/>
+                                          <input class="user_file" type="file" id="userFile_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" data-counter="{{ forloop.counter }}" onchange="submit_user_file(this)"/>
+                                          <label for="userFile_{{ question.id }}{{ forloop.counter }}"><i class="fa fa-camera"></i></label>
+                                        </div>
+                                        <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:none;">
+                                          <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                        </div>
+                                      </figure>
+                                    </li>
+                                    {% endif %}
+                                  {% endfor %}
+                              </ol>
+                            </div>
+                            <div class="block">
+                              <ul class="chat-btns">
+                                <li>
+                                  <button type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_upload_answer(this)" class="btn btn-secondary btn-sm submit_ans">Confirm</button>
+                                </li>
+                                <li>
+                                  <a class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 1 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="1" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 2 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="2" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 3 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="3" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="4" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num > 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="5" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="locationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'theme-4/images/map-pic.png' %}" alt="real estate sales"/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.0.id and not question.answer.0.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a href="javascript:void(0)" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="editLocationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_address_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_address_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="2" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                        {% if not question.answer.0.id and not question.answer.0.answer %}
+                        <ul class="chat-btns">
+                          <li>
+                            <button type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,0)" class="btn btn-secondary submit_ans">Confirm</button>
+                          </li>
+                          <li>
+                            <a class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                          </li>
+                        </ul>
+                        {% endif %}
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              <li style="{% if total_address_ans <= 0 %}{% else %}display:none;{% endif %}" class="bot_loading">
+                <div class="chat-align lft-chat">
+                  <figure>
+                    <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                  </figure>
+                  <figcaption class="loading-bot-box">
+                    <div class="chat-time">
+                      <!--06-21-2021 <span>3:15 PM</span>-->
+                    </div>
+                    <div class="loader-bot">
+                      <div class="loaderb">Loading...</div>
+                    </div>
+                  </figcaption>
+                </div>
+              </li>
+            </ul>
+            {% endif %}
+            {% if address_question_list|length == total_address_ans %}
+            <ul class="bot-chat {% if address_question_list|length == total_address_ans and detail_question_list|length != total_detail_ans %}active{% endif %} {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans %}valid_block{% endif %}" data-total="{{ detail_question_list|length }}" data-id="2" id="property_detail_section" data-name="property_detail_section" data-total-unanswered="{{ total_detail_not_ans|default:0 }}" data-total-answered="{{ total_detail_ans|default:0 }}" style="{% if address_question_list|length == total_address_ans and detail_question_list|length != total_detail_ans %}display:block;{% else %}display:none;{% endif %}">
+              {% if total_detail_ans < detail_question_list|length  %}
+                {% define_var total_detail_ans|add:'1' as display_detail_question_num %}
+              {% else %}
+                {% define_var total_detail_ans as display_detail_question_num %}
+              {% endif %}
+              {% if detail_question_list %}
+                {% for question in detail_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                              <div class="block" style="{% if not setting_list or option.id in setting_list %}display:block;{% else %}display:none;{% endif %}">
+                                <input id="user_radio_answer_{{ question.id }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.0.answer|convert_num %}checked{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ question.id }}" class="radio-label" data-question="{{ question.id }}" data-option-id="{{ option.id }}" {% if not question.answer.0.id and not question.answer.0.answer %} onclick="submit_radio_answer(this,'{{ option.id }}')"{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential" role="presentation"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial" role="presentation"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land" role="presentation"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+                    <li class="question_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      {% if question.answer.0.id and question.answer.0.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <input type="hidden" name="user_img_id" id="userImgId_{{ question.id }}" value="{{ question.all_ans|default:'' }}" />
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% for i in num_doc %}
+                                    {% get_list_value question.documents i 'id' as doc_id %}
+                                    {% get_list_value question.documents i 'bucket_name' as bucket_name %}
+                                    {% get_list_value question.documents i 'doc_file_name' as doc_name %}
+                                    {% if doc_id and bucket_name and doc_name %}
+                                      <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                        <figure>
+                                          <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ bucket_name }}/{{ doc_name }}',this)">
+                                            <img id="userProfile_{{ forloop.counter }}" src="{% if doc_name %}{{ aws_url }}{{ bucket_name }}/{{ doc_name }}{% else %}{% static 'theme-4/images/default-img-lg.png' %}{% endif %}" alt="real estate sales">
+                                          </a>
+                                          <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:block;" onclick="confirm_delete_bot_image(this,'{{ question.id|default:'' }}','{{ doc_id|default:'' }}','{{ doc_id|default:'' }}','photo_document_section','{{ forloop.counter }}','{{ doc_name }}','{{ question.id }}{{ forloop.counter }}','deleteImg_{{ question.id }}{{ forloop.counter }}')">
+                                            <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                          </div>
+                                        </figure>
+                                      </li>
+                                    {% else %}
+                                    <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                      <figure>
+                                        <img id="userProfile_{{ forloop.counter }}" src="{% static 'theme-4/images/default-img-lg.png' %}" data-counter="{{ forloop.counter }}" alt="real estate sales">
+                                        <div class="upload-pic">
+                                          <input class="user_image_id" type="hidden" id="userImgId_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" value=""/>
+                                          <input class="user_file" type="file" id="userFile_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" data-counter="{{ forloop.counter }}" onchange="submit_user_file(this)"/>
+                                          <label for="userFile_{{ question.id }}{{ forloop.counter }}"><i class="fa fa-camera"></i></label>
+                                        </div>
+                                        <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:none;">
+                                          <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                        </div>
+                                      </figure>
+                                    </li>
+                                    {% endif %}
+                                  {% endfor %}
+                              </ol>
+                            </div>
+                            <div class="block">
+                              <ul class="chat-btns">
+                                <li>
+                                  <button type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_upload_answer(this)" class="btn btn-secondary btn-sm submit_ans">Confirm</button>
+                                </li>
+                                <li>
+                                  <a class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 1 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="1" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 2 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="2" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 3 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="3" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="4" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num > 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="5" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a role="button" href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="locationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'theme-4/images/map-pic.png' %}" alt="real estate sales"/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.0.id and not question.answer.0.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a role="button" href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="editLocationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit" role="presentation"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_detail_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_detail_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                        {% if not question.answer.0.id and not question.answer.0.answer %}
+                        <ul class="chat-btns">
+                          <li>
+                            <button role="button" type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,0)" class="btn btn-secondary btn-sm submit_ans">Confirm</button>
+                          </li>
+                          <li>
+                            <a role="button" class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                          </li>
+                        </ul>
+                        {% endif %}
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              <li style="display:none;" class="bot_loading">
+                <div class="chat-align lft-chat">
+                  <figure>
+                    <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                  </figure>
+                  <figcaption class="loading-bot-box">
+                    <div class="chat-time">
+                      <!--06-21-2021 <span>3:15 PM</span>-->
+                    </div>
+                    <div class="loader-bot">
+                      <div class="loaderb">Loading...</div>
+                    </div>
+                  </figcaption>
+                </div>
+              </li>
+            </ul>
+            {% endif %}
+            {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans %}
+            <ul class="bot-chat {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length != total_doc_ans %}active{% endif %} {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans %}valid_block{% endif %}" data-total="{{ document_question_list|length }}" data-id="3" id="photo_document_section" data-name="photo_document_section" data-total-unanswered="{{ total_doc_not_ans|default:0 }}" data-total-answered="{{ total_doc_ans|default:0 }}" style="{% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length != total_doc_ans %}display:block;{% else %}display:none;{% endif %}">
+              {% if total_doc_ans < document_question_list|length  %}
+                {% define_var total_doc_ans|add:'1' as display_doc_question_num %}
+              {% else %}
+                {% define_var total_doc_ans as display_doc_question_num %}
+              {% endif %}
+              {% if document_question_list %}
+                {% for question in document_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                              <div class="block" style="{% if not setting_list or option.id in setting_list %}display:block;{% else %}display:none;{% endif %}">
+                                <input id="user_radio_answer_{{ question.id }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.0.answer|convert_num %}checked{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ question.id }}" class="radio-label" data-question="{{ question.id }}" data-option-id="{{ option.id }}" {% if not question.answer.0.id and not question.answer.0.answer %} onclick="submit_radio_answer(this,'{{ option.id }}')"{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential" role="presentation"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial" role="presentation"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land" role="presentation"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+                    <li class="question_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      {% if question.answer.0.id and question.answer.0.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <input type="hidden" name="user_img_id" id="userImgId_{{ question.id }}" value="{{ question.all_ans|default:'' }}" />
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% for i in num_doc %}
+                                    {% get_list_value question.documents i 'id' as doc_id %}
+                                    {% get_list_value question.documents i 'bucket_name' as bucket_name %}
+                                    {% get_list_value question.documents i 'doc_file_name' as doc_name %}
+                                    {% if doc_id and bucket_name and doc_name %}
+                                      <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                        <figure>
+                                          <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ bucket_name }}/{{ doc_name }}',this)">
+                                            <img id="userProfile_{{ forloop.counter }}" src="{% if doc_name %}{{ aws_url }}{{ bucket_name }}/{{ doc_name }}{% else %}{% static 'theme-4/images/default-img-lg.png' %}{% endif %}" alt="real estate sales">
+                                          </a>
+                                          <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:block;" onclick="confirm_delete_bot_image(this,'{{ question.id|default:'' }}','{{ doc_id|default:'' }}','{{ doc_id|default:'' }}','photo_document_section','{{ forloop.counter }}','{{ doc_name }}','{{ question.id }}{{ forloop.counter }}','deleteImg_{{ question.id }}{{ forloop.counter }}')">
+                                            <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                          </div>
+                                        </figure>
+                                      </li>
+                                    {% else %}
+                                    <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                      <figure>
+                                        <img id="userProfile_{{ forloop.counter }}" src="{% static 'theme-4/images/default-img-lg.png' %}" data-counter="{{ forloop.counter }}" alt="real estate sales">
+                                        <div class="upload-pic">
+                                          <input class="user_image_id" type="hidden" id="userImgId_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" value=""/>
+                                          <input class="user_file" type="file" id="userFile_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" data-counter="{{ forloop.counter }}" onchange="submit_user_file(this)"/>
+                                          <label for="userFile_{{ question.id }}{{ forloop.counter }}"><i class="fa fa-camera"></i></label>
+                                        </div>
+                                        <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:none;">
+                                          <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                        </div>
+                                      </figure>
+                                    </li>
+                                    {% endif %}
+                                  {% endfor %}
+                              </ol>
+                            </div>
+                            <div class="block">
+                              <ul class="chat-btns">
+                                <li>
+                                  <button type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_upload_answer(this)" class="btn btn-secondary btn-sm submit_ans">Confirm</button>
+                                </li>
+                                <li>
+                                  <a class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 1 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="1" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 2 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="2" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 3 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="3" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="4" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num > 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="5" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a role="button" href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="locationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'theme-4/images/map-pic.png' %}" alt="real estate sales"/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.0.id and not question.answer.0.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a role="button" href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="editLocationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit" role="presentation"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_doc_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_doc_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                        {% if not question.answer.0.id and not question.answer.0.answer %}
+                        <ul class="chat-btns">
+                          <li>
+                            <button role="button" type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,0)" class="btn btn-secondary btn-sm submit_ans">Confirm</button>
+                          </li>
+                          <li>
+                            <a role="button" class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                          </li>
+                        </ul>
+                        {% endif %}
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              <li style="display:none;" class="bot_loading">
+                <div class="chat-align lft-chat">
+                  <figure>
+                    <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                  </figure>
+                  <figcaption class="loading-bot-box">
+                    <div class="chat-time">
+                      <!--06-21-2021 <span>3:15 PM</span>-->
+                    </div>
+                    <div class="loader-bot">
+                      <div class="loaderb">Loading...</div>
+                    </div>
+                  </figcaption>
+                </div>
+              </li>
+            </ul>
+            {% endif %}
+            {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans %}
+            <ul class="bot-chat {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length != total_additional_ans %}active{% endif %} {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}valid_block{% endif %}" data-total="{{ additional_question_list|length }}" data-id="4" id="additional_section" data-name="additional_section" data-total-unanswered="{{ total_additional_not_ans|default:0 }}" data-total-answered="{{ total_additional_ans|default:0 }}" style="{% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length != total_additional_ans %}display:block;{% else %}display:none;{% endif %}">
+              {% if total_additional_ans < additional_question_list|length  %}
+                {% define_var total_additional_ans|add:'1' as display_additional_question_num %}
+              {% else %}
+                {% define_var total_additional_ans as display_additional_question_num %}
+              {% endif %}
+              {% if additional_question_list %}
+                {% for question in additional_question_list %}
+                  {% if question.option_type == 2 %}
+                    <li class="question_section_radio" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSectionRadio_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption class="type">
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                          <div class="item">
+                            {% for option in question.question_option %}
+                              <div class="block" style="{% if not setting_list or option.id in setting_list %}display:block;{% else %}display:none;{% endif %}">
+                                <input id="user_radio_answer_{{ question.id }}" type="radio" name="user_radio_answer" value="1" data-question="{{ question.id }}" data-option-id="{{ option.id }}" class="css-radio user_radio_answer" {% if option.id == question.answer.0.answer|convert_num %}checked{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                <label for="user_radio_answer_{{ question.id }}" class="radio-label" data-question="{{ question.id }}" data-option-id="{{ option.id }}" {% if not question.answer.0.id and not question.answer.0.answer %} onclick="submit_radio_answer(this,'{{ option.id }}')"{% endif %} {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>
+                                  {% if option.option|lower == 'residential' %}
+                                    <span class="icon icon-residential" role="presentation"></span>
+                                  {% elif option.option|lower == 'commercial' %}
+                                    <span class="icon icon-commercial" role="presentation"></span>
+                                  {% elif option.option|lower == 'land' %}
+                                    <span class="icon icon-land" role="presentation"></span>
+                                  {% else %}
+                                  {% endif %}
+                                  {{ option.option }}
+                                </label>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </figcaption>
+                      </div>
+                    </li>
+                  {% elif question.option_type == 4 %}
+                    <li class="question_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                      <div class="chat-align lft-chat">
+                        <figure>
+                          <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                        </figure>
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <p>
+                            {{ question.question }}
+                          </p>
+                        </figcaption>
+                      </div>
+                    </li>
+                    <li class="answer_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      {% if question.answer.0.id and question.answer.0.total_doc == 0 %}
+                        <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% else %}
+                      <div class="chat-align rgt-chat">
+                        <figcaption class="bot-pics">
+                          <div class="upload-images">
+                            <div class="block">
+                              <input type="hidden" name="user_img_id" id="userImgId_{{ question.id }}" value="{{ question.all_ans|default:'' }}" />
+                              <ol class="img_section" id="imgSection_{{ question.id }}">
+                                {% for i in num_doc %}
+                                    {% get_list_value question.documents i 'id' as doc_id %}
+                                    {% get_list_value question.documents i 'bucket_name' as bucket_name %}
+                                    {% get_list_value question.documents i 'doc_file_name' as doc_name %}
+                                    {% if doc_id and bucket_name and doc_name %}
+                                      <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                        <figure>
+                                          <a href="javascript:void(0)" class="thumbnail" onclick="show_thumb_image('{{ aws_url }}{{ bucket_name }}/{{ doc_name }}',this)">
+                                            <img id="userProfile_{{ forloop.counter }}" src="{% if doc_name %}{{ aws_url }}{{ bucket_name }}/{{ doc_name }}{% else %}{% static 'theme-4/images/default-img-lg.png' %}{% endif %}" alt="real estate sales">
+                                          </a>
+                                          <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:block;" onclick="confirm_delete_bot_image(this,'{{ question.id|default:'' }}','{{ doc_id|default:'' }}','{{ doc_id|default:'' }}','photo_document_section','{{ forloop.counter }}','{{ doc_name }}','{{ question.id }}{{ forloop.counter }}','deleteImg_{{ question.id }}{{ forloop.counter }}')">
+                                            <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                          </div>
+                                        </figure>
+                                      </li>
+                                    {% else %}
+                                    <li class="image_upload" id="imageUpload_{{ question.id }}{{ forloop.counter }}">
+                                      <figure>
+                                        <img id="userProfile_{{ forloop.counter }}" src="{% static 'theme-4/images/default-img-lg.png' %}" data-counter="{{ forloop.counter }}" alt="real estate sales">
+                                        <div class="upload-pic">
+                                          <input class="user_image_id" type="hidden" id="userImgId_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" value=""/>
+                                          <input class="user_file" type="file" id="userFile_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" data-counter="{{ forloop.counter }}" onchange="submit_user_file(this)"/>
+                                          <label for="userFile_{{ question.id }}{{ forloop.counter }}"><i class="fa fa-camera" role="presentation"></i></label>
+                                        </div>
+                                        <div class="close-pic delete_img_section" id="deleteImgSection_{{ question.id }}{{ forloop.counter }}" style="display:none;">
+                                          <a href="javascript:void(0)" id="deleteImg_{{ question.id }}{{ forloop.counter }}" data-question="{{ question.id }}" >×</a>
+                                        </div>
+                                      </figure>
+                                    </li>
+                                    {% endif %}
+                                  {% endfor %}
+                              </ol>
+                            </div>
+                            <div class="block">
+                              <ul class="chat-btns">
+                                <li>
+                                  <button role="button" type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_upload_answer(this)" class="btn btn-secondary btn-sm submit_ans">Confirm</button>
+                                </li>
+                                <li>
+                                  <a role="button" class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </figcaption>
+                      </div>
+                      {% endif %}
+                    </li>
+                  {% elif question.option_type == 5 %}
+                  <li class="question_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align rgt-chat">
+                      <figcaption class="bot-rating">
+                        <ol class="rating">
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 1 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="1" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 2 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="2" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 3 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="3" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num >= 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="4" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                          <li class="rating_li {% if question.answer.0.answer|convert_num > 4 %}active{% endif %} {% if question.answer.0.id %}no_hover{% endif %}" data-value="5" {% if not question.answer.0.id %}onclick="submit_rating_answer(this)"{% endif %}>
+                            <i class="fa fa-star" role="presentation"></i>
+                          </li>
+                        </ol>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% elif question.option_type == 6 %}
+                  <li class="question_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption class="map-bot">
+                        <div class="item">
+                          <div class="block">
+                            <a href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="locationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}></a>
+                            <img src="{% static 'theme-4/images/map-pic.png' %}" alt="real estate sales"/>
+                          </div>
+                          <div class="block">
+                            {% if question.answer.0.id and not question.answer.0.answer %}
+                            Skipped
+                            {% else %}
+                              {% autoescape off %}
+                              {{ question.formatted_addr|default:'' }}
+                              {% endautoescape %}
+                            {% endif %}
+                          </div>
+                          <div class="block">
+                            <a href="javascript:void(0)" class="map-zoom location_map" data-lat="{{ question.latitude|default:'33.1836304229855' }}" data-lng="{{ question.longitude|default:'-117.32728034223504' }}" data-question="{{ question.id }}" data-answer="{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}" id="editLocationMap_{{ question.id }}" data-counter="{{ forloop.counter }}" {% if not question.answer.0.id %}onclick="show_location_map(this)"{% elif question.answer.0.id and question.answer.0.answer %}onclick="show_location_map(this)"{% else %}{% endif %}><i class="fa fa-edit"></i></a>
+                          </div>
+                        </div>
+                      </figcaption>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="question_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="questionSection_{{ question.id }}">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          {{ question.question }}
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+                  <li class="answer_section" style="{% if total_additional_ans == 0 and forloop.counter == 1 %}display:block;{% elif forloop.counter <= display_additional_question_num %}display:block;{% else %}display:none;{% endif %}" data-question="{{ question.id }}" data-property-type="{{ question.property_type }}" id="answerSection_{{ question.id }}">
+                      <div class="chat-align rgt-chat">
+                        <figcaption>
+                          <div class="chat-time">
+                            <!--06-21-2021 <span>3:15 PM</span>-->
+                          </div>
+                          <div class="bot-content">
+                            <textarea class="user_answer" rows="1" name="user_answer" data-question="{{ question.id }}" id="user_answer_{{ question.id }}" placeholder="{{ question.placeholder|default:'' }}" {% if question.answer.0.id or question.answer.0.answer %}disabled{% endif %}>{% if question.answer.0.id and not question.answer.0.answer %}Skipped{% else %}{{ question.answer.0.answer|default:'' }}{% endif %}</textarea>
+                          </div>
+                        </figcaption>
+                        {% if not question.answer.0.id and not question.answer.0.answer %}
+                        <ul class="chat-btns">
+                          <li>
+                            <button type="button" id="submitAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,0)" class="btn btn-secondary btn-sm submit_ans">Confirm</button>
+                          </li>
+                          <li>
+                            <a class="skip_ans" id="skipAns_{{ question.id }}" data-question="{{ question.id }}" onclick="submit_answer(this,1)" href="javascript:void(0)">Skip</a>
+                          </li>
+                        </ul>
+                        {% endif %}
+                      </div>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              <li style="display:none;" class="bot_loading">
+                <div class="chat-align lft-chat">
+                  <figure>
+                    <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                  </figure>
+                  <figcaption class="loading-bot-box">
+                    <div class="chat-time">
+                      <!--06-21-2021 <span>3:15 PM</span>-->
+                    </div>
+                    <div class="loader-bot">
+                      <div class="loaderb">Loading...</div>
+                    </div>
+                  </figcaption>
+                </div>
+              </li>
+            </ul>
+            {% endif %}
+            {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans  %}
+            <ul class="bot-chat {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}active{% endif %} {% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}valid_block{% endif %}" data-total="{{ detail_question_list|length }}" data-id="5" id="complete_section" data-name="complete_section"  style="{% if address_question_list|length == total_address_ans and detail_question_list|length == total_detail_ans and document_question_list|length == total_doc_ans and additional_question_list|length == total_additional_ans %}display:block;{% else %}display:none;{% endif %}">
+              <li class="question_section">
+                    <div class="chat-align lft-chat">
+                      <figure>
+                        <img src="{% static 'theme-4/images/bot-user.svg' %}" alt="real estate sales">
+                      </figure>
+                      <figcaption>
+                        <div class="chat-time">
+                          <!--06-21-2021 <span>3:15 PM</span>-->
+                        </div>
+                        <p>
+                          Thank you for submitting your request, agent will contact you soon.
+                        </p>
+                      </figcaption>
+                    </div>
+                  </li>
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+  </div><!-- end .body-content -->
+  <div id="BotMapModal" class="modal centered-modal bot-popup" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="location-map" id="location-map">
+          </div>
+        </div>
+        <div class="bot-btn">
+          <div class="type">
+            <div class="block">
+              <input type="hidden" name="map_question" id="mapQuestion" value=""/>
+              <input type="hidden" name="section" id="section" value=""/>
+              <input type="hidden" name="counter" id="counter" value=""/>
+              <input type="hidden" name="counter_id" id="counterId" value=""/>
+              <input type="hidden" id="latitude" value=""/>
+              <input type="hidden" id="longitude" value=""/>
+              <!--<input type="text" name="map_answer" id="mapAnswer" class="form-control" placeholder="Address" onblur="map_address_blur(this)">-->
+              <textarea name="map_answer" id="mapAnswer" class="form-control" placeholder="Address" onblur="map_address_blur(this)"></textarea>
+            </div>
+            <div class="block" id="submitMapBtnSection">
+              <a href="javascript:void(0)" name="submitMapAnswer" id="submitMapAnswer" class="btn btn-secondary" onclick="submit_map_answer(this)">confirm</a>
+            </div>
+            <div class="block" id="skipMapBtnSection">
+              <a href="javascript:void(0)" id="skipMapAnswer" onclick="skip_map_answer(this)">Skip</a>
+            </div>
+          </div>
+          <p><strong>Is this the correct property location?</strong> Drag the marker to change it.Try Zooming in to see the What3Words grid.We recommend the marker to the front door.</p>
+        </div>
+          <div id="arielView" class="map_view" style="height: 500px; width: 100px; position: relative; overflow: hidden;">
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .counterOfferModal -->
+  <div id="confirmOfferDocDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Image</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="popup_section" id="popup_section" value=""/>
+                <input type="hidden" name="popup_image_id" id="popup_image_id" value=""/>
+                <input type="hidden" name="popup_image_bot_id" id="popup_image_bot_id" value=""/>
+                <input type="hidden" name="popup_image_name" id="popup_image_name" value=""/>
+                <input type="hidden" name="counter" id="conter" value=""/>
+                <input type="hidden" name="counter_id" id="counter_id" value=""/>
+                <input type="hidden" name="img_cnt" id="img_cnt" value=""/>
+                <input type="hidden" name="question_id" id="question_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                     <button type="button" class="btn btn-secondary del_upload_doc" id="del_upload_doc_true" onclick="delete_bot_image()">Yes</button> <button type="button" class="btn btn-primary-bdr del_upload_doc" id="del_upload_doc_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+  <div id="lightbox" class="modal centered-modal lightbox-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <div class="modal-content">
+            <div class="modal-body">
+              <img id="popupThumbImg" src="{% static 'theme-4/images/default-img-lg.png' %}" alt="real estate sales">
+            </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.blockUI.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static '/theme-common/js/common.js' %}"></script>
+<script type="text/javascript" src="{% static '/theme-common/js/property-bot.js' %}?v=6.1"></script>
+
+<!--<script>
+function initializeGMap(lat, lng) {
+    console.log()
+    myLatlng = new google.maps.LatLng(lat, lng);
+    var myOptions = {
+      zoom: 12,
+      zoomControl: true,
+      center: myLatlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("arielView"), myOptions);
+    myMarker = new google.maps.Marker({
+      position: myLatlng
+    });
+    myMarker.setMap(map);
+  }
+$(document).ready(function() {
+  var map = null;
+  var myMarker;
+  var myLatlng;
+  // Re-init map before show modal
+  $('#BotMapModal').on('show.bs.modal', function(event) {
+    var button = $(event.relatedTarget);
+    initializeGMap($('.location_map').data('lat'), $('.location_map').data('lng'));
+    $("#arielView").css("width", "100%");
+  });
+  // Trigger map resize event after modal shown
+  $('#BotMapModal').on('shown.bs.modal', function() {
+    google.maps.event.trigger(map, "resize");
+    map.setCenter(myLatlng);
+  });
+});
+</script>-->
+<script src="https://maps.googleapis.com/maps/api/js?key={{site_detail.google_map_key}}&libraries=places&v=weekly" async></script>
+{% endblock %}
+<!--
+<script>
+function initmap(){
+    var myLoc = new google.maps.LatLng(34.0522, 118.2437);
+    var marker = new google.maps.Marker({
+            position: myLoc
+        });
+      var opt = {
+            center: myLoc,
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById("arielView"), opt);
+        marker.setMap(map);
+    };
+    $('#BotMapModal').modal('show');
+};
+</script>-->

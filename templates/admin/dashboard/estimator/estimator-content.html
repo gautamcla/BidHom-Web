@@ -1,0 +1,107 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if estimator_list %}
+  {% if estimator_list|length > 3 %}
+    {% define_var estimator_list|length|add:'-1' as first_row %}
+    {% define_var estimator_list|length as second_row %}
+  {% else %}
+    {% define_var 0 as first_row %}
+    {% define_var 0 as second_row %}
+  {% endif %}
+  {% for estimator in estimator_list %}
+
+  <div id="row_{{ estimator.id }}" class="listing_blocks {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}">
+                <ul class="bottom">
+                  <li>
+                    User Type: {{ estimator.user_type|default:'' }}
+                  </li>
+                  <li class="item convert_to_local_date_time date-block" data-value="{{ estimator.added_on|default:'' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Created Date | {{ estimator.added_on }}
+                  </li>
+                </ul>
+                <ul class="top estimator-top">
+                  <li class="review-status">
+                    <div class="display_status" id="display_status_{{ estimator.id }}">
+                      <span class="badge {% if estimator.complete_status_id == 2 %} badge-danger{% elif estimator.complete_status_id == 4 %} badge-warning{% else %}badge-success{% endif %}" style="cursor:pointer;">
+                        {{ estimator.complete_status|default:'' }}
+                      </span>
+                    </div>
+                    <div class="change_status" id="change_status_{{ estimator.id }}" style="display:none;">
+                      <select class="select form-control change_status" name="change_status" id="change_status_{{ estimator.id }}" onchange="change_estimator_status({{ estimator.id }},this)">
+                        <option value="">Select Status</option>
+                        {% if status_list %}
+                        {% for item in status_list %}
+                          <option value="{{ item.id }}" {% if item.id == estimator.complete_status_id %}selected{% endif %}>{{ item.status_name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                      </select>
+                    </div>
+                      
+                    <h6 class="name">
+                      {{ estimator.user_first_name|default:'' }} {{ estimator.user_last_name|default:'' }}
+                    </h6>
+                  </li>
+                  {% if is_broker == 1 %}
+                  <li>
+                    <h5 class="buyer-name">
+                      <i class="fa-solid fa-user-large"></i>
+                      <div class="display_agent" id="display_agent_{{ estimator.id }}">
+                        {% if estimator.assign_to_first_name %}
+                        {{ estimator.assign_to_first_name|default:'' }} {{ estimator.assign_to_last_name|default:'' }}
+                        {% else %}
+                          Not Assigned Yet
+                        {% endif %}
+                      </div>
+                      <div class="change_agent" id="change_agent_{{ estimator.id }}" style="display:none;">
+                        <select class="select form-control estimator_change_agent" name="estimator_change_agent" id="estimator_change_agent_{{ estimator.id }}" onchange="change_estimator_agent({{ estimator.id }},this)">
+                          <option value="">Select Agent</option>
+                          {% if agent_list %}
+                          {% for item in agent_list %}
+                            <option value="{{ item.id }}" {% if item.id == estimator.assign_to %}selected{% endif %}>{{ item.first_name }} {{ item.last_name }}</option>
+                          {% endfor %}
+                          {% endif %}
+                        </select>
+                      </div>
+                      <span>
+                        Assign To
+                      </span>
+                    </h5>
+                  </li>
+                  {% endif %}
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-envelope"></i> {{ estimator.user_email|default:'' }}
+                    </div>
+                    <div class="email-text">
+                      <i class="fa-solid fa-phone"></i> {{ estimator.user_phone_no|default:''|format_phone }}
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <a href="javascript:void(0)" onclick="show_message('{{ estimator.id }}', '{{ estimator.review_msg|escape_char|default:'' }}');" class="blue-text" title="View Message"><i class="fa-solid fa-comment-dots"></i> View Message</a>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <a href="/admin/property-estimator-details/?id={{ estimator.id }}"><i class="fa-solid fa-eye"></i> View</a>
+                    </div>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+  {% endfor %}
+  {% else %}
+  <div class="block-item">
+    <div class="item fullwidth">
+      <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+    </div>
+  </div>
+  {% endif %}
+{% block js_content %}
+
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.6"></script>
+    <script type="text/javascript" src="{% static 'admin/js/property-estimator.js' %}?v=6.1"></script>
+    <script>
+      $('.select').chosen();
+    </script>
+
+{% endblock %}

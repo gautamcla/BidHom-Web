@@ -1,0 +1,229 @@
+{% load static %}
+<div id="personalModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Buyer Dashboard</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="personal-modal">
+            <div class="block">
+              <ul class="personal-links">
+                <li class="active">
+                  <a href="javascript:void(0)" onclick="return show_hide_popup('personalModal')">Personal Info</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)" onclick="return show_hide_popup('securityModal')">Security</a>
+                </li>
+              </ul>
+            </div>
+            <div class="block">
+              <form name="updatePersonInfoPopupFrm" id="updatePersonInfoPopupFrm" method="post">
+                {% csrf_token %}
+                <h6>
+                  Personal Info
+                </h6>
+                <!--<div class="upload-photo">
+                  <div class="item">
+                    <img src="{% static 'admin/images/user-pic.png' %}" alt="">
+                  </div>
+                  <div class="item">
+                    A photo helps personalize your account<br>
+                    <div class="upload-btn-wrapper">
+                      <button class="btn">+ Upload</button>
+                      <input type="file" name="myfile" />
+                    </div>
+
+                  </div>
+                </div>-->
+
+              <div class="form-group">
+                <label>
+                User Image
+                </label>
+                <div class="personal-pic-upload">
+                  <div class="upload-fav" style="padding-bottom: 0; padding-top: 5px;">
+                    <div class="item">
+                      <!--<form action="/upload-target" class="dropzone" id="favicon_img" name="favicon_img"></form>-->
+                      <div class="dropzone dz-clickable" id="loggedInUserImgFrm">
+                        <input type="hidden" id="loggedin_user_img_id" name="loggedin_user_img_id" value=""/>
+                        <input type="hidden" name="loggedin_user_img_name" id="loggedin_user_img_name" value=""/>
+                        <div class="dz-default dz-message" data-dz-message="">
+
+                          <div class="block">
+                            <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Photos</button>
+                          </div>
+                          <div class="block">
+                            or
+                          </div>
+                          <div class="block">
+                            <h6>
+                              Drag & Drop Docs
+                              <span>Supported Files:  .png, .jpeg, .jpg</span>
+                            </h6>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <div class="item" id="loggedInUserImgDiv">
+                      <div class="fav-icon">
+                        <figure>
+                          <img src="" id="loggedInUserImg" alt="" style="display:none;">
+                        </figure>
+
+                        <a href="javascript:void(0)" class="confirm_image_delete" data-image-id="" data-image-name="" data-image-section="" data-count="" id="loggedInUserImageDelBtn" style="display:none;"><i class="fas fa-trash-alt"></i></a>
+                      </div>
+                    </div>
+                  </div><!-- End .uplaod-fav -->
+                </div><!-- End .user-pic-upload -->
+              </div>
+                <input type="hidden" id="loggedin_user_id" name="loggedin_user_id" value=""/>
+                <div class="form-group focused">
+                  <label class="form-label" for="first_name">First Name</label>
+                  <input type="text" class="form-input" name="first_name" id="first_name" placeholder="" value="{{ user_personal_info.first_name|default:'' }}">
+                </div>
+                <div class="form-group focused">
+                  <label class="form-label" for="last_name">Last Name</label>
+                  <input type="text" class="form-input" name="last_name" id="last_name"  placeholder="" value="{{ user_personal_info.last_name|default:'' }}">
+                </div>
+                <div class="form-group focused">
+                  <label class="form-label" for="usr_phone_no">Phone number</label>
+                  <input type="text" class="form-input" name="usr_phone_no" id="usr_phone_no"  placeholder=" " value="{{ user_personal_info.phone_no|default:'' }}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="10">
+                </div>
+                <div class="form-group focused">
+                  <label class="form-label" for="user_email">Email</label>
+                  <input type="email" class="form-input" name="user_email" id="user_email"  placeholder="" value="{{ user_personal_info.email|default:'' }}">
+                </div>
+                <div class="pt10 clearfix">
+                  <button type="button" class="btn btn-primary-bdr" class="close" data-dismiss="modal" aria-label="Close">Cancel</button> <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .personalModal -->
+
+
+  <div id="securityModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Buyer Dashboard</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="personal-modal">
+            <div class="block">
+              <ul class="personal-links">
+                <li>
+                  <a href="javascript:void(0)" onclick="show_hide_popup('personalModal')">Personal Info</a>
+                </li>
+                <li class="active">
+                  <a href="javascript:void(0)" onclick="show_hide_popup('securityModal')">Security</a>
+                </li>
+              </ul>
+            </div>
+            <div class="block">
+              <form name="updatePasswordPopupFrm" id="updatePasswordPopupFrm" method="post">
+                {% csrf_token %}
+                <h6>
+                Personal Info
+              </h6>
+              <div class="form-group">
+                <label class="form-label" for="current_password">Current Password</label>
+                <input type="password" class="form-input" name="current_password" id="current_password" placeholder="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new_password">New Password</label>
+                <input type="password" class="form-input"  name="new_password" id="new_password" placeholder="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="confirm_password">Confirm Password</label>
+                <input type="password" class="form-input" name="confirm_password" id="confirm_password" placeholder="">
+              </div>
+              <ul class="security-list">
+                <li>
+                  Include at least 1 uppercase letter
+                </li>
+                <li>
+                  Include at least 1 lower case letter
+                </li>
+               <li>
+                Include at least 1 number
+               </li>
+              </ul>
+              <div class="pt10 clearfix">
+                <button type="button" class="btn btn-primary-bdr" class="close" data-dismiss="modal" aria-label="Close">Cancel</button> <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .securityModal -->
+
+
+  <div id="logoutModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Logout Confirmation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="font15 center">
+            Are you sure you want to logout now?
+          </p>
+          <div class="clearfix center">
+            <button class="btn btn-primary-bdr" id="logout_false" onclick="confirm_logout(0)">No</button> <button class="btn btn-primary" id="logout_true" onclick="confirm_logout(1)">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .logoutModal -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+
+<script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+<script>
+$(document).ready(function(){
+  $("#update_user_frm #user_phone_no").inputmask('(999) 999-9999');
+  $('.form-input').focus(function(){
+      $(this).parents('.form-group').addClass('focused');
+    });
+
+    $('.form-input').blur(function(){
+      var inputValue = $(this).val();
+      if ( inputValue == "" ) {
+        $(this).removeClass('filled');
+        $(this).parents('.form-group').removeClass('focused');
+      } else {
+        $(this).addClass('filled');
+      }
+    });
+});
+
+
+  //end show_hide_popup
+  function confirm_logout(flag){
+    if(flag){
+      $('.personalModalwrap').modal('hide');
+      window.location.href='/logout/';
+    }else{
+      $('.personalModalwrap').modal('hide');
+    }
+  }
+</script>

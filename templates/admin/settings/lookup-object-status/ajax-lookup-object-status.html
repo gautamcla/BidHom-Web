@@ -1,0 +1,240 @@
+{% load static %}
+<div class="listing-top">
+    <div class="block">
+      <h6>
+        {{object_details.object_name}} Object
+        <span>
+          Total Count :- {{total_contacts|default:'0'}}
+        </span>
+      </h6>
+    </div>
+
+    <div class="block">
+      <form action="" class="search-field last">
+        <div class="search-icon"><i class="fas fa-search"></i></div>
+        <input type="text" id="search" class="form-control input-sm" placeholder="Search for..." value="{{search|safe}}">
+        <button class="btn btn-primary btn-sm pl20 searchBtn"  type="submit">Go!</button>
+      </form>
+    </div>
+
+    <div class="block filters">
+      <ul>
+        <li>
+          <span class="text"><i class="fa fa-filter"></i> Filters</span>
+        </li>
+        <li>
+          <select class="form-control" name="per_page_record" id="per_page_record">
+            <option value="10" {% if page_size == 10%} selected {% endif %}>10 Records</option>
+            <option value="20" {% if page_size == 20%} selected {% endif %}>20 Records</option>
+            <option value="30" {% if page_size == 30%} selected {% endif %}>30 Records</option>
+            <option value="40" {% if page_size == 40%} selected {% endif %}>40 Records</option>
+            <option value="50" {% if page_size == 50%} selected {% endif %}>50 Records</option>
+          </select>
+        </li>
+        <li>
+          <button type="button" class="btn btn-primary" style="float:right;" data-toggle="modal" data-target=".add-lookup-object-status-modal"><i class="fa fa-plus-circle"></i> Add More</button>
+        </li>
+      </ul>
+    </div>
+
+</div>
+  
+  {% if messages %}
+      {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>{{ message }}
+      </div>
+      {% endfor %}
+  {% endif %}
+
+  <div class="table-responsive">
+      <table class="table table-striped jambo_table bulk_action">
+          <thead>
+          <tr class="headings">
+              <th class="column-title">ID </th>
+              <th class="column-title">Lookup Object Name </th>
+              <th class="column-title">Lookup Status Name </th>
+              <th class="column-title">Status </th>
+              <th class="column-title no-link last"><span class="nobr">Action</span>
+              </th>
+          </tr>
+          </thead>
+
+          <tbody>
+          {% if data %}
+              {% for ptype in data %}
+              <tr class="even pointer">
+              <td class=" ">{{ forloop.counter|add:start_index }}</td>
+              <td class=" ">{{ptype.status_object}}</td>
+              <td class=" ">{{ptype.status_name}}</td>
+              <td class=" ">
+                  {% if ptype.is_active %}
+                  <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{ptype.id}}">Active</button> 
+                  {% else %}
+                  <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{ptype.id}}">Inactive</button> 
+                  {% endif %}
+              </td>
+              <td class="last">
+                  <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                    <form method="post" data-id="{{ptype.id}}" action="{% url 'admin-lookup-object-status-change' %}" class="ActiveInactive" >
+                      {% csrf_token %}
+                      <input type="hidden" name="status_object_id" value="{{ptype.id}}">
+                      <input type="hidden" class="status-change" name="status" value="{{ptype.is_active|yesno:"0,1"}}">
+                      {% if ptype.is_active %}
+                      <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                      {% else %}
+                      <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                      {% endif %}
+                    </form>
+                    <button type="button" data-id="{{ptype.id}}" data-status-id="{{ptype.lookup_status_id}}" data-object-id="{{ptype.lookup_object_id}}" data-status="{{ptype.is_active}}" class="btn btn-xs btn-round btn-primary edit-lookup-object-status"><i class="fa fa-edit"></i> Edit</button>
+                  </div>
+
+              </td>
+              </tr>
+              {% endfor %}
+          {% else %}
+              <tr>  <td class=" ">No Status for {{object_details.object_name}} object is available </td></tr>
+          {% endif %}
+          
+          </tbody>
+      </table>
+
+      {% if  total_contacts > 0 %}
+      <nav aria-label="Page navigation example" style="float:right;">
+      <ul class="pagination justify-content-end">
+          {{pagination|safe}}
+      </ul
+      </nav>
+      {% endif %}
+  </div>
+  
+</div>
+
+
+<!--  Add modal -->
+  <div class="modal fade add-lookup-object-status-modal centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">{{object_details.object_name}} Object</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'admin-lookup-object-status' %}" id="addLookupObjectStatus" data-parsley-validate class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <input type="hidden" name="object_id" value="{{object_details.id}}"/>
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="status_id">Choose Lookup Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="select form-control" name="status_id" required="required">
+                    <option value="" disabled selected>Select</option>
+                    {% for data in lookup_status_data %}
+                        {% if data.is_active %}
+                        <option value="{{data.id}}" >{{data.status_name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>              
+              </div>
+              <div class="col-md-3 col-sm-3 col-xs-12">
+                <a href="{% url 'admin-lookup-status' %}#add-status" target="_blank" type="button" class="btn btn-primary "><i class="fa fa-external-link"></i> Add more</a>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="select form-control" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-3 col-sm-3 col-xs-12">&nbsp;</div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+  <!--Edit Modal-->
+  <div class="modal fade edit-lookup-object-status-modal centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">{{object_details.object_name}} Object</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'admin-lookup-object-status' %}" id="editLopkupObjectStatus" data-parsley-validate class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <input type="hidden" name="object_id" value="{{object_details.id}}"/>
+            <input type="hidden" id="editStatusObjectId" name="status_object_id" >
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="status_id">Choose Lookup Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="form-control" name="status_id" id="editStatusId" required="required">
+                    <option value="" disabled selected>Select</option>
+                    {% for data in lookup_status_data %}
+                        {% if data.is_active %}
+                        <option value="{{data.id}}" >{{data.status_name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>              
+              </div>
+              <div class="col-md-3 col-sm-3 col-xs-12">
+                <a href="{% url 'admin-lookup-status' %}#add-status" target="_blank" type="button" class="btn btn-primary btn-round"> Add more <i class="fa fa-external-link"></i></a>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" id="editIsActive" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-3 col-sm-3 col-xs-12">&nbsp;</div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End modal-->
+
+
+
+{% block js_content %}
+  <script>
+  $(function() {
+    $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+    $('#addLookupObjectStatus').parsley();
+
+  });
+  </script>
+
+<script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+
+{% endblock %}

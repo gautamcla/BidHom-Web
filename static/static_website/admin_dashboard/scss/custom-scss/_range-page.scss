@@ -1,0 +1,74 @@
+.slider_input_span {
+  background: $secondary;
+  color: $white;
+  padding: 3px;
+  line-height: 20px;
+  font-size: $fontSmall;
+  @include border-radius(5px);
+  &.price-slider {
+    position: absolute;
+    left: 82px;
+    top: 27px;
+    line-height: 15px;
+    letter-spacing: 1px;
+  }
+}
+
+.insider_auction_section {
+  clear: both;
+  h5 {
+    color: $secondary;
+    border-left: 2px solid $secondary;
+    padding-left: 10px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+}
+.range-slide {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  .block {
+    width: 30px;
+    height: 25px;
+    &:nth-child(2) {
+      width: calc(100% - 60px);
+      padding: 0 10px;
+    }
+    input[type=range].error {
+      position: relative;
+      padding-top: 0;
+    }
+    .added {
+      background: $secondary;
+      color: $white;
+      font-size: 20px;
+      font-weight: 600;
+      padding: 0;
+      border: none;
+      width: 30px;
+      height: 25px;
+      @include border-radius(5px);
+    }
+  }
+}
+
+
+
+.process-bar {
+  background-color: #000;
+  border-radius: 3px;
+  margin: 0;
+  height: 8px;
+  width: 500px;
+  max-width: 100%;
+  .process {
+    border-radius: 3px;
+    height: 8px;
+    width: 0;
+    transition: width 0.5s ease-in;
+  }
+}
+small {
+  font-size: 12px;
+}

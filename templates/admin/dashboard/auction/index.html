@@ -1,0 +1,763 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+{% endblock %}
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        
+        <div class="listing-top">
+          <div class="block">
+            <h6>
+              <strong>Online Auction Listings</strong>
+            </h6>
+          </div>
+          <div class="block">
+            <form action=""  onkeydown="return event.key != 'Enter';" class="search-field last">
+              <div class="search-icon"><i class="fas fa-search"></i></div>
+              <input type="text" class="form-control input-sm sugesstion_input" name="prop_search" id="prop_search"  placeholder="Search...">
+              <button type="button" id="searchAuctiomyBtn" onclick="auctionListingSearch(1);" class="btn btn-primary btn-sm pl20">Search</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="listing-bottom">
+          <div class="block right">
+            <i class="fas fa-filter"></i> Filters
+          </div>
+          <div class="block" >
+            <select class="select form-control" name="filter_agent" id="filter_agent" onchange="auctionListingSearch(1);">
+              <option value="">All Agents</option>
+              {% for agent in agent_list %}
+              <option value="{{ agent.id }}">{{ agent.first_name }}&nbsp;{{agent.last_name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <!-- <div class="block">
+            <select class="select form-control" name="filter_auction_type" id="filter_auction_type" onchange="auctionListingSearch(1);">
+                <option value="">All Auction Type</option>
+                {% comment %} {% for item in auction_type_list %}
+                <option value="{{ item.id }}">{{ item.auction_type }}</option>
+                {% endfor %} {% endcomment %}
+                <option value="1">Classic Online Auction</option>
+            </select>
+          </div> -->
+          <div class="block">
+            <select class="select form-control" name="filter_asset_type" id="filter_asset_type" onchange="filter_property_asset_type(this, 1);">
+                <option value="">All Asset Types</option>
+                {% for asset in asset_listing %}
+                <option value="{{ asset.id }}">{{ asset.name }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <div class="block">
+            <select class="select form-control" name="filter_property_type" id="filter_property_type" onchange="auctionListingSearch(1);">
+                <option value="">All Property Subtypes</option>
+                {% for item in property_type_listing %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <div class="block">
+            <select class="select form-control" name="prop_filter_status" id="prop_filter_status" onchange="auctionListingSearch(1);">
+                    <option value="">All Status</option>
+                    <option value="1" selected="selected" >Active</option>
+                    <option value="17" >Coming Soon</option>
+                    {% comment %} <option value="10"> Auction Ended</option> {% endcomment %}
+                    <option value="9" >Sold</option>
+                    <option value="16" >Pending Review</option>
+                    <option value="8" >Not Sold</option>
+                    {% comment %} {% if status_list %}
+                    {% for item in status_list %}
+                    <option value="{{ item.id }}" {% if item.id == 1 %}selected="selected"{% endif %}>{{ item.status_name }}</option>
+                    {% endfor %}
+                    {% endif %} {% endcomment %}
+                </select>
+          </div>
+          <div class="block">
+            <select class="select form-control" name="prop_num_record" id="prop_num_record" onchange="auctionListingSearch(1);">
+              <option value="">Record per page</option>
+              <option value="10" selected="selected">10 Property</option>
+              <option value="20">20 Property</option>
+              <option value="30">30 Property</option>
+              <option value="40">40 Property</option>
+              <option value="50">50 Property</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="default-table auctionlist-table">
+          <div class="block">
+            <div class="item">
+              No.
+            </div>
+            <div class="item">
+              Property Name
+            </div>
+            <!-- <div class="item">
+              Status
+            </div> -->
+            <div class="item">
+              Timer
+            </div>
+            <div class="item">
+              Auction Status
+            </div>
+            <div class="item">
+              High Bidder
+            </div>
+            <div class="item">
+              Total Bids
+            </div>
+            <div class="item">
+              Bidders
+            </div>
+            <div class="item">
+              Watching
+            </div>
+            <div class="item">
+              Bid Increment
+            </div>
+            <div class="item">
+              Next Bid
+            </div>
+            <div class="item">
+              No Reserve Auction
+            </div>
+            <div class="item">
+              Reserve Price
+            </div>
+            <div class="item">
+              Reserve Met
+            </div>
+            <div class="item">
+              Action
+            </div>
+          </div><!-- End .block -->
+          <input type="hidden" name="counter_num" id="counter_num" value="{{ sno|default:1 }}">
+          <div class="block sscroll" id="auctionList">
+            {% if auction_data|length > 0 %}
+            {% for property in auction_data %}
+            <div class="block-item {% if not property.read_by_auction_dashboard %}focused-bid-row{% endif %} " data-property="{{ property.id }}" data-auction="{{property.auction_data.id}}">
+              <div class="item">
+              {{ forloop.counter0|add:sno }}
+              </div>
+              <div class="item">
+                <div class="user-pics">
+                <a href="/asset-details/?property_id={{ property.id }}" class="go-to-listing" target="_blank">
+                  <span class="user-pic"><img src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt=""></span>
+                  <h6>
+                    <span class="blue-text" title="{{ property.address_one }}, {{property.city}}, {{property.state}}, {{property.postal_code}}">
+                    {% with property.address_one|add:', '|add:property.city|add:', '|add:property.state|add:', '|add:property.postal_code as pname %}
+                        {% if pname|length > 22 %}
+                            {{pname|slice:22}}...
+                        {% else  %}
+                            {{ppnamel }}
+                        {% endif %}
+                    {% endwith %}
+                    </span>
+                    <i class="fas fa-map-marker-alt"></i> {{property.city}}, {{property.state}}
+                    <em class="user-info listing-broker-info" data-id='{{property.id}}' data-first-name="{{property.property_owner.first_name}}" data-last-name="{{property.property_owner.last_name}}" data-company="{{property.property_owner.company}}" data-phone="{{property.property_owner.phone_no|default:''|format_phone}}" data-email="{{property.property_owner.email}}" ><i class="fas fa-info-circle"></i></em>
+                  </h6>
+                </a>
+                </div>
+              </div>
+              <!-- <div class="item">
+                {{property.status}}
+              </div> -->
+              <div class="item bidding_timer" id="timerProperty{{property.id}}" data-status-id="" data-status="" data-property="{{property.id}}"  data-start-date="{% if property.auction_data.status == 1 %}{{property.auction_data.start_date|default:''}}{% endif %}" data-end-date="{% if property.auction_data.status == 1 %}{{property.auction_data.end_date|default:''}}{% endif %}" >
+                <div class="time" style="text-align: left;">
+                  <div class="countdown_text">Loading... </div>
+                  <span id="timerCounter{{property.id}}" style="display: none;"><span class="day_remaining red-text">00</span>:<span class="hr_remaining red-text">00</span>:<span class="min_remaining red-text">00</span>:<span class="sec_remaining red-text">00</span></span>
+                </div>
+              </div>
+              <div class="item" id="auctionStatus{{property.id}}">
+                {% if property.status_id %}
+                  {% if property.status_id == 1 %}
+                    {% if property.auction_data.start_date|in_the_future %}
+                      <div class="text-warning"><strong>Coming Soon</strong></div>
+                    {% else %}
+                      <div class="text-success"><strong>Active</strong></div>
+                    {% endif %}
+                  {% elif property.status_id == 17 %}
+                  <div class="text-warning"><strong>Coming Soon</strong></div>
+                  {% elif property.status_id == 10 %}
+                  <div class="text-success"><strong> Auction Ended</strong></div>
+                  {% elif property.status_id == 9 %}
+                  <div class="text-success"><strong>Sold</strong></div>
+                  {% elif property.status_id == 16 %}
+                  <div class="text-warning"><strong>Pending Review</strong></div>
+                  {% elif property.status_id == 8 %}
+                  <div class="red-text"><strong>Not Sold</strong></div>
+                  {% endif %}
+                {% else %}
+                NA
+                {% endif %}
+              </div>
+              <div class="item">
+                  <div class="text" id="highBidderParent{{property.id}}" data-id="{{property.high_bidder.user_id|default:''}}">
+                  {% if property.high_bidder %}
+                    <span id="highBid{{property.id}}" >${{property.high_bidder.bid_amount|convert_num|intcomma|default:'0'}}</span><br />
+                    <a href="javascript:void(0);" data-id="{{property.id}}" class="blue-text show-detailed-info"><strong>{{property.high_bidder.first_name}}&nbsp;{{property.high_bidder.last_name}}&nbsp;<i class="fas fa-chevron-down" id="arrowPositionHighBidder{{property.id}}"></i></strong></a><br>
+                    <p id="showDetailedinfoBidder{{property.id}}" style="display:none">
+                      {% if property.high_bidder.address_first %}
+                      <span class="blue-text">
+                      {{property.high_bidder.address_first}},
+                      </span><br>
+                      {% endif %}
+                      <span class="blue-text">
+                        {% if property.high_bidder.city %}
+                        {{property.high_bidder.city}},
+                        {% endif %}
+                        {% if property.high_bidder.state %}
+                        {{property.high_bidder.state}},
+                        {% endif %}
+                        {% if property.high_bidder.postal_code %}
+                        {{property.high_bidder.postal_code}}
+                        {% endif %}
+                      </span><br>
+                      <span class="blue-text">{{property.high_bidder.phone_no|default:''|format_phone}}</span><br>
+                      <span class="blue-text">{{property.high_bidder.email}}</span><br>
+                      {{property.high_bidder.ip_address|default:''}}
+                    </p>
+                    {% else %}
+                    NA
+                    {% endif %}
+                  </div>
+              </div>
+              <div class="item">
+                <button class="badge badge-info bids-limit bidder-record-modal" id="totalBidCount{{property.id}}" data-id="{{property.id}}" onclick="propertyBidHistorySearch(event, {{ property.id }} ,1)" >{{property.total_bids|default:'0'}}</button>
+              </div>
+              <div class="item">
+                <button class="badge badge-info bids-limit bidder-list-modal" id="totalBidderCount{{property.id}}" data-id="{{property.id}}" onclick="propertyBidderListingSearch(event, {{ property.id }} ,1)" >{{property.bidder|default:'0'}}</button>
+              </div>
+              <div class="item">
+                <button class="badge badge-default bids-limit property-atchers-modal" id="totalWatcherCount{{property.id}}" data-id="{{property.id}}" onclick="propertyWatcherListingSearch(event, {{ property.id }} ,1)" >{{property.watcher|default:'0'}}</button>
+              </div>
+              <div class="item">
+                <div class="bid-increment" style="display:none" id="propertyIncBid{{property.id}}">
+                  <form action="" id="bidIncremementForm" >
+                    {% csrf_token %}
+                    <input type="text" data-id='{{property.id}}' id="bidIncremementValue{{property.id}}" value="{{property.auction_data.bid_increments|default:'0'}}" class="form-control input-xs numbersOnly bid-increment" maxlength="10" pattern="[0-9]{10}" placeholder="Enter Bid Inc.">
+                    <button class="btn btn-primary btn-xs bidincrementupdate" id="bidIncrementUpdate{{property.id}}" data-id="{{property.id}}" ><i class="fas fa-check"></i></button>
+                  </form>
+                  <a href="#" class="red-text show-bid-text" data-id='{{property.id}}'><i class="fa fa-times"></i></a>
+                </div>
+                <span id="bidIncText{{property.id}}" ><span>${{property.auction_data.bid_increments|convert_num|intcomma|default:'0'}}</span><a href="#" data-id='{{property.id}}' class="ml10 property-bid-incremennt-edit"><i class="fa fa-edit"></i></a></span>
+              </div>
+              <div class="item">
+                <form action="" class="nxt-bid">
+                  <input type="text" readonly id="nextBid{{property.id}}" value="${{property.next_bid|convert_num|intcomma|default:'0'}}" class="form-control input-xs">
+                </form>
+              </div>
+              <div class="item" id="noReserveAuction{{property.id}}">
+                {% if property.reserve_price %}
+                  <span class="badge badge-success">
+                    Yes
+                  </span>
+                {% else %}
+                  <span class="badge badge-danger">
+                    No
+                  </span>
+                {% endif %}
+                {% comment %} <input type="checkbox" {% if property.reserve_price %}checked="checked"{% endif %} disabled="disabled" class="css-checkbox no-reserve-auction" data-id="{{property.id}}" id="noReserveAuction{{property.id}}">
+                <label for="noReserveAuction{{property.id}}" class="check-label">&nbsp;</label> {% endcomment %}
+              </div>
+              <div class="item">
+                <div class="bid-increment" style="display:none" id="propertyReservePrice{{property.id}}">
+                  <form action="" id="reservePriceForm" >
+                  {% csrf_token %}
+                    <input type="text" id="reservePriceValue{{property.id}}" value="{{property.reserve_price|default:'0'}}" class="form-control input-xs numbersOnly" maxlength="10" pattern="[0-9]{10}" placeholder="Enter Price" >
+                    <button class="btn btn-primary btn-xs reservepriceupdate" id="reservePriceUpdate{{property.id}}" data-id="{{property.id}}"><i class="fas fa-check"></i></button>
+                  </form>
+                  <a href="#" class="red-text show-reserve-price-text" data-id='{{property.id}}' ><i class="fa fa-times"></i></a>
+                </div>
+                <span id="reservePriceText{{property.id}}" ><span>${{property.reserve_price|convert_num|intcomma|default:'0'}}</span><a href="#" data-id='{{property.id}}' class="ml10 property-reserve-price-edit"><i class="fa fa-edit"></i></a></span>
+              </div>
+              <div class="item" id="reserveMet{{property.id}}">
+                {% if property.reserve_met|lower == 'no' %}
+                <span class="badge badge-danger">
+                  No
+                </span>
+                {% else %}
+                <span class="badge badge-success">
+                  Yes
+                </span>
+                {% endif %}
+              </div>
+              
+              <div class="item action-btnn">
+                <a href="#" id="editAuctionDetails{{property.id}}"  data-id="{{property.id}}" data-start-date="{{property.auction_data.start_date|default:''}}" data-end-date="{{property.auction_data.end_date|default:''}}" class="btn btn-blue btn-xs edit-auction-details"><div class="tooltipp"><i class="far fa-edit"></i>
+                  <span class="tooltipp__content top width100">Edit Auction </span>
+                </div></a> 
+                {% if property.auction_data %}
+                {% if property.auction_data.status == 1 %}
+                  <a href="#" id="stopAuctionDetails{{property.id}}" data-id="{{property.id}}" data-text="Stop Auction?" class="btn btn-secondary btn-xs stop-auction-details"><div class="tooltipp"><i id="startStopAuctionIcon{{property.id}}" class="fas fa-circle"></i>
+                    <span class="tooltipp__content top width100" id="startStopAuctionTooltip{{property.id}}">Stop Auction </span>
+                  </div></a>
+                {% else %}
+                  <a href="#" {% if property.auction_data.status != 2 %}style="display:none"{% endif %} id="stopAuctionDetails{{property.id}}" data-id="{{property.id}}" data-text="Start Auction?" class="btn btn-secondary btn-xs stop-auction-details"><div class="tooltipp"><i id="startStopAuctionIcon{{property.id}}" class="fas fa-play"></i>
+                    <span class="tooltipp__content top width100" id="startStopAuctionTooltip{{property.id}}">Start Auction </span>
+                  </div></a>
+                {% endif %}
+                {% endif %}
+              </div>
+            </div><!-- End .block-item -->
+            {% endfor %}
+            {% else %}
+            <div class="block-item">
+              <div class="item fullwidth">
+                <div class="item fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div><!-- End .block -->
+        </div><!-- End .create-table -->
+
+        <div class="pagination">
+          <ul id="prop_auction_pagination_list">
+            {{ pagination_html }}
+          </ul>
+        </div><!-- End .pagination -->
+
+
+      </div><!-- End .col-md-10 -->
+    </div><!-- End .row -->
+  </div><!-- End .dashboard-body -->
+<div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+</div>
+
+
+<div id="stopbiddingModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="center mb0">
+        Confirmation
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="" id="stopAuctionForm" >
+      {% csrf_token %}
+      <div class="modal-body">
+        <input type="hidden" name="stop-bid-listing" id="stopBidListingId" value="">
+        <h6 class="center">
+          Are you sure you want to <br>
+          <span class="blue-text" id="startStopModalText"></span>
+        </h6>
+        <div class="clearfix pt20"></div>
+        <button class="btn btn-primary-bdr width47" data-dismiss="modal" aria-label="Close">No</button> <button class="btn btn-primary width47" id="stopAuctionSubmit">Yes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div><!-- End .stopbiddingModal -->
+
+
+<div id="editbiddingModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="center mb0">
+          Manage Property <br>
+          <span class="blue-text">Bidding Information</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="" id="editAuctionForm" autocomplete="off">
+        {% csrf_token %}
+          <input type="hidden" name="edit-bid-listing" id="editBidListingId" value="">
+          <div class="form-group">
+            <label for="">Bidding Starting Time</label>
+            <div class='input-group date' id='datetimepicker1'>
+              <input type='text' class="form-control" name="virtual_bidding_start_date" id="virtual_bidding_start_date" placeholder="mm-dd-yyyy" required=required>
+              <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+              </span>
+              <input autocomplete="off" type='hidden' class="form-control" name="bidding_start_date_local" id="bidding_start_date_local" />
+              <input autocomplete="off" type='hidden' class="form-control" name="bidding_start_date" id="bidding_start_date" value=""/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="">Bidding Ending Time</label>
+            <div class='input-group date' id='datetimepicker2'>
+              <input type='text' class="form-control" name="virtual_bidding_end_date" id="virtual_bidding_end_date" placeholder="mm-dd-yyyy" required=required>
+              <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+              </span>
+              <input autocomplete="off" type='hidden' class="form-control" name="bidding_end_date_local" id="bidding_end_date_local" />
+              <input autocomplete="off" type='hidden' class="form-control" name="bidding_end_date" id="bidding_end_date" value=""/>
+            </div>
+          </div>
+        <div class="clearfix pt20"></div>
+        <button class="btn btn-primary-bdr width47" data-dismiss="modal" aria-label="Close" >No</button> <button type="button" class="btn btn-primary width47" id="editAuctionSubmit" aria-invalid="false" disabled>Update</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- End .stopbiddingModal -->
+
+
+<div id="bidderrecordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <input type="hidden" name="bidHistoryPropertyId" id="bidHistoryPropertyId" value=""/>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="center mb0">
+          Total Bids
+        </h5>
+        <div class="bidderrecord-top">
+          <figure>
+            <img src="{% static 'admin/images/property-default-img.png' %}" alt="" id="bidHistoryPropertyImage">
+            </figure>
+            <figcaption>
+              <h6 id="bidHistoryPropertyName">
+                Loading...
+              </h6>
+          </figcaption>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="table-responsive">
+          <table width="100%" class="table table-scroll auctionrecordTable">
+            <thead>
+              <tr>
+                <th>
+                  Bidder
+                </th>
+                <th>
+                  Start Bid
+                </th>
+                <th>
+                  High Bids
+                </th>
+                <th>
+                  Bids
+                </th>
+                <th>
+                  Bidding Date
+                </th>
+<!--                <th>-->
+<!--                  Approval Status-->
+<!--                </th>-->
+              </tr>
+            </thead>
+            <tbody id="bidHistoryList">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination" id="bidHistoryPagination">
+            <ul id="bidHistoryPaginationList">
+            </ul>
+        </div><!-- End .pagination -->
+
+        <div class="clearfix right" id="auction_bid_btn_section">
+          <button class="btn btn-primary" onClick="window.location.href='/static/admin/export/Bidders_List.xls'"><i class="fas fa-file-export"></i>&nbsp; Export</button> <button class="btn btn-primary" id="emailAllBidders" data-email-for="total_bids" ><i class="fas fa-envelope"></i>&nbsp; Email All</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div><!-- End .bidderrecordModal -->
+
+
+<div id="propertybrokerModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="center mb0">
+          Property Added By
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="table-responsive">
+          <table width="100%" class="table table-scroll propertybrokerTable">
+            <thead>
+              <tr>
+                <th>
+                  Name
+                </th>
+                <th>
+                  Company
+                </th>
+                <th>
+                  Phone
+                </th>
+                <th>
+                  Email
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="propAgentName">
+                </td>
+                <td id="propAgentCompany">
+                </td>
+                <td id="propAgentPhone">
+                </td>
+                <td id="propAgentEmail">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .propertybrokerModal -->
+
+<div id="propertywatcherModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+   <input type="hidden" name="bidWatcherPropertyId" id="bidWatcherPropertyId" value=""/>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="center mb0">
+          Watching
+        </h5>
+        <div class="bidderrecord-top">
+          <figure>
+            <img src="{% static 'admin/images/property-default-img.png' %}" alt="" id="bidWatcherPropertyImage">
+            </figure>
+            <figcaption>
+              <h6 id="bidWatcherPropertyName">
+                Loading...
+              </h6>
+          </figcaption>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="pb10"><strong>Total Watchers :</strong> <span id="totalWatchersCount">Loading...</span>(<span id="totalWatchersCountAnonm"></span> Anonymous)</div>
+        
+        <div class="table-responsive">
+          <table width="100%" class="table table-scroll auctionwatchTable">
+            <thead>
+              <tr>
+                <th>
+                  Watchers
+                </th>
+              </tr>
+            </thead>
+            <tbody id="bidWatcherList">
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="bidWatcherPagination">
+            <ul id="bidWatcherPaginationList">
+            </ul>
+        </div><!-- End .pagination -->
+
+        <div class="clearfix right" id="watcherBtnSection">
+          <button type="button" class="btn btn-primary"><i class="fas fa-file-export"></i>&nbsp; Export</button> <button type="button" class="btn btn-primary" id="emailAllWatchers" data-email-for="watching"><i class="fas fa-envelope"></i>&nbsp; Email All</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div><!-- End .propertywatcherModal -->
+
+
+<div id="bidderlistModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-laptop" role="document">
+  <input type="hidden" name="bidderHistoryPropertyId" id="bidderHistoryPropertyId" value=""/>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="center mb0">
+          Bidders
+        </h5>
+        <div class="bidderrecord-top">
+          <figure>
+            <img src="{% static 'admin/images/property-default-img.png' %}" alt="" id="bidderHistoryPropertyImage">
+          </figure>
+          <figcaption>
+              <h6 id="bidderHistoryPropertyName">
+                Loading...
+              </h6>
+          </figcaption>
+          
+          <div class="listing-bottom">
+            <div class="block" id="bidder_list_export_btn_section">
+              <button class="btn btn-primary btn-sm pl20"><i class="fas fa-file-export"></i> Export</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="default-table auctionbidderlisttable">
+          <div class="block">
+            <div class="item">
+              #
+            </div>
+            <div class="item">
+              Bidder Name
+            </div>
+            <div class="item">
+              Company
+            </div>
+            <div class="item">
+              Email
+            </div>
+            <div class="item">
+              Phone
+            </div>
+            <div class="item">
+              Approved Bid Limit
+            </div>
+            <div class="item">
+              Approval Status
+            </div>
+            <div class="item">
+              Due Diligence Vault
+            </div>
+            <div class="item">
+              Registration Approval
+            </div>
+          </div><!-- End .block -->
+          <div class="block sscroll" id="bidderHistoryList">
+
+          </div><!-- End .block -->
+        </div><!-- End .create-table -->
+
+        <div class="pagination" id="bidderHistoryPagination">
+            <ul id="bidderHistoryPaginationList">
+            </ul>
+        </div><!-- End .pagination -->
+
+      </div>
+    </div>
+  </div>
+</div><!-- End .bidderlistModal -->
+
+<div id="emailrecordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="center mb0">
+          Email All <span class="object-name-string" >Users</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="" id="emailAllUsersForm">
+        {% csrf_token %}
+        <input type="hidden" id="emailPropertyid" name="property_id" value="">
+        <input type="hidden" id="emailForObject" name="email_for" value="">
+        <ul class="email-bidder">
+          <li>
+            Email
+          </li>
+          <li>
+            All <span class="object-name-string" >Users</span>
+          </li>
+          <li>
+            Subject
+          </li>
+          <li>
+            <input type="text" id="subject" placeholder="Enter email subject" name="subject" class="form-control">
+          </li>
+          <li>
+            Message
+          </li>
+          <li>
+            <textarea name="message" id="message" placeholder="Enter message here..." rows="5" class="form-control"></textarea>
+          </li>
+        </ul>
+        
+        <div class="clearfix pt20 right">
+          <button class="btn btn-primary" id="emailAllSubmit" disabled="disabled">Send</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- End .stopbiddingModal -->
+
+{% endblock %}
+{% block js_content %}
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script> {% endcomment %}
+<script type="text/javascript" src="{% static 'admin/js/tableHeadFixer.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom.js' %}?v=1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.3"></script>
+<script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/pagination.js' %}?v=1.0"></script>
+<script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'admin/js/countdown-timer.js' %}?v=1.4"></script>
+<script type="text/javascript" src="{% static 'admin/js/auction-dashbaord.js' %}?v=6.9.0"></script>
+<script type="text/javascript" src="{% static 'admin/js/auction-socket.js' %}?v=1.7"></script>
+<script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+<script type="text/javascript">
+    const ip_address = "{{ip_address}}";
+    /* const socket = io.connect(socket_domain, {
+        transports: ["websocket", "xhr-polling", "htmlfile", "jsonp-polling"],
+        rejectUnauthorized: false,
+        requestCert: false,
+    }); */
+    var user_id = "{{user_id}}"
+    $(function() {
+      // apply datepickers
+      $('.date').datetimepicker({
+          format: 'MM-DD-YYYY hh:mm A',
+      }).on('dp.change',function(e){
+          var virtual_date_element = $(this).find('input:first').attr('id');
+          var date_element = $(this).find('input:last').attr('id');
+          var dates = $("#"+virtual_date_element).val();
+          if(dates != ""){
+            var actualStartDate = dates.split(" ");
+            //new lines
+            var mdy_format = actualStartDate[0].split("-");
+            mdy_date = mdy_format[2]+"-"+mdy_format[0]+"-"+mdy_format[1];
+
+            //actualStartDate = mdy_date+' '+convert_to_24h(actualStartDate[1]+' '+actualStartDate[2]);
+            actualStartDate = actualStartDate[0]+' '+convert_to_24h(actualStartDate[1]+' '+actualStartDate[2]);
+            //var utc_date = convert_to_utc_datetime(actualStartDate);
+            var utc_date = convert_to_utc_date(actualStartDate, 'mm-dd-yyyy', 'datetime');
+            console.log(utc_date)
+            $("#"+date_element+"_local").val(actualStartDate);
+            $("#"+date_element).val(utc_date);
+          }
+
+      });
+    });
+ </script>
+{% endblock %}

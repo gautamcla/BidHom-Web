@@ -1,0 +1,297 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+  
+  <div class="body-content blog-body">
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Buyers
+                </h3>
+                <h1>
+                  Guide
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <div class="investment-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <h2>
+              Find Exclusive Properties For Investment <span class="hr-line"></span>
+            </h2>
+            <h4>
+              Switch to a Better Buying Experience with {{company_name}}
+            </h4>
+            <p>
+              {{company_name}} offers home buyers exclusive access to endless possibilities online. Options aren’t limited to luxury or commercial properties, you can even buy residential properties that match your budget and specifications. Thanks to our strategic relationships, we provide an enormous database of properties for purchase. We enhance all aspects of your home buying experience by making sure you are smiling every step of the way.
+            </p>
+            <ul>
+              <li>
+                <div class="item">
+                  <div class="icon icon-1" role="img" aria-label="Omni-Channel"></div>
+                  <h4>
+                    Omni-Channel <span>Platform</span>
+                  </h4>
+                  <p>
+                    An easy-to-use platform that works seamlessly on every device, including smartphones, desktops, and tablets. With advanced search features, you can search properties by features, location, amenities, etc.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <div class="icon icon-2" role="img" aria-label="No Upfront"></div>
+                  <h4>
+                    No Upfront <span>Deposits </span>
+                  </h4>
+                  <p>
+                    Yes, with {{company_name}}, there is no need to tie up funds when you register as a bidder. When the auction ends, the highest bidder will be contacted to sign the contract, pay the platform fees to move the property under contract.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <div class="icon icon-3" role="img" aria-label="Due Diligence"></div>
+                  <h4>
+                    Due Diligence at <span>Your Finger Tips</span>
+                  </h4>
+                  <p>
+                    Each property page has detailed information including due diligence folders that help our buyers to make the informed decision. 
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <div class="icon icon-4" role="img" aria-label="Contact Certified"></div>
+                  <h4>
+                    Contact Certified Real <span>Estate Professionals</span>
+                  </h4>
+                  <p>
+                    Connect to qualified agents/ brokers who not only can guide you throughout the buying process but resolve all your queries. 
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <div class="icon icon-5" role="img" aria-label="Schedule an Appointment"></div>
+                  <h4>
+                    Schedule an <span>Appointment </span>
+                  </h4>
+                  <p>
+                    Schedule your meets and visit the shortlisted properties. It saves you time, money and helps you make well-informed advice with seamless service. 
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <div class="icon icon-6" role="img" aria-label="Register to Bid & Win"></div>
+                  <h4>
+                    Register to <span>Bid & Win</span>
+                  </h4>
+                  <p>
+                    Besides listings, you can participate in different auctions to get desired properties at affordable pricing. Once you register, you can have complete control over bids, bidding history, and crucial property documents.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .investment-wrap -->
+
+
+    <div class="multiinvest-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="item">
+              <div class="block">
+                <h2>
+                  Multiple Ways to Invest 
+                </h2>
+                <p>
+                  Our Platform offers diverse buying opportunities so you can invest in the desired properties with lesser effort. 
+                </p>
+                <ul>
+                  <li>
+                    <h5>
+                      <i class="fa-solid fa-chevron-right" role="presentation"></i> Bid Actively in an Online Auction
+                    </h5>
+                    <p>
+                      Our sale events are one-day or two-day online auctions where registered bidders can bid on properties across the world. Following a streamlined approach, users can see all the information on each property that helps them to make the right buying decision.
+                    </p>
+                    <ol>
+                      <li>
+                        English Auction
+                      </li>
+                      <li>
+                        Hybrid Auction
+                      </li>
+                      <li>
+                        Multi parcel Auction 
+                      </li>
+                    </ol>
+                  </li>
+                  <li>
+                    <h5>
+                      <i class="fa-solid fa-chevron-right" role="presentation"></i> Buy Directly with Marketplace Listings
+                    </h5>
+                    <p>
+                      Sellers/Agents list their properties on our platform, where you can review the details, contact them, and submit offers with a few clicks. You can also schedule your appointments with the agents to visit the properties.
+                    </p>
+                  </li>
+                </ul>
+                {% if sess_user_id %}
+                {% else %}
+                <div class="clearfix">
+                  <a role="button" href="{% if sess_user_id %}javascript:void(0);{% else %}{% url 'register' %}{% endif %}" class="btn btn-secondary" tabindex="1">Register Now</a>
+                </div>
+                {% endif %}
+              </div>
+              <div class="block">
+                <div class="pic">
+                  <img src="{% static 'theme-4/images/buyer-invest.jpg' %}" alt="real estate sales" role="img" >
+                </div>
+              </div>
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .multiinvest-wrap -->
+
+    <div class="benifits-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <h2>
+              Benefits 
+            </h2>
+            <ul>
+              <li>
+                <div class="item">
+                  <h4>
+                    Transparency
+                  </h4>
+                  <p>
+                    Buyers are kept in the loop throughout the process. A better understanding of the real estate transaction will help you enjoy the journey.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <h4>
+                    Convenience 
+                  </h4>
+                  <p>
+                    From registration to finalizing, you won’t find an easier process to search, compare, and purchase the home of your dreams. 
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <h4>
+                    Control 
+                  </h4>
+                  <p>
+                    Explore new opportunities, get custom alerts, shortlist favorite properties, and much more with just a few clicks.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div class="item">
+                  <h4>
+                    Multiple Options
+                  </h4>
+                  <p>
+                    {{company_name}} provide buyers with an endless portfolio of properties with motivated sellers, offering greater certainty to close.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .benifits-wrap -->
+    {% if testimonials|length %}
+    <div class="testimonial-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="customers-testimonials">
+              {% for testimonial in testimonials%}
+              <div class="item">
+                <figure>
+                  {% if testimonial.author_image.image_name %}
+                    <img src="{{ aws_url }}{{ testimonial.author_image.bucket_name }}/{{ testimonial.author_image.image_name }}" alt="real estate sales">
+                  {% else %}
+                    <img src="{% static 'theme-4/images/man.png' %}" alt="real estate sales">
+                  {% endif %}
+                </figure>
+                <h6>
+                  "{{testimonial.description|safe|striptags|default:""}}
+                </h6>
+                <h4>
+                  {{testimonial.author_name|default:""}}
+                </h4>
+                <div class="designation">
+                  {{testimonial.type|title|default:""}}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .testimonial-wrap -->
+    {% endif %}
+    {% if sess_user_id %}
+    {% else %}
+    <div class="register-today">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="register-today-wrap">
+              <h3>
+                Why wait? Register today!
+              </h3>
+              <form action="">
+                <input type="text" class="form-control" placeholder="Your email address" role="textbox" aria-label="Email Address">
+                <button role="button" class="btn btn-primary" aria-label="Signup">Signup</button>
+              </form>
+              <!-- <div class="button">
+                <a href="{% if sess_user_id %}javascript:void(0);{% else %}{% url 'register' %}{% endif %}" class="btn btn-primary line">Signup now</a>
+              </div> -->
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .register-today -->
+    {% endif %}
+  </div><!-- end .body-content -->
+
+{% endblock %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'theme-common/js/slick.js' %}"></script>
+  <script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+  <script>
+      $(".customers-testimonials").slick({
+        dots: false,
+        infinite: true,
+        slidesToShow: 1,
+        adaptiveHeight:true,
+      });
+  </script>
+{% endblock %}
+

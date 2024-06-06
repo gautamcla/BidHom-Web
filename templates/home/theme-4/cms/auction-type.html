@@ -1,0 +1,243 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+  
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Auction
+                </h2>
+                <h1>
+                  Type
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <div class="tabs-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <ul class="auction-tab">
+              <li>
+                <a role="button" tabindex="1" href="#english-auction">English Auction</a>
+              </li>
+              <li>
+                <a role="button" tabindex="2" href="#direct-offer">Direct Offer</a>
+              </li>
+              <li>
+                <a role="button" tabindex="3" href="#hybrid-auction">Hybrid Auction</a>
+              </li>
+              <li>
+                <a role="button" tabindex="4" href="#multiple-auction">Multiple Auction</a>
+              </li>
+              <li>
+                <a role="button" tabindex="5" href="#traditional-auction">Traditional Auction</a>
+              </li>
+              <li>
+                <a role="button" tabindex="6" href="#live-auction">Live Auction</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div><!-- End .tabs-header -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12 col-md-12">
+          <div class="auction-body">
+            {% if auction.page_content %}
+                {% autoescape off %}
+                {{ auction.page_content }}
+                {% endautoescape %}
+                {% else %}
+            <div class="auction_type" id="english-auction">
+              <h2>
+                English Auction <span class="hr-line"></span>
+              </h2>
+
+              <div class="item">
+                <div class="block">
+                  <p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                  <p>
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                </div>
+                <div class="block">
+                  <figure>
+                    <a href="javascript:void(0)" data-toggle="modal" data-target="#videoModal">
+                      <img src="{% static 'theme-4/images/video-img.jpg' %}" alt="real estate sales">
+                      <span class="play-icon"></span>
+                    </a>
+                  </figure>
+                </div>
+              </div>
+
+              <p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+              </p>
+              <p>
+                It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
+              </p>
+            </div>
+
+
+            <div class="auction_type" id="direct-offer">
+              <h2>
+                Direct Offer <span class="hr-line"></span>
+              </h2>
+
+              <div class="item">
+                <div class="block">
+                  <p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                  <p>
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                </div>
+                <div class="block">
+                  <figure>
+                    <a href="javascript:void(0)" data-toggle="modal" data-target="#videoModal">
+                      <img src="{% static 'theme-4/images/video-img.jpg' %}" alt="real estate sales">
+                      <span class="play-icon"></span>
+                    </a>
+                  </figure>
+                </div>
+              </div>
+
+              <p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+              </p>
+              <p>
+                It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
+              </p>
+            </div><!-- End .direct-offer -->
+
+            <div class="auction_type" id="hybrid-auction">
+              <h2>
+                Hybrid Auction <span class="hr-line"></span>
+              </h2>
+
+              <div class="item">
+                <div class="block">
+                  <p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                  <p>
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                </div>
+                <div class="block">
+                  <figure>
+                    <a href="javascript:void(0)" data-toggle="modal" data-target="#videoModal">
+                      <img src="{% static 'theme-4/images/video-img.jpg' %}" alt="real estate sales">
+                      <span class="play-icon"></span>
+                    </a>
+                  </figure>
+                </div>
+              </div>
+
+              <p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+              </p>
+              <p>
+                It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
+              </p>
+            </div><!-- End .hybrid-auction -->
+
+            <div class="auction_type" id="multiple-auction">
+              <h2>
+                Multiple Auction <span class="hr-line"></span>
+              </h2>
+
+              <div class="item">
+                <div class="block">
+                  <p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                  <p>
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                </div>
+                <div class="block">
+                  <figure>
+                    <a href="javascript:void(0)" data-toggle="modal" data-target="#videoModal">
+                      <img src="{% static 'theme-4/images/video-img.jpg' %}" alt="real estate sales">
+                      <span class="play-icon"></span>
+                    </a>
+                  </figure>
+                </div>
+              </div>
+
+              <p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+              </p>
+              <p>
+                It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
+              </p>
+            </div><!-- End .multiple-auction -->
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div><!-- End .container-fluid -->
+  {% if not request.session.user_id %}
+    <div class="register-today">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="register-today-wrap">
+              <h3>
+                Why wait? Register today!
+              </h3>
+              <form action="">
+                <input type="text" class="form-control" placeholder="Your email address" role="textbox" aria-label="Email Address">
+                <button role="button" class="btn btn-primary" aria-label="Signup">Signup</button>
+              </form>
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .register-today -->
+  {% endif %}
+
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+
+<script>
+  $('.auction-tab li:first').addClass('active');
+  $('.auction-body > div').hide();
+  $('.auction-body > div:first').show();
+  $('.auction-tab a').click(function() {
+      $('.auction-tab li').removeClass('active');
+      $(this).parent().addClass('active');
+      var activeTab = $(this).attr('href');
+      $('.auction-body > div:visible').hide();
+      $(activeTab).show();
+      return false;
+  });
+</script>
+{% endblock %}

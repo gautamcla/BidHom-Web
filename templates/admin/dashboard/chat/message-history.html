@@ -1,0 +1,78 @@
+{% load static %}
+{% load dashboard_extra %}
+{% for chat in chat_listing %}
+{% if chat.chat_position == 'right' %}
+<li>
+  <div class="chat-align rgt-chat">
+    <figcaption>
+      <div class="chat-time convert_to_local_date_time" data-value="{{ chat.message_date|default:'' }}">
+        {{ chat.message_date }}
+      </div>
+      <p>
+        {{ chat.message }}
+      </p>
+    </figcaption>
+    <figure>
+      <div class="chat-tooltipp">
+      <img src="{% if chat.image.doc_file_name %}{{ aws_url }}{{ chat.image.bucket_name }}/{{ chat.image.doc_file_name }}{% else %}{% static 'admin/images/no-image.jpg' %}{% endif %}" alt="">
+
+        <span class="tooltipp__content">
+            <ul>
+              <li>
+                Name - {{ chat.name|default:'' }}
+              </li>
+              <li>
+                Profile Type - {{ chat.user_type|default:'' }}
+              </li>
+              <li>
+                Phone No - {{ chat.phone_no|format_phone|default:'' }}
+              </li>
+              <li>
+                Email - {{ chat.email|default:'' }}
+              </li>
+            </ul>
+          </span>
+      </div>
+    </figure>
+  </div>
+</li>
+{% else %}
+<li>
+  <div class="chat-align lft-chat">
+    <figure>
+      <div class="chat-tooltipp">
+      <img src="{% if chat.image.doc_file_name %}{{ aws_url }}{{ chat.image.bucket_name }}/{{ chat.image.doc_file_name }}{% else %}{% static 'admin/images/no-image.jpg' %}{% endif %}" alt="">
+
+        <span class="tooltipp__content right">
+          <ul>
+              <li>
+                Name - {{ chat.name|default:'' }}
+              </li>
+              <li>
+                Profile Type - {{ chat.user_type|default:'' }}
+              </li>
+              <li>
+                Phone No - {{ chat.phone_no|format_phone|default:'' }}
+              </li>
+              <li>
+                Email - {{ chat.email|default:'' }}
+              </li>
+            </ul>
+        </span>
+
+    </div>
+    </figure>
+    <figcaption>
+      <div class="chat-time convert_to_local_date_time" data-value="{{ chat.message_date|default:'' }}">
+        {{ chat.message_date }}
+      </div>
+      <p>
+        {{ chat.message }}
+      </p>
+    </figcaption>
+
+  </div>
+</li>
+{% endif %}
+{% endfor %}
+<script type="text/javascript" src="{% static '/admin/js/custom_js.js' %}"></script>

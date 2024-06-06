@@ -1,0 +1,62 @@
+{% load static %}
+{% load humanize %}
+{% load dashboard_extra %}
+<h4>
+  Property Deposit Payment <span class="hr-line"></span>
+</h4>
+
+<div class="depost_text_section">
+  <h5>Depost Amount: <strong class="blue-text">${{ bidder.property.deposit_amount|convert_num|intcomma|default:'0' }}</strong></h5>
+</div>
+<div class="bidder-information">
+  <div class="upload-doc">
+    <div class="row">
+      <div class="col-md-12 ptb10">
+        <p>
+          <strong>By checking below, you agree:</strong>
+        </p>
+        <div class="form-group">
+          <input id="term_accepted" type="checkbox" name="term_accepted" value="1" class="css-checkbox">
+          <label for="term_accepted" class="check-label">I have read and agree to the <a href="/terms/" target="_blank" class="red-text" role="button" tabindex="1">Terms Of Use</a> and <a href="/privacy-policy/" target="_blank" class="red-text" role="button" tabindex="2">Privacy Policy</a>.</label>
+        </div>
+        <div class="form-group">
+          <input id="age_validate" type="checkbox" name="age_validate" value="1" class="css-checkbox">
+          <label for="age_validate" class="check-label">I am 18 years of age or older</label>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-info">
+    <h6>
+      Bidder Information 
+    </h6>
+    <div class="info-box">
+      <ul>
+        <li id="bidder_name">
+          <span class="icon icon-user"></span>
+          {{ bidder.first_name|default:'' }} {{ bidder.last_name|default:'' }}
+        </li>
+        
+        <li id="bidder_address">
+          <span class="icon icon-address"></span>
+          {{ bidder.address.address_first|default:'1561  Cerullo Road' }}, {{ bidder.address.city|default:'' }}, {{ bidder.address.state_name|default:'' }} {{ bidder.address.postal_code|default:'' }}
+        </li>
+        <li id="bidder_email">
+          <span class="icon icon-mail"></span>
+          {{ bidder.email|default:'' }}
+        </li>
+        <li id="bidder_phone">
+          <span class="icon icon-phone"></span>
+          {{ bidder.phone_no|format_phone|default:'' }}
+        </li>
+      </ul>
+    </div>
+  </div><!-- End .doc-info -->
+</div>
+
+<div class="clearfix">
+  <button role="button" type="button" class="btn btn-primary" id="bidderPaymentPreviousBtn" tabindex="3">Back to Register</button> <button role="button" type="button" class="btn btn-secondary" id="pay_now" tabindex="4">Pay Deposit Amount</button>
+</div>
+

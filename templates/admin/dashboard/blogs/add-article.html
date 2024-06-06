@@ -1,0 +1,259 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.2" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+
+        <div class="row">
+
+          <div class="col-md-12 col-sm-12">
+            <div class="back-btn">
+              <a href="/admin/blogs/"><i class="fas fa-chevron-left"></i> Back</a>
+            </div>
+
+            <h6>
+              <strong>Blog Information</strong>
+            </h6>
+           <form name="article_frm" id="article_frm" method="post" autocomplete="off">
+               {% csrf_token %}
+            <div class="box clearfix">
+              
+                <input type="hidden" name="article_id" id="article_id" value="{{ article_details.id|default:'' }}"/>
+                <div class="form-group">
+                  <label for="asset">
+                    Category <span class="text-danger">*</span>
+                  </label>
+                  <select name="asset" id="asset" class="select form-control">
+                    <option value="">Select</option>
+                    {% for data in asset_list %}
+                    <option value="{{data.id}}" {% if article_details.asset and article_details.asset == data.id %}selected{% endif %}>{{data.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                    <label for="article_title">
+                      Title <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" name="article_title" id="article_title" class="form-control article_title" value="{{ article_details.title|default:'' }}" maxlength="50" placeholder="Enter title">
+                </div>
+                <div class="form-group">
+                  <div class="clearfix">
+                    <label for="article_description" class="black-text pb10">
+                      Description <span class="text-danger">*</span>
+                    </label>
+                  </div>
+                  <textarea class="article_description ckeditor" name="article_description" id="article_description">{{ article_details.description|default:'' }}</textarea>
+                </div>
+                <h6>
+                  Blog Image <span class="text-danger">*</span>
+                </h6>
+                <div class="upload-fav">
+                  <div class="item">
+                    <div class="dropzone articleImgFrm" id="articleImgFrm">
+                      <input type="hidden" class="article_image_id" id="article_image_id" name="article_image_id" value="{{ article_details.article_image.upload_id|default:'' }}"/>
+                      <input type="hidden" class="article_image_name" name="article_image_name" id="article_image_name" value="{{ article_details.article_image.image_name|default:'' }}"/>
+                      <!--<div class="fallback">
+                        <input name="file" type="file" class="article_image_div" id="article_image_div" name="testimonial_image_div" />
+                        <button><i class="fas fa-upload"></i> Upload favicon</button>
+                      </div>-->
+                        <div class="dz-default dz-message" data-dz-message="">
+                        <!-- <input name="file" type="file" id="website_logo" name="website_logo" />
+                        <button><i class="fas fa-upload"></i> Upload Logo</button> -->
+                        <div class="block">
+                          <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Photos</button>
+                        </div>
+                        <div class="block">
+                          or
+                        </div>
+                        <div class="block">
+                          <h6>
+                            Drag & Drop Docs
+                            <span>Supported Files: jpg, jpeg, png, svg</span>
+                          </h6>
+                        </div>
+                        </div>
+                    </div>
+                  </div>
+
+
+                    <div class="item articleImgDiv" id="articleImgDiv" >
+                        <div class="artical-icon article-img">
+                          <figure>
+                            <img src="{{ aws_url }}{{ article_details.article_image.bucket_name }}/{{ article_details.article_image.image_name }}" id="articleImg" alt="" style="{% if article_details.article_image.image_name %}{% else %}display:none;{% endif %}">
+                          </figure>
+                          <a href="javascript:void(0)" class="confirm_image_delete" data-article-id="{{ article_details.id|default:'' }}" data-image-id="{{ article_details.article_image.upload_id|default:'' }}" data-image-name="{{ article_details.article_image.image_name|default:'' }}" data-image-section="{{ article_details.article_image.bucket_name|default:'' }}" data-count="" id="articleDelImgBtn" style="{% if article_details.article_image.image_name %}{% else %}display:none;{% endif %}"><i class="fas fa-trash-alt"></i></a>
+                        </div>
+                        <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                          <span class="tooltipp__content">Prefered logo size is 400x262px. Raster (jpg, jpeg, png, svg) <br><img src="{% static 'admin/images/tooltip/logo.png' %}" alt=""></span>
+                        </div>
+                      </div>
+                </div><!-- End .uplaod-fav -->
+                <p id="custom_article_img_error"  class="custom_image_error" style="display:none;">Image is required.</p>
+
+
+
+                <div class="form-group">
+                    <label for="author_name">
+                      Author Name <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" name="author_name" id="author_name" class="form-control author_name" value="{{ article_details.author_name|default:'' }}" placeholder="Enter author name">
+                </div>
+                <h6>
+                  Author Image <span class="text-danger">*</span>
+                </h6>
+                <div class="upload-fav">
+                  <div class="item">
+                    <div class="dropzone articleAuthorImgFrm" id="articleAuthorImgFrm">
+                      <input type="hidden" class="article_author_image_id" id="article_author_image_id" name="article_author_image_id" value="{{ article_details.author_image.upload_id|default:'' }}"/>
+                      <input type="hidden" class="article_author_image_name" name="article_author_image_name" id="article_author_image_name" value="{{ article_details.author_image.image_name|default:'' }}"/>
+
+                        <div class="dz-default dz-message" data-dz-message="">
+                        <!-- <input name="file" type="file" id="website_logo" name="website_logo" />
+                        <button><i class="fas fa-upload"></i> Upload Logo</button> -->
+                        <div class="block">
+                          <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Photos</button>
+                        </div>
+                        <div class="block">
+                          or
+                        </div>
+                        <div class="block">
+                          <h6>
+                            Drag & Drop Docs
+                            <span>Supported Files: jpg, jpeg, png, svg</span>
+                          </h6>
+                        </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="item articleAuthorImgDiv" id="articleAuthorImgDiv" >
+                      <div class="fav-icon article-img">
+                        <figure>
+                          <img src="{{ aws_url }}{{ article_details.author_image.bucket_name }}/{{ article_details.author_image.image_name }}" id="articleAuthorImg" alt="" style="{% if article_details.author_image.image_name %}{% else %}display:none;{% endif %}">
+                        </figure>
+                        <a href="javascript:void(0)" class="confirm_image_delete" data-article-id="{{ article_details.id|default:'' }}" data-image-id="{{ article_details.author_image.upload_id|default:'' }}" data-image-name="{{ article_details.author_image.image_name }}" data-image-section="{{ article_details.author_image.bucket_name }}" data-count="" id="articleAuthorDelImgBtn" style="{% if article_details.author_image.image_name %}{% else %}display:none;{% endif %}"><i class="fas fa-trash-alt"></i></a>
+                      </div>
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content">Prefered size is 119x119px. Raster (jpg, jpeg, png, svg) <br><img src="{% static 'admin/images/tooltip/logo.png' %}" alt=""></span>
+                      </div>
+                  </div>
+                </div><!-- End .uplaod-fav -->
+                  <p id="custom_author_img_error"  class="custom_image_error" style="display:none;">Image is required.</p>
+
+                <div class="form-group">
+                  <label for="article_status">
+                    Status <span class="text-danger">*</span>
+                  </label>
+                  <select name="article_status" id="article_status" class="select form-control">
+                    <option value="">Select</option>
+                    <option value="1" {% if article_details.status and article_details.status == 1 %}selected{% endif %}>Active</option>
+                    <option value="2" {% if article_details.status and article_details.status == 2 %}selected{% endif %}>Inactive</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="virtual_publish_date">Publish Date <span class="text-danger" style="{% if article_details.status and article_details.status != 1 %}display:none;{% endif %}">*</span></label>
+                  <div class='input-group date' id='datetimepicker8'>
+                    <input type='text' class="form-control" name="virtual_publish_date" id="virtual_publish_date" placeholder="mm-dd-yyyy" value="">
+                    <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    <input autocomplete="off" type='hidden' class="form-control" name="publish_date_local" id="publish_date_local" />
+                    <input autocomplete="off" type='hidden' class="form-control" name="publish_date" id="publish_date" value="{{ article_details.publish_date|default:'' }}"/>
+                  </div>
+                </div>
+
+
+            </div><!-- End .box -->
+
+            <div class="clearfix pt30">
+              <button type="submit" id="submit" class="btn btn-primary">Save</button> 
+              <a href="/admin/blogs/" class="btn btn-primary-bdr">Cancel</a>
+            </div>
+            <div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+          </div><!-- End .col-md-10 -->
+          </form>
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+{% endblock %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <!--<script type="text/javascript" src="{% static 'admin/js/tinymce/tinymce.min.js' %}"></script>-->
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/ckeditor/ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/article.js' %}?v=1.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=3.8"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+<script>
+      var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+
+      $(function() {
+    //format: 'YYYY-MM-DD hh:mm A'
+      $('.date').datetimepicker({
+          format: 'MM-DD-YYYY hh:mm A',
+      }).on('dp.change',function(e){
+          var virtual_date_element = $(this).find('input:first').attr('id');
+          var date_element = $(this).find('input:last').attr('id');
+          var dates = $("#"+virtual_date_element).val();
+          if(dates != ""){
+            var actualStartDate = dates.split(" ");
+            //new lines
+            var mdy_format = actualStartDate[0].split("-");
+            mdy_date = mdy_format[2]+"-"+mdy_format[0]+"-"+mdy_format[1];
+
+            //actualStartDate = mdy_date+' '+convert_to_24h(actualStartDate[1]+' '+actualStartDate[2]);
+            actualStartDate = actualStartDate[0]+' '+convert_to_24h(actualStartDate[1]+' '+actualStartDate[2]);
+
+
+            console.log(actualStartDate);
+            //var utc_date = convert_to_utc_datetime(actualStartDate);
+            var utc_date = convert_to_utc_date(actualStartDate, 'mm-dd-yyyy', 'datetime');
+            $("#"+date_element+"_local").val(actualStartDate);
+            $("#"+date_element).val(utc_date);
+          }
+
+      });
+    });
+
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }
+      $('[data-toggle="tooltip"]').tooltip();
+      CKEDITOR.on( 'instanceReady', function(e) {
+        $('iframe', e.editor.container.$).contents().on('click', function() {
+            e.editor.focus();
+        });
+    });
+      $.each(CKEDITOR.dtd.$removeEmpty, function (i, value) {
+          CKEDITOR.dtd.$removeEmpty[i] = false;
+      });
+    $('#article_status').chosen();
+    </script>
+{% endblock %}

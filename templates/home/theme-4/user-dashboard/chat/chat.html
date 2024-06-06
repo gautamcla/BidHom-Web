@@ -1,0 +1,362 @@
+{% extends "layout/theme-4/user-dashboard/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+    <div class="chat-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="chat-top">
+              <div class="block">
+                <h6>
+                  <strong>Chat</strong>
+                </h6>
+              </div>
+
+              <div class="block">
+                <i class="fas fa-filter"></i> Filters
+                <select name="filter_chat" id="filter_chat" class="select form-control" onchange="filterChatListing();">
+                  <option value="">All</option>
+                  <option value="agent">Agent</option>
+                  <option value="broker">Broker</option>
+                </select>
+              </div>
+            </div><!-- End .chat-top -->
+            {% comment %} {% if chat_listing %} {% endcomment %}
+                <div class="chat-bottom">
+              <div class="chat-sidebar">
+                <input type="hidden" name="first_master_id" id="first_master_id" value="" />
+                <input type="hidden" name="last_master_id" id="last_master_id" value="" />
+                <input type="hidden" name="chat_master_id" id="chat_master_id" value="" />
+                <input type="hidden" name="first_msg_id" id="first_msg_id" value="" />
+                <input type="hidden" name="last_msg_id" id="last_msg_id" value="" />
+                <input type="hidden" name="left_page_offset" id="left_page_offset" value="" />
+                <input type="hidden" name="left_page_size" id="left_page_size" value="" />
+                <input type="hidden" name="right_page_offset" id="right_page_offset" value="" />
+                <input type="hidden" name="right_page_size" id="right_page_size" value="" />
+                <ul id="chat_listings">
+                  {% comment %} {% for chat in chat_listing %}
+                  <li class="chat_rooms {% if chat.unread_msg_cnt > 0 %}unread{% endif %}" onclick="active_chatroom(this)" data-id="{{ chat.id }}" data-name="{{ chat.name }}" data-msg="{{ chat.last_message }}" data-email="{{ chat.email }}" data-phone="{{ chat.phone_no }}" data-property="{{ chat.property_data.id|default:'' }}" data-property-name="{{ chat.property_data.name|default:'' }}">
+                    <figure>
+                      <img src="{% if chat.image.doc_file_name %}{{ aws_url }}{{ chat.image.bucket_name }}/{{ chat.image.doc_file_name }}{% else %}{% static 'theme-4/user-dashboard/images/no-image.jpg' %}{% endif %}" alt="real estate sales">
+                    </figure>
+                    <figcaption>
+                      <h6>
+                        {{ chat.name }} <span class="user-type">({{ chat.user_type }})</span>
+                      </h6>
+                      <p>
+                        {{ chat.last_message|truncatechars:30 }}
+                      </p>
+                      <div class="timer convert_to_local_date_message" data-value="{{ chat.last_message_date|default:'' }}">
+                        Loading...
+                      </div>
+                      <div class="circle" style="{% if chat.unread_msg_cnt > 0 %}{% else %}display:none;{% endif %}">{{ chat.unread_msg_cnt|default:'' }}</div>
+                    </figcaption>
+                  </li>
+                  {% endfor %} {% endcomment %}
+                </ul>
+              </div><!-- End .chat-sidebar -->
+
+              <div class="chat-rightbar">
+                <div class="chat-top-active" style="{% if chat_listing|length > 0 %}display:flex;{% else %}display:none;{% endif %}">
+                  <div class="block">
+                    <figure>
+                      <img src="{% static 'theme-4/user-dashboard/images/no-image.jpg' %}" alt="real estate sales" id="active_chat_img">
+                    </figure>
+                    <figcaption>
+                      <h6 class="chat_name">
+                        Jennifer Fritz
+                      </h6>
+                    </figcaption>
+                  </div>
+                  <div class="block">
+                    <ul>
+                      <li>
+                        <a href="#" id="active_chat_email"><i class="fas fa-envelope"></i> johnsmith@gmail.com</a>
+                      </li>
+                      <li>
+                        <a href="#" id="active_chat_phone"><i class="fas fa-phone-alt"></i> +1-202-555-0169</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div><!-- End .chat-top-active -->
+
+                <div class="chat-middle">
+                  <ul class="chat-list" id="chat_list">
+
+                  </ul>
+                </div>
+                <form name="chat_msg_form" id="chat_msg_form" method="post">
+                <div class="chat-bottom-fixed" style="{% if chat_listing|length > 0 %}display:block;{% else %}display:none;{% endif %}">
+                  <input type="hidden" id="chat_doc_id" name="chat_doc_id" value=""/>
+                  <input type="hidden" name="chat_doc_name" id="chat_doc_name" value=""/>
+                  <ul id="chat_fixed_bottom">
+                    <li>
+                      <textarea name="chat_message_input" id="chat_message_input" placeholder="Type a message"></textarea>
+                      <ol class="chat-preview" style="display:none;">
+                        <li></li>
+                      </ol>
+                    </li>
+                    <li>
+                      <a href="#"><span class="smile-icon"></span></a>
+                    </li>
+                    <li>
+                      <div class="upload-pic">
+                        <input type="file" id="file" />
+                        <label for="file"><span class="attach-icon"></span></label>
+                      </div>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0)" id="send_msg_btn" class="send-btn" onclick="save_chat_message()">Send <span class="send-icon"></span></a>
+                    </li>
+                  </ul>
+                  <p id="chat_message_input-error" style="display: none;" class="error">Please enter some text...</p>
+                </div>
+              </div><!-- End .chat-rightbar -->
+            </form>
+            </div><!-- End .chat-bottom -->
+            {% comment %} {% else %} {% endcomment %}
+            <div class="chat-blank" style="display:none">
+              <img class="cntr" src="{% static 'theme-4/user-dashboard/images/no-chat.png' %}" alt="real estate sales">
+            </div><!-- End .chat-blank -->
+            {% comment %} {% endif %} {% endcomment %}
+
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+    <div class="overlay" style="display:none;">
+      <div class="loader">Loading...</div>
+    </div>
+
+
+    <div id="confirmChatDocDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete This Document</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <input type="hidden" name="popup_section" id="popup_section" value=""/>
+          <input type="hidden" name="popup_image_id" id="popup_image_id" value=""/>
+          <input type="hidden" name="popup_image_name" id="popup_image_name" value=""/>
+          <div class="modal-body">
+            <p class="font15 center">
+              Are you sure you want to delete?
+            </p>
+            <div class="clearfix center">
+               <button type="button" class="btn btn-secondary del_offer_doc" id="del_offer_doc_true">Yes</button> <button type="button" class="btn btn-primary-bdr del_offer_doc" id="del_offer_doc_false">No</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+{% block js_content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script type="text/javascript" src="{% static '/theme-common/js/common.js' %}"></script>
+{% comment %} <script type="text/javascript" src="{% static '/theme-common/js/chat.js' %}?v=1.0.0"></script> {% endcomment %}
+
+<!-- chat socket -->
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script> {% endcomment %}
+<script type="text/javascript" src="{% static '/theme-common/js/chat_socket.js' %}?v=1.3"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/chat_tour.js' %}?v=3.1"></script>
+
+<script>
+  var is_first_login = {{request.session.is_first_login}};
+  //const socket_domain = "{{node_url}}";
+  const ip_address = "{{ip_address}}";
+  //const user_id = '{{ request.session.user_id }}';
+  //const site_id = '{{site_id}}';
+
+  /*const socket = io.connect(socket_domain, {
+      transports: ["websocket", "xhr-polling", "htmlfile", "jsonp-polling"],
+      rejectUnauthorized: false,
+      requestCert: false,
+  }); */
+
+  $(document).ready(function () {
+    var charsidebar = $(window).height();;
+    $(".chat-sidebar, .chat-rightbar").css("height", charsidebar - 202);
+    $(".chat-middle").css("height", charsidebar - 360);
+  });
+
+  $( window ).resize(function() {
+    var charsidebar = $(window).height();;
+    $(".chat-sidebar, .chat-rightbar").css("height", charsidebar - 202);
+    $(".chat-middle").css("height", charsidebar - 360);
+  });
+  /*function active_chatroom(element){
+    $('.chat_rooms').removeClass('active');
+    $(element).addClass('active');
+
+      //async chat
+      const roomName = $(element).attr('data-id');
+      const masterChatName = $(element).attr('data-name');
+      const masterMessage = $(element).attr('data-msg');
+
+      $('.chat_name').html(masterChatName);
+      $('.chat_msg').html(masterMessage);
+      $('#chat_master_id').val(roomName);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+
+        chatSocket.onopen = function(e) {
+
+          getRoomMessages();
+        };
+        chatSocket.onmessage = function(e) {
+            const sess_user_id = '{{ request.session.user_id }}';
+            const data = JSON.parse(e.data);
+            console.log("from on message");
+            console.log(data);
+            console.log(sess_user_id);
+            var aws_url = '{{ aws_url }}';
+            var chat_html = '';
+            if(data.message.command == 'fetch_messages'){
+              $('#last_msg_id').val(data.message.last_msg_id);
+              $.each(data.message.message, function(i, item) {
+                if(parseInt(item.sender_id) == parseInt(sess_user_id)){
+                  var class_add = 'rgt-chat';
+                }else{
+                  var class_add = 'lft-chat';
+                }
+                var added_date = '';
+                if(item.message_date){
+                  added_date = convert_Date(item.message_date, 'mm-dd-yyyy','ampm');
+                }
+                var user_img = 'static/theme-4/user-dashboard/images/no-image.jpg';
+                if(item.image.doc_file_name){
+                  user_img = aws_url+''+item.image.bucket_name+'/'+item.image.doc_file_name;
+                }
+                chat_html += '<li><div class="chat-align '+class_add+'"><figcaption><div class="chat-time convert_to_local_date_time" data-value="'+added_date+'">'+added_date+'</div><p>'+item.message+'</p></figcaption><figure><img src="'+user_img+'" alt="real estate sales"></figure></div></li>';
+
+              });
+              $('#chat_list').html(chat_html);
+            }else{
+              $.each(data.message.message, function(i, item) {
+                if(parseInt(item.sender_id) == parseInt(sess_user_id)){
+                  var class_add = 'rgt-chat';
+                }else{
+                  var class_add = 'lft-chat';
+                }
+                var added_date = '';
+                if(item.message_date){
+                  added_date = convert_Date(item.message_date, 'mm-dd-yyyy','ampm');
+                }
+                var user_img = 'static/theme-4/user-dashboard/images/no-image.jpg';
+                if(item.image.doc_file_name){
+                  user_img = aws_url+''+item.image.bucket_name+'/'+item.image.doc_file_name;
+                }
+                $('#chat_list').append('<li><div class="chat-align '+class_add+'"><figcaption><div class="chat-time convert_to_local_date_time" data-value="'+added_date+'">'+added_date+'</div><p>'+item.message+'</p></figcaption><figure><img src="'+user_img+'" alt="real estate sales"></figure></div></li>');
+              });
+
+            }
+
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat_message_input').focus();
+        document.querySelector('#chat_message_input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#send_msg_btn').click();
+            }
+        };
+
+        document.querySelector('#send_msg_btn').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat_message_input');
+            const message = messageInputDom.value;
+            //const message = $('#chat_message_input').val();
+
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'room_id': roomName,
+                'command': 'new_message',
+            }));
+            messageInputDom.value = '';
+        };
+        function getRoomMessages(){
+          chatSocket.send(JSON.stringify({
+                'room_id': roomName,
+                'command': 'fetch_messages',
+          }));
+        }
+        function convert_Date(myTimeStamp, dateformat, timeformat){
+          var dateX = new Date(myTimeStamp);
+          var dateY = new Date();
+          var date = '';
+          if(myTimeStamp.includes('Z')){
+              //if utc format
+              date = new Date(dateX.getTime());
+          }
+          else{
+              // for non utc format
+              date = new Date(dateX.getTime() - dateY.getTimezoneOffset() * 60000);
+          }
+          var fullyear = date.getFullYear();
+          var halfYear = parseInt(date.getFullYear().toString().substr(2,2), 10);
+          var mts = date.getMonth()+1;
+          var short_month_name = date.toLocaleString('default', { month: 'short' })
+          var long_month_name = date.toLocaleString('default', { month: 'long' })
+          var month_num = (mts < 10)?'0'+mts:mts;
+          var dt = (date.getDate() < 10)?'0'+date.getDate():date.getDate();
+          var hrs = (date.getHours() < 10)?'0'+date.getHours():date.getHours();
+          var mins = (date.getMinutes() < 10)?'0'+date.getMinutes():date.getMinutes();
+          var secs = (date.getSeconds() < 10)?'0'+date.getSeconds():date.getSeconds();
+          var timeStp = '';
+          if(dateformat == 'yyyy-mm-dd'){
+              timeStp = fullyear+'-'+month_num+'-'+dt;
+          }else if(dateformat == 'mm-dd-yyyy'){
+              timeStp = month_num+'-'+dt+'-'+fullyear;
+          }else if(dateformat == 'dd-mm-yyyy'){
+              timeStp = dt+'-'+month_num+'-'+fullyear;
+          }else if(dateformat == 'dd-mm-yy'){
+              timeStp = dt+'-'+month_num+'-'+halfYear;
+          }else if(dateformat == 'mm-dd-yy'){
+              timeStp = month_num+'-'+dt+'-'+halfYear;
+          }else if(dateformat == 'yy-mm-dd'){
+              timeStp = halfYear+'-'+month_num+'-'+dt;
+          }else if(dateformat == 'j m, Y'){
+              timeStp = dt+' '+short_month_name+', '+fullyear;
+          }else if(dateformat == 'm j, Y'){
+              timeStp = short_month_name+', '+dt+' '+fullyear;
+          }else if(dateformat == 'M j, Y'){
+              timeStp = long_month_name+' '+dt+', '+fullyear;
+          }else if(dateformat == 'j M, Y'){
+              timeStp = dt+' '+long_month_name+', '+fullyear;
+          }
+          if(timeformat =='ampm'){
+              var mer = (parseInt(hrs) >= 12)?'PM':'AM';
+              hrs = parseInt(hrs) % 12;
+              hrs = (hrs)?hrs:12;
+              timeStpDate = timeStp+" "+hrs+":"+mins+" "+mer;
+          }else{
+              timeStpDate = timeStp+" "+hrs+":"+mins+":"+secs;
+          }
+          return timeStpDate;
+      }
+  }*/
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+  
+
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 ">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Our
+                </h3>
+                <h1>
+                  Blog
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+
+    <section class="blog-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+
+            <div class="blog-detail-wrap">
+              <div class="blog-wrap">
+                <ul class="blog-list" id="blog_list">
+                  {% if blog_listing %}
+                  {% for blog in blog_listing %}
+
+                  <li>
+                    
+                      <div class="item">
+                        <figure>
+                          <a href="/blog-details/?id={{ blog.id }}" role="button">
+                            <div class="image">
+                              <img src="{% static 'theme-4/images/no-blog-full.png' %}" alt="real estate sales">
+                              <img class="article-pic" src="{% if blog.article_image.image_name %}{{ aws_url }}{{ blog.article_image.bucket_name }}/{{ blog.article_image.image_name }}{% else %}{% static 'theme-4/images/no-blog-full.png' %}{% endif %}" alt="{{ blog.article_image.image_name|default:'' }}">
+                            </div>
+                          </a>
+                          <!-- <small>
+                            {{ blog.category_name|default:'' }}
+                          </small> -->
+                        </figure>
+                        <figcaption>
+                          <h4>
+                            <a href="/blog-details/?id={{ blog.id }}" role="button">
+                              {{ blog.title|default:'' }}
+                            </a>
+                          </h4>
+                          <div class="blog-user">
+                            <ul>
+                              <li>
+                                <figure>
+                                  <img src="{% if blog.author_image.image_name %}{{ aws_url }}{{ blog.author_image.bucket_name }}/{{ blog.author_image.image_name }}{% else %}{% static 'theme-4/images/no-blog-full.png' %}{% endif %}" alt="real estate sales">
+                                </figure>
+                              </li>
+                              <li>
+                                {{ blog.author_name }}
+                              </li>
+                              <li class="{% if blog.publish_date %}convert_to_local_date_time{% endif %}" data-value="{{ blog.publish_date|default:'' }}">
+                                {{ blog.publish_date|default:'' }}
+                              </li>
+                              <li>
+                                <a href="javascript:void(0)" role="button"><span class="share-icon"></span> Share</a>
+                              </li>
+                            </ul>
+                          </div>
+                          {% autoescape off %}{{ blog.description|default:'' }}{% endautoescape %}
+                          <div class="more" onclick="blog_details({{ blog.id }})">
+                            Read More
+                          </div>
+                        </figcaption>
+                      </div>
+                    
+                  </li>
+                  {% endfor %}
+                  {% else %}
+                  <li class="text-center text-danger" style="width:100%;"><img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" role="img" alt="real estate sales" /></li>
+                  {% endif %}
+                </ul>
+                <div class="pagination-wrap">
+
+                <ul>
+                  <li class="page-item">Result Per Page:</li>
+                  <li class="page-item">
+                    <select class="select form-control" aria-label="Result" name="blog_num_record" id="blog_num_record" onchange="blogListingSearch(1,'');">
+                      <!--<option value="2">2</option>-->
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="30">30</option>
+                      <option value="40">40</option>
+                    </select>
+                  </li>
+                </ul>
+                  <ul id="{{ pagination_id }}">
+                  {{ pagination_html }}
+                  </ul>
+                </div>
+
+              </div><!-- End .blog-wrap -->
+
+              <div class="blog-sidebar" id="blog_sidebar">
+                <ul>
+                  <li>
+                    <div class="heading">
+                      <h5>
+                        Our 
+                      </h5>
+                      <h4>
+                        Listings
+                      </h4>
+                      <a role="button" tabindex="4" href="/our-listing" class="btn btn-secondary">Search</a>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="heading">
+                      <h5>
+                        Property BOT 
+                      </h5>
+                      <h4>
+                        Value Estimator
+                      </h4>
+                      <a role="button" tabindex="5" href="/property-value-estimator/" class="btn btn-secondary">Get Started</a>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="heading">
+                      <h5>
+                        Auction 
+                      </h5>
+                      <h4>
+                        Types
+                      </h4>
+                      <a role="button" tabindex="6" href="/auction-type/" class="btn btn-secondary">Learn More</a>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="heading">
+                      <h5>
+                        Stay Informed 
+                      </h5>
+                      <h4>
+                        Listing Alerts
+                      </h4>
+                      <a role="button" tabindex="7" href="{% url 'register' %}" class="btn btn-secondary">Sign Up</a>
+                    </div>
+                  </li>
+                </ul>
+              </div><!-- End .blog-sidebar -->
+
+            </div><!-- End .blog-detail-wrap -->
+
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </section> <!-- End .blog-wrapper -->
+
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/mask_input.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+
+<script type="text/javascript" src="{% static 'theme-common/js/custom_validator.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-4/js/autosuggestion.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/blogs.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/pagination.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+<script>
+// $(document).ready(function(){
+//   $('.select').chosen();
+// });
+function blog_details(blog_id){
+  window.location.href='/blog-details/?id='+blog_id;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.2" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+
+        <div class="row">
+          <form name="add_portfolio_form" id="add_portfolio_form" method="post" autocomplete="off">
+            {% csrf_token %}
+          <div class="col-md-12 col-sm-12">
+            <div class="back-btn">
+              <a href="/admin/portfolio-list/"><i class="fas fa-chevron-left"></i> Back</a>
+            </div>
+
+            <h6>
+              <strong>Multiple Parcel Information</strong>
+            </h6>
+            <div class="box clearfix">
+              <div class="row">
+                <input type="hidden" name="portfolio_id" id="portfolio_id" value="{{ portfolio_detail.id|default:'' }}"/>
+                <div class="col-lg-6 col-md-4">
+                  <div class="form-group">
+                    <label for="portfolio_name">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="portfolio_name" id="portfolio_name" placeholder="Portfolio Name" value="{{ portfolio_detail.name|default:'' }}" maxlength="40">
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-8">
+                  <div class="form-group">
+                    <label for="property_name">Property</label>
+                    <select class="select form-control" name="property_name" id="property_name" data-placeholder="Select" multiple>
+<!--                      <option value="">Select</option>-->
+                      {% for prop in property_list %}
+                        <option value="{{ prop.id }}" {% if prop.id in portfolio_detail.property_id_in %}selected{% endif %}>{{ prop.address_one|default:'' }}, {{ prop.city|default:'' }}, {{ prop.state_name|default:'' }} {{ prop.postal_code|default:'' }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-12 col-sm-12">
+                  <div class="form-group">
+                    <label for="portfolio_details">Details</label>
+                    <textarea name="portfolio_details" id="portfolio_details" class="ckeditor form-control portfolio_details">{{ portfolio_detail.details|default:'' }}</textarea>
+                  </div>
+                </div><!-- End .col-md-12 -->
+                <div class="col-md-12 col-sm-12">
+                  <div class="form-group">
+                    <label for="portfolio_terms">Terms</label>
+                    <textarea name="portfolio_terms" id="portfolio_terms" class="ckeditor form-control portfolio_terms">{{ portfolio_detail.terms|default:'' }}</textarea>
+                  </div>
+                </div><!-- End .col-md-12 -->
+                <div class="col-md-12 col-sm-12">
+                  <div class="form-group">
+                    <label for="portfolio_terms">Contact</label>
+                    <textarea name="portfolio_contacts" id="portfolio_contacts" class="ckeditor form-control portfolio_contacts">{{ portfolio_detail.contact|default:'' }}</textarea>
+                  </div>
+                </div><!-- End .col-md-12 -->
+                <div class="col-md-12 col-sm-12">
+                  <h6>
+                    <i class="far fa-image red-text"></i> Photos
+                  </h6>
+                  <div class="upload-fav">
+                    <div class="item">
+                      <div class="dropzone" id="portfolioImageFrm">
+                          <input type="hidden" id="portfolio_image_id" name="portfolio_image_id" value="{{ portfolio_detail.portfolio_image_ids|default:'' }}"/>
+                            <input type="hidden" name="portfolio_image_name" id="portfolio_image_name" value="{{ portfolio_detail.portfolio_image_name|default:'' }}"/>
+                            <div class="dz-default dz-message" data-dz-message="">
+                              <div class="block">
+                                <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Photos</button>
+                              </div>
+                              <div class="block">
+                                or
+                              </div>
+                              <div class="block">
+                                <h6>
+                                  Drag & Drop Docs
+                                  <span>Supported Files: jpg, jpeg, png</span>
+                                </h6>
+                              </div>
+                            </div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content">Allowed file types are jpg, jpeg, png. Preferred image size is 617*414 px.</span>
+                      </div>
+                    </div>
+                  </div><!-- End .uplaod-fav -->
+                  <p id="custom_portfolio_image_error"  class="custom_image_error" style="display:none;">Image is required.</p>
+                </div>
+                <div class="col-md-12 col-sm-12">
+                  <h6>
+                    Primary photos
+                    <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                      <span class="tooltipp__content right">Drag and drop photos to change their order.</span>
+                    </div>
+                  </h6>
+
+                  <div class="image-show-list" id="portfolioImgDiv" style="{% if portfolio_detail.images|length > 0 %}{% else %}display:none;{% endif %}">
+                    <ul id="portfolioImgList">
+                      {% for item in portfolio_detail.images %}
+                      <li rel_id="{{ item.doc_id }}" rel_position="{{ forloop.counter }}">
+                        <a href="javascript:void(0)" data-article-id="" data-image-id="{{ item.doc_id }}" data-image-name="{{ item.doc_file_name }}" data-image-section="{{ item.bucket_name }}"  class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+                        <img src="{% if item.doc_file_name %}{{ aws_url }}{{ item.bucket_name }}/{{ item.doc_file_name }}{% else %}{% static 'admin/images/upload-banner-1.png' %}{% endif %}" alt="">
+                        <figcaption>
+                          <h6>
+                            {{ item.doc_file_name }}
+                          </h6>
+                          <!--<p class="size_date_sec" data-file-size="{{ item.file_size }}" data-added-date="{{ item.added_on }}">
+                            File Size: {{ item.file_size }} <br>
+                            Uploaded: {{ item.added_on|parse_iso|date:'M j, Y h:i:sa' }}
+                          </p>
+                          <div class="move">
+                            <i class="fas fa-expand-arrows-alt"></i> Move
+                          </div>-->
+                        </figcaption>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                    <label for="portfolio_status">Status <span class="text-danger">*</span></label>
+                    <select name="portfolio_status" class="select form-control" id="portfolio_status">
+                      <option value="">Select</option>
+                      <option value="1" {% if portfolio_detail.status == 1 %}selected{% endif %}>Active</option>
+                      <option value="2" {% if portfolio_detail.status == 2 %}selected{% endif %}>InActive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div><!-- End .box -->
+
+            <div class="clearfix pt30">
+              <button type="submit" id="submit" class="btn btn-primary">Save</button>
+              <a href="/admin/portfolio-list/" class="btn btn-primary-bdr">Cancel</a>
+            </div>
+            <div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+          </div><!-- End .col-md-10 -->
+          </form>
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+{% endblock %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <!--<script type="text/javascript" src="{% static 'admin/js/tinymce/tinymce.min.js' %}"></script>-->
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/ckeditor/ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=3.6"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/add-portfolio.js' %}?v=3.6"></script>
+
+<script>
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#usr_phone_no").inputmask('(999) 999-9999');
+    </script>
+{% endblock %}

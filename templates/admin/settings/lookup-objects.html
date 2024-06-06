@@ -1,0 +1,199 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Lookup Objects {% endblock title %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  <div class="listing-top">
+    <div class="block">
+      <h3>Lookup Objects</h3>
+    </div>
+    <div class="block">
+      <button type="button" class="btn btn-primary" style="float:right;" data-toggle="modal" data-target=".add-object"><i class="fa fa-plus-circle"></i> Add Object</button>
+    </div>
+  </div>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>{{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="table-responsive">
+    <table class="table table-striped jambo_table bulk_action">
+      <thead>
+        <tr class="headings">
+          <th class="column-title">ID </th>
+          <th class="column-title">Object Name </th>
+          <th class="column-title">Status </th>
+          <th class="column-title no-link last"><span class="nobr">Action</span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% if data %}
+            {% for object in data %}
+            <tr class="even pointer">
+            <td class=" ">{{ forloop.counter }}</td>
+            <td class=" ">{{object.object_name}}</td>
+            <td class=" ">
+              {% if object.is_active %}
+              <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{object.id}}">Active</button> 
+              {% else %}
+              <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{object.id}}">Inactive</button> 
+                {% endif %}
+            </td>
+            <td class="last">
+              <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                <form method="post" data-id="{{object.id}}" action="{% url 'admin-object-status-change' %}" class="ActiveInactive" >
+                  {% csrf_token %}
+                  <input type="hidden" name="object_id" value="{{object.id}}">
+                  <input type="hidden" class="status-change" name="status" value="{{object.is_active|yesno:"0,1"}}">
+                  {% if object.is_active %}
+                    <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                  {% else %}
+                    <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                  {% endif %}
+                </form>
+                <button type="button" data-id="{{object.id}}" data-name="{{object.object_name}}" data-status="{{object.is_active}}" class="btn btn-xs btn-round btn-primary edit-object"><i class="fa fa-edit"></i> Edit</button>
+              </div>
+
+            </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>  <td class=" ">No Object available </td></tr>
+        {% endif %}
+        
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+  <!-- Add theme modal -->
+  <div class="modal fade add-object centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Add Object</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate name="admin_login_frm" id="admin_login_frm" class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="name">Object Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+             <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="select form-control" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-3 col-sm-3 col-xs-12">
+                &nbsp;
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+  <!--Edit thene Modal-->
+  <div class="modal fade edit-object-modal centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Edit Object</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <input type="hidden" id="object_id" name="object_id" >
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="edit_name">Object Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="edit_name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="edit_is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="select form-control" id="edit_is_active" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-3 col-sm-3 col-xs-12">
+                &nbsp;
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End modal-->
+</div>  
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+      // hit add object modal
+      if(window.location.hash && window.location.hash == '#add-object' ) {
+          var hash = window.location.hash;
+          window.history.pushState({}, "", window.location.href.split("#")[0]);
+          $('.' + hash.split('#')[1]).modal('show');
+      }
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/lookup-objects.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+
+{% endblock %}

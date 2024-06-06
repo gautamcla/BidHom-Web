@@ -1,0 +1,554 @@
+.bidding-header {
+    padding: 15px 0 3px;
+
+    ul {
+        display: flex;
+        justify-content: space-between;
+
+        li {
+            padding: 0 1px 0 0;
+            width: 33.3%;
+
+            &:last-child {
+                padding-right: 0;
+            }
+
+            &.active {
+                a {
+                    border-color: $secondary;
+                }
+            }
+
+            &.tab-activated {
+                a {
+                    color: $secondary;
+                    border-color: $secondary;
+
+                    .circle {
+                        background: $secondary;
+                    }
+                }
+            }
+
+            a {
+                padding: 10px;
+                line-height: 26px;
+                border-bottom: 3px solid #707070;
+                display: inline-block;
+                width: 100%;
+                text-align: center;
+
+                @include breakpoint(lg) {
+                    font-size: $fontExtraLarge;
+                }
+
+                @include breakpoint(md) {
+                    font-size: $font14;
+                }
+
+                @include breakpoint(xxs) {
+                    font-size: $fontSmall;
+                    padding: 10px 0;
+                    line-height: 20px;
+                }
+
+                &:hover {
+                    color: $secondary;
+                }
+
+                .circle {
+                    width: 24px;
+                    height: 24px;
+                    line-height: 24px;
+                    color: $white;
+                    background: #9E9E9E;
+                    display: inline-block;
+                    @include border-radius (100%);
+
+                    @include breakpoint(xxs) {
+                        width: 20px;
+                        height: 20px;
+                        line-height: 20px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.bidding-body {
+    padding: 30px 0 5%;
+    
+    .bidding-property {
+        display: flex;
+        align-items: center;
+        padding-bottom: 20px;
+
+        figure {
+            width: 80px;
+            height: 60px;
+
+            img {
+                width: 100%;
+                height: 100%;
+                max-width: 100%;
+                @include border-radius (4px);
+            }
+        }
+
+        figcaption {
+            width: calc(100% - 80px);
+            padding-left: 15px;
+
+            h5 {
+                margin-bottom: 0;
+                font-weight: $bold;
+                
+                span {
+                    font-weight: 400;
+                    font-size: $fontMedium;
+                    line-height: 20px;
+                    display: block;
+                }
+            }
+        }
+    }
+
+    .error-msg {
+        padding: 15px 20px;
+        background: #FCFAEE;
+        border: 1px dashed $gray;
+        margin-bottom: 20px;
+
+        @include breakpoint(sm) {
+            padding: 10px;
+        }
+
+        p {
+            margin-bottom: 0;
+            line-height: 20px;
+        }
+    }
+
+    .current-info {
+        .error {
+            padding-top: 16px;
+        }
+    }
+
+    .bidding-accordian {
+        .panel-group {
+            margin-bottom: 0;
+        }
+
+        .panel-group .panel+.panel {
+            margin: 20px 0;
+
+            @include breakpoint(sm) {
+                margin: 10px 0;
+            }
+        }
+
+        .panel-default {
+            border-bottom: none;
+            box-shadow: none;
+            @include border-radius(0);
+            position: relative;
+            background: transparent;
+
+            &.completed {
+                .panel-heading {
+                    .panel-title {
+                        a {
+                            i {
+                                color: #62B22B;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .panel-heading {
+                background: $white;
+                padding: 0;
+
+                .panel-title {
+                    font-weight: $bold;
+                    padding: 12px 20px;
+                    border: 1px solid #DDD;
+                    font-size: 20px;
+                    position: relative;
+
+                    @include breakpoint(lg) {
+                        font-size: $fontExtraLarge;
+                        line-height: 30px;
+                        padding: 10px 15px;
+                    }
+
+                    @include breakpoint(sm) {
+                        font-size: $fontLarge;
+                        padding: 5px 10px;
+                    }
+
+                    .edit-link {
+                        position: absolute;
+                        right: 50px;
+                        color: $secondary;
+                        display: inherit;
+                        width: auto;
+                        font-size: $font14;
+                        line-height: 16px;
+                        top: 16px;
+
+                        &:after {
+                            content: none;
+                        }
+                    }
+
+                    a {
+                        color: $secondary;
+                        display: flex;
+                        width: 100%;
+                        align-items: center;
+                        @include css3-transition(transition, all 0.4s ease);
+
+                        &:after {
+                            content: "\f107";
+                            font-family: 'fontAwesome';
+                            position: absolute;
+                            right: 20px;
+
+                        }
+
+                        i {
+                            padding-right: 10px;
+                        }
+
+                        &.collapsed {
+                            color: $black;
+
+                            &:after {
+                                content: "\f105";
+                                font-family: 'fontAwesome';
+                                position: absolute;
+                                right: 20px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .panel-body {
+                padding: 20px 0 0;
+                border-top: none !important;
+                position: relative;
+                color: rgba($color: #000, $alpha: 0.7);
+
+                &:before {
+                    content: none;
+                    position: absolute;
+                    top: 0;
+                }
+
+                p {
+                    line-height: 30px;
+                    color: rgba($color: #000, $alpha: 0.7);
+                }
+
+                .bidder-state {
+                    .chosen-container-single .chosen-search {
+                        display: inherit;
+                    }
+                }
+            }
+        }
+    }
+
+    h4 {
+        font-weight: $bold;
+    }
+
+    .bidding-success {
+        text-align: center;
+        padding: 5% 0;
+    }
+}
+
+.bidder-information {
+    display: flex;
+    justify-content: space-between;
+
+    @include breakpoint(sm) {
+        flex-wrap: wrap;
+    }
+
+    .upload-doc {
+        width: 55%;
+
+        @include breakpoint(sm) {
+            width: 100%;
+        }
+
+        .radio-list {
+            li {
+                margin: 0 0 0 30px;
+
+                input[type=radio].css-radio+label.radio-label {
+                    font-size: $font14;
+                    opacity: 0.75;
+                }
+            }
+        }
+
+        .upload-fav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+
+            .dropzone {
+                background: #F2F2F2;
+                border: 1px dashed #8F8F8F;
+                min-height: inherit;
+                padding: 30px;
+
+                @include breakpoint(lg) {
+                    padding: 20px;
+                }
+
+                @include breakpoint(xs) {
+                    padding: 10px;
+                }
+
+                .dz-default {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 0;
+
+                    .block {
+                        &:nth-child(2) {
+                            font-size: $fontMiddle;
+                            color: rgba($color: #000000, $alpha: 0.5);
+
+                            @include breakpoint(xxs) {
+                                display: none;
+                            }
+                        }
+                    }
+
+                    .btn {
+                        padding: 0 30px;
+
+                        @include breakpoint(lg) {
+                            padding: 0 20px;
+                        }
+                    }
+
+                    h6 {
+                        line-height: 16px;
+                        font-size: $fontMedium;
+                        margin-bottom: 0;
+                        font-weight: 400;
+
+                        span {
+                            font-size: $fontXS;
+                            display: block;
+                            color: rgba($color: #000000, $alpha: 0.5);
+                        }
+                    }
+                }
+            }
+
+            .singleitem {
+                position: relative;
+                width: 100%;
+
+                .dropzone {
+                    padding: 0;
+                    min-height: auto;
+                    background: transparent;
+
+                    .dz-message {
+                        margin: 0;
+                        text-align: left;
+                    }
+                }
+            }
+
+            .item {
+                width: 100%;
+                position: relative;
+            }
+        }
+
+        .doc-show-list {
+            clear: both;
+            margin-bottom: 30px;
+
+            ul {
+                margin: 0;
+
+                li {
+                    padding: 0 0 20px;
+                    margin: 0 0 20px;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    border-bottom: 1px solid #D1D1D1;
+
+                    @include breakpoint(sm) {
+                        padding-bottom: 10px;
+                        margin-bottom: 10px;
+                    }
+
+                    &:last-child {
+                        margin-bottom: 0;
+                        border-bottom: none;
+                        padding-bottom: 0;
+                    }
+
+                    figure {
+                        width: 25px;
+
+                        @include breakpoint(sm) {
+                            width: 20px;
+                        }
+
+                        i {
+                            font-size: 22px;
+
+                            @include breakpoint(sm) {
+                                font-size: 18px;
+                            }
+                        }
+                    }
+
+                    figcaption {
+                        width: calc(100% - 25px);
+                        padding-left: 10px;
+                        display: flex;
+                        align-items: center;
+
+                        @include breakpoint(sm) {
+                            padding-left: 5px;
+                            width: calc(100% - 20px);
+                        }
+
+                        .actions-btn {
+                            display: flex;
+                            width: 35px;
+                            justify-content: space-between;
+                        }
+
+                        .close-btn {
+                            color: $secondary;
+                            line-height: 15px;
+                            font-size: $fontMiddle;
+                        }
+
+                        .badge-success {
+                            color: $green;
+                            line-height: 15px;
+                            font-size: $fontMiddle;
+                        }
+                    }
+
+                    h6 {
+                        margin-bottom: 0;
+                        font-weight: 400;
+                        padding-right: 10px;
+                        font-size: $font14;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                    }
+
+                    p {
+                        display: none;
+                        margin-bottom: 0;
+                    }
+
+                }
+            }
+        }
+    }
+
+    .doc-info {
+        width: 35%;
+
+        @include breakpoint(sm) {
+            width: 100%;
+            padding-top: 0px;
+        }
+
+        h6 {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            margin-bottom: 10px;
+            position: relative;
+            
+            a {
+                font-weight: 400;
+                color: $secondary;
+                position: absolute;
+                right: 0;
+            }
+        }
+
+        .info-box {
+            padding: 20px 30px;
+            background: $white;
+            border: 1px dashed $secondary;
+            @include border-radius (12px);
+
+            @include breakpoint(sm) {
+                padding: 10px;
+                margin-bottom: 20px;
+            }
+
+            ul {
+                li {
+                    line-height: 25px;
+                    padding: 0 0 15px 25px;
+                    position: relative;
+
+                    &:last-child {
+                        padding-bottom: 0;
+                    }
+
+                    .icon {
+                        position: absolute;
+                        left: 0;
+                        top: 6px;
+                        width: 15px;
+                        height: 14px;
+                        background: $iconBg;
+
+                        &.icon-user {
+                            background-position: -285px -572px;
+                        }
+
+                        &.icon-business {
+                            background-position: -316px -572px;
+                        }
+
+                        &.icon-address {
+                            background-position: -194px -572px;
+                        }
+
+                        &.icon-mail {
+                            background-position: -225px -572px;
+                        }
+
+                        &.icon-phone {
+                            background-position: -254px -572px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

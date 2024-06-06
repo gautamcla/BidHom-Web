@@ -1,0 +1,94 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% for property in property_list %}
+  <div class="listing_blocks">
+    <ul class="top">
+      <li>
+        <figure>
+          <img class="slide-fixed" src="{% static 'theme-4/images/transparent.png' %}" alt="real estate sales">
+          <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+        </figure>
+        <figcaption>
+          <h6>
+            <a href="/asset-details/?property_id={{property.property_id}}">
+              <span class="blue-text">{{property.name}}</span>
+              <i class="fas fa-map-marker-alt"></i> {{property.city}}, {{property.state_name}}
+            </a>
+          </h6>
+          <h5 class="price">
+            Starting Bid - ${{ property.property_price |convert_num|intcomma|default:'0' }}
+          </h5>
+        </figcaption>
+      </li>
+      <li>
+        <div class="block-status">
+          <div class="item">
+            <strong><label for="">Status</label></strong><br>
+            <span class="badge badge-success">
+              {{property.status}}
+            </span>
+          </div>
+          <div class="item">
+            <strong><label for="">Tags</label></strong><br>
+            <span class="badge badge-danger">
+              {{property.auction_type}}
+            </span>
+            <span class="badge badge-danger">
+              {{property.property_asset}}
+            </span>
+          </div>
+        </div>
+        {% if property.bidding_start %}
+        <div class="block-date">
+          <div class="item">
+            <strong><label for="">Start Date</label></strong>
+          </div>
+          <div class="item">
+            <span class="time convert_to_local_date_time" data-value="{{ property.bidding_start|default:'' }}"></span>
+          </div>
+        </div>
+        {% endif %}
+        {% if property.bidding_end %}
+        <div class="block-date">
+          <div class="item">
+            <strong><label for="">End Date</label></strong>
+          </div>
+          <div class="item">
+            <span class="time convert_to_local_date_time" data-value="{{ property.bidding_end|default:'' }}"></span>
+          </div>
+        </div>
+        {% endif %}
+      </li>
+      <!-- <li>
+        <div class="block-status">
+          {% if property.bidding_start %}
+          <div class="item">
+            Start Date <span class="time convert_to_local_date_time" data-value="{{ property.bidding_start|default:'' }}"></span>
+          </div>
+          {% endif %}
+          {% if property.bidding_end %}
+          <div class="item">
+            End Date <span class="time convert_to_local_date_time" data-value="{{ property.bidding_end|default:'' }}"></span>
+          </div>
+          {% endif %}
+        </div>
+      </li> -->
+      <li>
+        <div class="center">
+          {% if property.sale_by_type == '1' %}
+            {% if property.registration_id %}
+              <button class="btn btn-secondary btn-sm">{{property.registration_approval}}</button>
+            {% elif property.status_id == '1' %}
+              <a href="/bid-registration/?property={{property.property_id}}"><button class="btn btn-secondary btn-sm">Register to Bid</button></a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </li>
+    </ul>
+
+  </div><!-- End .block-item -->
+{% endfor %}
+
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+  

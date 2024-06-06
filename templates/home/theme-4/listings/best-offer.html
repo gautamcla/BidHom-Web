@@ -1,0 +1,1327 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" media="screen" rel="stylesheet" type="text/css">
+
+{% endblock %}
+{% block content %}
+{% load humanize %}
+  <div class="clearfix"></div>
+
+    <div class="body-content">
+
+      <div class="offer-header">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <h4>
+                Highest & Best Offer
+                <span class="hr-line"></span>
+              </h4>
+              <div class="arrow-steps">
+                <div class="step complete can_navigate {% if offer_details.offer_detail.step == 1 or offer_details.offer_detail.step >= 4 or not offer_details.offer_detail.step %}current{% endif %}" id="step_1" rel_position="1"> <span>Register</span></div>
+                <div class="step {% if offer_details.offer_detail.step >= 2 and offer_details.offer_detail.step < 4 %}complete{% endif %} {% if offer_details.offer_detail.step >= 1 %}can_navigate{% endif %} {% if offer_details.offer_detail.step == 2 %}current{% endif %}" id="step_2" rel_position="2"> <span>Price & Terms</span> </div>
+                <div class="step {% if offer_details.offer_detail.step == 3 %}complete{% endif %} {% if offer_details.offer_detail.step >= 2 %}can_navigate{% endif %} {% if offer_details.offer_detail.step == 3 %}current{% endif %}" id="step_3" rel_position="3"> <span>Proof of Funds</span>  </div>
+                <div class="step {% if offer_details.offer_detail.step >= 3 %}can_navigate{% endif %}" id="step_4" rel_position="4"> <span>Review Offer</span> </div>
+                <div class="step {% if offer_details.offer_detail.step == 5 %}current{% endif %}" id="step_5" rel_position=""> <span>Offer Completed</span> </div>
+              </div><!-- End .arrow-steps -->
+              
+            </div><!-- End .col-lg-12 -->
+          </div><!-- End .row -->
+        </div><!-- End .container-fluid -->
+      </div><!-- End .offer-header -->
+
+      <section class="best-detail-wrap">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-12">
+                <form name="best_offer_frm" id="best_offer_frm" method="post">
+                  {% csrf_token %}
+                  {% now "U" as todays_date %}
+                  {% define_var offer_details.auction_data.start_date|parse_iso|date:"U" as start_date %}
+                  {% if offer_details.offer_detail.step %}
+                    {% if offer_details.offer_detail.step < 4 %}
+                      {% define_var offer_details.offer_detail.step as my_current_step %}
+                    {% else %}
+                      {% define_var 1 as my_current_step %}
+                    {% endif %}
+                  {% else %}
+                    {% define_var 1 as my_current_step %}
+                  {% endif %}
+                  <input type="hidden" name="property_id" id="property_id" value="{{ request.GET.property_id|default:'' }}"/>
+                  <input type="hidden" name="current_step" id="current_step" value="{% if offer_details.offer_detail.step < 4 %}{{ offer_details.offer_detail.step|default:'1' }}{% else %}1{% endif %}"/>
+                  <input type="hidden" name="is_current_offer" id="is_current_offer" value="{% if offer_details.current_offer_detail.current_offer_amount %}1{% else %}0{% endif %}"/>
+                  <input type="hidden" name="highest_best_format" id="highest_best_format" value="{{ offer_details.property.highest_best_format|default:'' }}"/>
+                <div class="bestoffer-wrap">
+
+                  <div class="best-wrap">
+                    
+
+                    <div id="steps-1" class="steps" style="{% if offer_details.offer_detail.step == 1 or offer_details.offer_detail.step >= 4 or not offer_details.offer_detail.step %}{% else %}display:none;{% endif %}">
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <h5>
+                            Register <span class="hr-line"></span>
+                          </h5>
+                          <p>
+                            Please take the time to review/update your contact information in case we need to contact you.
+                          </p>
+                          <!--<p>
+                            <u>Same information that you currently have except for any changes I have already submitted for this step.</u>
+                          </p>-->
+                        </div>
+                        <div class="col-lg-12">
+                          <input type="hidden" name="is_update" id="is_update" value="{% if offer_details.is_update == True %}1{% endif %}"/>
+                          <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group price-offer">
+                                <label for="first_name">First Name</label>
+                                <input type="text" name="first_name" id="first_name" class="form-control alphaAccpt" placeholder="Enter First Name" value="{{ offer_details.user_detail.first_name|default:'' }}" maxlength="40">
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group price-offer">
+                                <label for="last_name">Last Name</label>
+                                <input type="text" name="last_name" id="last_name" class="form-control alphaAccpt" placeholder="Enter Last Name" value="{{ offer_details.user_detail.last_name|default:'' }}" maxlength="40">
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group price-offer">
+                                <label for="user_email">Email</label>
+                                <input type="email" name="user_email" id="user_email" class="form-control" placeholder="Enter Email"  value="{{ offer_details.user_detail.email|default:'' }}">
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="user_phone_no">Phone No.</label>
+                                <input type="text" class="form-control" name="user_phone_no" id="user_phone_no" placeholder="(xxx) xxx-xxxx" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true" value="{{ offer_details.phone_no|default:'' }}">
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group country">
+                                <label for="state">Country</label>
+                                <select class="select chosen-select form-control" name="country" id="country" data-placeholder="Select">
+                                    <option value="">Select</option>
+                                    {% for country in country_list %}
+                                      <option value="{{ country.id }}" data-short-code="{{ country.alpha2_code }}" {% if country.id == country_id%}selected{% endif %}>{{ country.country_name }}</option>
+                                    {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="address_1">Address</label>
+                                <input type="text" class="form-control" name="address_1" id="address_1" placeholder="Enter Address" value="{{ offer_details.user_detail.address_first|default:'' }}">
+                              </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="zip_code">Zip Code</label>
+                                <input type="text" class="form-control" id="zip_code" name="zip_code" placeholder="Enter Zip Code"  value="{{ offer_details.user_detail.postal_code|default:'' }}">
+                              </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" class="form-control" name="city" id="city" placeholder="Enter City" value="{{ offer_details.user_detail.city|default:'' }}">
+                              </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group bidder-state">
+                                <label for="state">State</label>
+                                <select class="select chosen-select form-control" name="state" id="state" data-placeholder="Select">
+                                    <option value="">Select</option>
+                                    {% if state_list %}
+                                    {% for state in state_list %}
+                                      <option value="{{ state.id }}" data-short-code="{{ state.iso_name }}" {% if state.id == offer_details.user_detail.state_id %}selected{% endif %}>{{ state.state_name }}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                </select>
+                              </div>
+                            </div>
+                            <input type="hidden" name="trad_user_type" id="trad_user_type" value="{% if offer_details.is_agent %}4{% else %}2{% endif %}"/>
+                            <!--<div class="col-lg-12">
+                              <div class="form-group">
+                                <label for="">
+                                  What describes you best?
+                                </label>
+                                <div class="lh45">
+                                  <input id="trad_user_type_buyer" type="radio" name="trad_user_type" value="2" class="css-radio" {% if offer_details.offer_detail.user_type == 2 %}checked{% endif %}>
+                                  <label for="trad_user_type_buyer" class="radio-label"> Buyer</label>
+                                  <input id="trad_user_type_agent" type="radio" name="trad_user_type" value="4" class="css-radio" {% if offer_details.offer_detail.user_type == 4 %}checked{% endif %}>
+                                  <label for="trad_user_type_agent" class="radio-label ml50"> Real Estate Agent</label>
+                                </div>
+                              </div>
+                            </div>-->
+                            <div class="col-lg-12 buyer_question clearfix" style="{% if offer_details.is_agent %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="">
+                                  Have you committed to working with a buyer's agent yet?
+                                </label>
+                                <div class="lh45">
+                                  <input id="working_with_agent_no" type="radio" name="working_with_agent" value="0" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.working_with_agent == False %}checked{% endif %}>
+                                  <label for="working_with_agent_no" class="radio-label"> No, I haven’t</label>
+                                  <input id="working_with_agent_yes" type="radio" name="working_with_agent" value="1" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.working_with_agent == True %}checked{% endif %}>
+                                  <label for="working_with_agent_yes" class="radio-label ml50"> Yes, I have</label>
+                                </div>
+
+                              </div>
+                            </div>
+                            <div class="col-lg-12 working_with_agent_no_section clearfix" style="{% if offer_details.is_agent == False and offer_details.offer_detail.working_with_agent == False  %}{% else %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="">
+                                  Have you toured the property in person?
+                                </label>
+                                <div class="lh45">
+                                  <input id="buyer_property_in_person_yes" type="radio" name="property_in_person" value="1" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.property_in_person == 1 %}checked{% endif %}>
+                                  <label for="buyer_property_in_person_yes" class="radio-label"> Yes, I have</label>
+                                  <input id="buyer_property_in_person_no" type="radio" name="property_in_person" value="2" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.property_in_person == 2 %}checked{% endif %}>
+                                  <label for="buyer_property_in_person_no" class="radio-label ml50"> No, not yet</label>
+                                  <input id="buyer_property_in_person_see" type="radio" name="property_in_person" value="3" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.property_in_person == 3 %}checked{% endif %}>
+                                  <label for="buyer_property_in_person_see" class="radio-label ml50"> I would like to see it</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-12 working_with_agent_no_section clearfix" style="{% if offer_details.is_agent == False and offer_details.offer_detail.working_with_agent == False  %}{% else %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="">
+                                  Have you been pre-approved or pre-qualified by your lender yet?
+                                </label>
+                                <div class="lh45">
+                                  <input id="buyer_pre_qualified_yes" type="radio" name="buyer_pre_qualified" value="1" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.pre_qualified_lender == 1 %}checked{% endif %}>
+                                  <label for="buyer_pre_qualified_yes" class="radio-label"> Yes, I have</label>
+                                  <input id="buyer_pre_qualified_no" type="radio" name="buyer_pre_qualified" value="2" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.pre_qualified_lender == 2 %}checked{% endif %}>
+                                  <label for="buyer_pre_qualified_no" class="radio-label ml50"> No, not yet</label>
+                                  <input id="buyer_pre_qualified_cash" type="radio" name="buyer_pre_qualified" value="3" class="css-radio" {% if offer_details.offer_detail.user_type == 2 and offer_details.offer_detail.pre_qualified_lender == 3 %}checked{% endif %}>
+                                  <label for="buyer_pre_qualified_cash" class="radio-label ml50"> I’m buying with all cash</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-12 agent_question_section clearfix" style="{% if offer_details.is_agent %}{% else %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="">
+                                  Are you representing and bidding on behalf of a buyer/client of yours?
+                                </label>
+                                <div class="lh45">
+                                  <input id="working_with_buyer_yes" type="radio" name="working_with_buyer" value="1" class="css-radio" {% if offer_details.offer_detail.behalf_of_buyer == True %}checked{% endif %}>
+                                  <label for="working_with_buyer_yes" class="radio-label"> Yes</label>
+                                  <input id="working_with_buyer_no" type="radio" name="working_with_buyer" value="0" class="css-radio" {% if offer_details.offer_detail.behalf_of_buyer == False %}checked{% endif %}>
+                                  <label for="working_with_buyer_no" class="radio-label ml50"> No</label>
+
+                                </div>
+
+                              </div>
+                            </div>
+                            <div id="agent_buyer_info" class="clearfix" style="{% if offer_details.offer_detail.behalf_of_buyer == True %}{% else %}display:none;{% endif %}">
+                              <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group price-offer">
+                                  <label for="agent_buyer_first_name">Buyer's First Name</label>
+                                  <input type="text" name="agent_buyer_first_name" id="agent_buyer_first_name" class="form-control alphaAccpt" placeholder="Enter Buyer's First Name" value="{{ offer_details.user_detail.buyer_first_name|default:'' }}" maxlength="40">
+                                </div>
+                              </div>
+                              <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group price-offer">
+                                  <label for="agent_buyer_last_name">Buyer's Last Name</label>
+                                  <input type="text" name="agent_buyer_last_name" id="agent_buyer_last_name" class="form-control alphaAccpt" placeholder="Enter Buyer's Last Name" value="{{ offer_details.user_detail.buyer_last_name|default:'' }}" maxlength="40">
+                                </div>
+                              </div>
+                              <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group price-offer">
+                                  <label for="agent_buyer_user_email">Buyer's Email</label>
+                                  <input type="email" name="agent_buyer_user_email" id="agent_buyer_user_email" class="form-control" placeholder="Enter Buyer's Email"  value="{{ offer_details.user_detail.buyer_email|default:'' }}">
+                                </div>
+                              </div>
+                              <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="agent_buyer_phone_no">Buyer's Phone No.</label>
+                                  <input type="text" class="form-control" name="agent_buyer_phone_no" id="agent_buyer_phone_no" placeholder="(xxx) xxx-xxxx" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true" value="{{ offer_details.user_detail.buyer_phone_no|default:'' }}">
+                                </div>
+                              </div>
+                              <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group price-offer">
+                                  <label for="agent_buyer_company">Buyer's Company/Entity</label>
+                                  <input type="text" name="agent_buyer_company" id="agent_buyer_company" class="form-control" placeholder="Enter Buyer's Company/Entity" value="{{ offer_details.user_detail.buyer_company|default:'' }}">
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="col-lg-12 agent_question_section clearfix" style="{% if offer_details.is_agent %}{% else %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="">
+                                  Have you toured the property with your client in person?
+                                </label>
+                                <div class="lh45">
+                                  <input id="agent_property_in_person_yes" type="radio" name="agent_property_in_person" value="1" class="css-radio" {% if offer_details.offer_detail.user_type == 4 and offer_details.offer_detail.property_in_person == 1 %}checked{% endif %}>
+                                  <label for="agent_property_in_person_yes" class="radio-label"> Yes, we have</label>
+                                  <input id="agent_property_in_person_no" type="radio" name="agent_property_in_person" value="2" class="css-radio" {% if offer_details.offer_detail.user_type == 4 and offer_details.offer_detail.property_in_person == 2 %}checked{% endif %}>
+                                  <label for="agent_property_in_person_no" class="radio-label ml50"> No, not yet</label>
+                                  <input id="agent_property_in_person_see" type="radio" name="agent_property_in_person" value="3" class="css-radio" {% if offer_details.offer_detail.user_type == 4 and offer_details.offer_detail.property_in_person == 3 %}checked{% endif %}>
+                                  <label for="agent_property_in_person_see" class="radio-label ml50"> We would like to see it</label>
+                                </div>
+
+                              </div>
+                            </div>
+                            <div class="col-lg-12 agent_question_section clearfix" style="{% if offer_details.is_agent %}{% else %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="">
+                                  Has your client been pre-qualified by a lender?
+                                </label>
+                                <div class="lh45">
+                                  <input id="agent_pre_qualified_yes" type="radio" name="agent_pre_qualified" value="1" class="css-radio" {% if offer_details.offer_detail.user_type == 4 and offer_details.offer_detail.pre_qualified_lender == 1 %}checked{% endif %}>
+                                  <label for="agent_pre_qualified_yes" class="radio-label"> Yes</label>
+                                  <input id="agent_pre_qualified_no" type="radio" name="agent_pre_qualified" value="2" class="css-radio" {% if offer_details.offer_detail.user_type == 4 and offer_details.offer_detail.pre_qualified_lender == 2 %}checked{% endif %}>
+                                  <label for="agent_pre_qualified_no" class="radio-label ml50"> No, not yet</label>
+                                  <input id="agent_pre_qualified_cash" type="radio" name="agent_pre_qualified" value="3" class="css-radio" {% if offer_details.offer_detail.user_type == 4 and offer_details.offer_detail.pre_qualified_lender == 3 %}checked{% endif %}>
+                                  <label for="agent_pre_qualified_cash" class="radio-label ml50"> Buying with all cash</label>
+                                </div>
+
+                              </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix">
+                              <div class="center">
+                                <a href="/asset-details/?property_id={{ request.GET.property_id|default:'' }}" type="button" class="btn btn-primary">Cancel</a>
+                                <button type="button" id="loadStepTwo" class="btn btn-secondary">Save and Continue</button>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+
+                    </div><!-- End .steps-1 -->
+                    <div id="steps-2" class="steps" style="{% if offer_details.offer_detail.step == 2 %}{% else %}display:none;{% endif %}">
+
+                        <div class="row">
+                          <div class="col-lg-12">
+                            <h5>
+                              Price & Terms <span class="hr-line"></span>
+                            </h5>
+                            <p>
+                              Get in front of everyone by making your highest and best offer!! Just provide us with the price and terms of your offer below. Upon completion the listing broker/agent and seller(s) will review and assess the strength of your offer. The Seller(s) reserves the right to accept, reject and counter any and all offers. All offers received are non-binding and only seen by the listing broker/agent and seller(s).
+                            </p>
+                          </div>
+                          <input type="hidden" name="earnest_deposit_type" id="earnest_deposit_type" value="{{ offer_details.property.earnest_deposit_type|default:'1' }}"/>
+                          <input type="hidden" name="pre_earnest_deposit" id="pre_earnest_deposit" value="{{ offer_details.property.earnest_deposit|default:'' }}"/>
+                          <input type="hidden" name="pre_offer_price" id="pre_offer_price" value="{{ offer_details.offer_detail.current_offer_price|default:'' }}"/>
+
+                          <div class="col-md-6 col-sm-6 col-xs-12" >
+                              <div class="form-group price-offer price-limit">
+                                <label for="offer_price">Price <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="The highest price the buyer is willing to pay for the property."><i class="fas fa-info-circle"></i></a></label>
+                                <input type="text" name="offer_price" id="offer_price" class="form-control" maxlength="14" placeholder="$0.00" onkeypress="return ((event.charCode == 46) || (event.charCode == 44) || (event.charCode >= 48 && event.charCode <= 57))" value="$" {% if offer_details.auction_data.un_priced == False %}{% endif %} />
+                                <!--<a class="cross" href="javascript:void(0)" id="edit_user_offer" style="{% if offer_details.auction_data.un_priced == True %}{% endif %}"><i class="far fa-times-circle"></i></a>-->
+                                <!--<a href="javascript:void(0)" id="save_user_offer" style="display:none;"><i class="fas fa-check"></i></a>-->
+                              </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group bidder-state">
+                                <label for="financing">Loan Type <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="The type of loan the buyer intends to obtain in order to purchase the property."><i class="fas fa-info-circle"></i></a></label>
+                                <select class="select chosen-select form-control" name="financing" id="financing" data-placeholder="Select">
+                                    <option value="">Select</option>
+                                    <!--<option value="1" {% if offer_details.offer_detail.financing_id == 1 %}selected{% endif %}>No Loan</option>
+                                    <option value="2" {% if offer_details.offer_detail.financing_id == 2 %}selected{% endif %}>Conventional Loan</option>
+                                    <option value="4" {% if offer_details.offer_detail.financing_id == 4 %}selected{% endif %}>VA Loan</option>
+                                    <option value="3" {% if offer_details.offer_detail.financing_id == 3 %}selected{% endif %}>HUD/FHA Loan</option>
+                                    <option value="8" {% if offer_details.offer_detail.financing_id == 8 %}selected{% endif %}>USDA Loan</option>
+
+                                    <option value="5" {% if offer_details.offer_detail.financing_id == 5 %}selected{% endif %}>SBA Loan</option>
+                                    <option value="6" {% if offer_details.offer_detail.financing_id == 6 %}selected{% endif %}>1031 Exchange</option>
+                                    <option value="7" {% if offer_details.offer_detail.financing_id == 7 %}selected{% endif %}>Other</option>-->
+                                    {% if loan_type_list %}
+                                      {% for loan in loan_type_list %}
+                                        <option value="{{ loan.id }}" {% if offer_details.offer_detail.financing_id == loan.id %}selected{% endif %}>{{ loan.name }}</option>
+                                      {% endfor %}
+                                    {% endif %}
+                                </select>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group price-offer">
+                                <label for="down_payment">Down Payment <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Money that a buyer has saved to help fund the purchase of a property. It’s simply the part of the purchase price you pay upfront, and does not come from a lender via a loan. It represents the initial equity you have in a property."><i class="fas fa-info-circle"></i></a></label>
+                                <input type="text" class="form-control" name="down_payment" id="down_payment" placeholder="Any dollar amount" value="{% if offer_details.offer_detail.down_payment %}${{ offer_details.offer_detail.down_payment|convert_num|intcomma|default:'' }}{% else %}${% endif %}" onkeypress="return ((event.charCode == 46) || (event.charCode == 44) || (event.charCode >= 48 && event.charCode <= 57))" maxlength="14" >
+                                <!--<a class="cross" href="javascript:void(0)" id="edit_down_payment"><i class="far fa-times-circle"></i></a>-->
+                              </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group price-offer">
+                                <label for="earnest_deposit">Earnest Money Deposit <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="In most cases sellers will ask for an earnest money deposit aka good faith deposit. It safeguards the interests of the seller and the buyer. It shows the seller the buyer is serious about buying the property, which can be reassuring to them if they agree to take the house off of the market while awaiting the appraisal and inspection results."><i class="fas fa-info-circle"></i></a></label>
+                                <input type="text" class="form-control" name="earnest_deposit" id="earnest_deposit" placeholder="{% if offer_details.property.earnest_deposit_type == 1 %}Any dollar amount{% else %}Any %{% endif %}" value="{% if offer_details.offer_detail.earnest_money_deposit %}{% if offer_details.property.earnest_deposit_type == 1 %}${{ offer_details.offer_detail.earnest_money_deposit|convert_num|intcomma|default:'' }}{% else %}{{ offer_details.offer_detail.earnest_money_deposit|convert_num|default:'' }}{% endif %}{% else %}{% if offer_details.property.earnest_deposit_type == 1 %}${% else %}{% endif %}{% endif %}" onkeypress="return ((event.charCode == 46) || (event.charCode == 44) || (event.charCode >= 48 && event.charCode <= 57))" {% if offer_details.offer_detail.step %}{% if offer_details.property.earnest_deposit_type == 2 %}max="100" maxlength="6"{% else %}maxlength="14"{% endif %}{% endif %}>
+                                <!--<a class="cross" href="javascript:void(0)" id="edit_earnest_deposit"><i class="far fa-times-circle"></i></a>-->
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="due_diligence">Inspection Contingency <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="This allows the buyer to have inspections done to ensure the property does not have any major deficiencies. If the buyer is unhappy with the results of the inspections and cannot come to an agreement with the seller to fix the deficiencies, the contract can be cancelled and the earnest money deposit is returned to the buyer. "><i class="fas fa-info-circle"></i></a></label>
+                                <select class="select chosen-select form-control" name="due_diligence" id="due_diligence" data-placeholder="Select">
+                                    <option value="">Select</option>
+                                    <option value="1" {% if offer_details.offer_detail.due_diligence_period_id == 1 %}selected{% endif %}>Yes, complete inspections at buyer(s) expense.</option>
+                                    <option value="2" {% if offer_details.offer_detail.due_diligence_period_id == 2 %}selected{% endif %}>No, waive inspections.</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="offer_contingent_true" class="pb10">Financing Contingency <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Contingent on being able to get a loan to buy the property. If buyer is unable to secure financing, the contract can be cancelled and the earnest money deposit is returned to the buyer."><i class="fas fa-info-circle"></i></a></label>
+                                <div class="lh45">
+                                  <input id="offer_contingent_true" type="radio" name="offer_contingent" value="1" class="css-radioo" {% if offer_details.offer_detail.offer_contingent == 1 %}checked{% endif %}>
+                                  <label for="offer_contingent_true" class="radioo-label"> Yes</label>
+                                  <input id="offer_contingent_false" type="radio" name="offer_contingent" value="2" class="css-radioo" {% if offer_details.offer_detail.offer_contingent == 2 %}checked{% endif %}>
+                                  <label for="offer_contingent_false" class="radioo-label ml20"> No</label>
+                                  <input id="offer_contingent_cash_buyer" type="radio" name="offer_contingent" value="3" class="css-radioo" {% if offer_details.offer_detail.offer_contingent == 3 %}checked{% endif %}>
+                                  <label for="offer_contingent_cash_buyer" class="radioo-label ml20"> Cash Buyer</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="offer_contingent_true" class="pb10">Appraisal Contingency <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Contingent upon an appraisal valuing the property for at least the amount of the purchase price. If the appraisal is not approved by the buyer’s lender, the contract can be cancelled and the earnest money deposit is returned to the buyer. If the buyer is paying with cash they are not required to have the property appraised. "><i class="fas fa-info-circle"></i></a></label>
+                                <div class="lh45">
+                                    <input id="appr_contingent_true" type="radio" name="appraisal_contingent" value="1" class="css-radioo" {% if offer_details.offer_detail.appraisal_contingent == True %}checked{% endif %}>
+                                    <label for="appr_contingent_true" class="radioo-label"> Yes</label>
+                                    <input id="appr_contingent_false" type="radio" name="appraisal_contingent" value="0" class="css-radioo" {% if offer_details.offer_detail.appraisal_contingent == False %}checked{% endif %}>
+                                    <label for="appr_contingent_false" class="radioo-label ml20"> No</label>
+                                </div>
+                              </div>
+                            </div>
+
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="sale_contingency_true" class="pb10">Property Sale Contingency <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Contingent on buyer being able to sell their property first. If buyer is unable to sell their property during an agreed upon time frame the contract can be cancelled and the earnest money deposit is returned to the buyer."><i class="fas fa-info-circle"></i></a></label>
+                                <div class="lh45">
+                                  <input id="sale_contingency_true" type="radio" name="sale_contingency" value="1" class="css-radioo" {% if offer_details.offer_detail.sale_contingency == True %}checked{% endif %}>
+                                  <label for="sale_contingency_true" class="radioo-label"> Yes</label>
+                                  <input id="sale_contingency_false" type="radio" name="sale_contingency" value="0" class="css-radioo" {% if offer_details.offer_detail.sale_contingency == False %}checked{% endif %}>
+                                  <label for="sale_contingency_false" class="radioo-label ml20"> No</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="closing_period">Closing Date <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Closing is the end goal of any real estate transaction. At closing, all agreements between buyer and seller are finalized, loan docs will be signed if needed, transaction documents are signed and exchanged, money passes to the seller, and title to the property passes to the buyer. In general, most buyer’s that are financing a property set a closing date 30 to 45 days after the offer has been accepted. "><i class="fas fa-info-circle"></i></a></label>
+                                <select class="select chosen-select form-control" name="closing_period" id="closing_period" data-placeholder="Select">
+                                    <option value="">Select</option>
+                                    <option value="1" {% if offer_details.offer_detail.closing_period_id == 1 %}selected{% endif %}>1-30 Days</option>
+                                    <option value="2" {% if offer_details.offer_detail.closing_period_id == 2 %}selected{% endif %}>30-45 Days</option>
+                                    <option value="3" {% if offer_details.offer_detail.closing_period_id == 3 %}selected{% endif %}>45-60 Days</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                              <div class="form-group bidder-state">
+                                <label for="financing" class="pb10">Closing Costs: <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Closing costs encompass a variety of expenses above a property's purchase price. Sellers are typically responsible for paying for half of the transaction related closing costs. Buyers usually pay for all loan-related closing costs and half of the transaction closing costs. Buyers and sellers can negotiate on some of the closing costs, it all just depends on any state requirements and traditional expectations in a particular area."><i class="fas fa-info-circle"></i></a></label>
+                                <ul class="radio-list" id="doc_reason_section" style="display: block;">
+                                  <li>
+                                    <div class="form-group">
+                                      <input id="closing_cost_first" type="radio" name="closing_cost" value="1" class="css-radio" {% if offer_details.offer_detail.closing_cost == 1 %}checked{% endif %}>
+                                      <label for="closing_cost_first" class="radio-label"> Buyer agrees to pay for all loan-related closing costs and half of the transaction closing costs.</label>
+
+                                    </div>
+                                    <div class="form-group">
+                                      <input id="closing_cost_sec" type="radio" name="closing_cost" value="2" class="css-radio" {% if offer_details.offer_detail.closing_cost == 2 %}checked{% endif %}>
+                                      <label for="closing_cost_sec" class="radio-label"> Buyer agrees to pay for all loan-related closing costs and all of the transaction closing costs.</label>
+
+                                    </div>
+                                    <div class="form-group">
+                                      <input id="closing_cost_thrd" type="radio" name="closing_cost" value="3" class="css-radio" {% if offer_details.offer_detail.closing_cost == 3 %}checked{% endif %}>
+                                      <label for="closing_cost_thrd" class="radio-label"> Seller to pay for all loan-related closing costs and all of the transaction closing costs.</label>
+                                    </div>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+
+                      </div>
+                        <div class="bottom-links">
+                          <button type="button" id="backStepOne" class="btn btn-secondary-bdr">Back</button>
+                          <button type="button" id="loadStepThree" class="btn btn-secondary">Save and Continue</button>
+                        </div>
+
+
+                    </div><!-- End .steps-2 -->
+                    <div id="steps-3" class="steps" style="{% if offer_details.offer_detail.step == 3 %}{% else %}display:none;{% endif %}">
+                      <div class="row">
+                          <div class="col-lg-12">
+                          <h5>
+                            Proof of Funds <span class="hr-line"></span>
+                          </h5>
+                          <p>
+                            Please provide the listing broker/agent with the necessary financial information to evaluate your offer by uploading the supporting documentation. For cash purchases, please attach a bank statement, investment account statement or similar document to verify adequate funds to close. For financed purchases, please attach a copy of a pre-approval letter from your selected financial institution.
+                          </p>
+                        </div>
+                      </div>
+                      <!--<p class="gray-text">
+                          To provide the seller with the necessary information to evaluate you bid, please upload supporting documentation. For cash purchase, please attach a bank statement, investment account or similar document to verify adequate funds to close. For financed purchases, please attach a copy of a pre-approval letter from your selected financial institution.
+                        </p>-->
+                        <div class="bidder-information">
+                          <div class="upload-doc">
+
+                            <div id="upload_document_section">
+                              <!-- <h6>
+                                Upload Doc(s)
+                              </h6> -->
+                              <div class="upload-fav">
+                                <div class="item">
+                                  <div class="dropzone" id="bestOfferDocFrm">
+                                      <input type="hidden" id="offer_doc_id" name="offer_doc_id" value="{{ offer_details.offer_doc_ids|default:'' }}"/>
+
+                                        <input type="hidden" name="offer_doc_name" id="offer_doc_name" value="{{ offer_details.offer_doc_name|default:'' }}"/>
+                                        <div class="dz-default dz-message" data-dz-message="">
+                                          <div class="block">
+                                            <button type="button" class="btn btn-secondary"><i class="fas fa-upload"></i> Upload Doc's</button>
+
+                                          </div>
+                                          <div class="block">
+                                            OR
+                                          </div>
+                                          <div class="block">
+                                            <h6>
+                                              Drag & Drop Docs
+                                              <span>Supported Files: jpg, jpeg, pdf, doc, docx</span>
+                                            </h6>
+                                          </div>
+                                        </div>
+
+                                  </div>
+                                </div>
+                              </div>
+
+                            <p id="custom_doc_error"  class="custom_doc_error" style="display:none;">Document is required.</p>
+                            <br>
+                            <div class="doc-show-list" id="bestOfferDocDiv" style="{% if offer_details.documents %}{% else %}display:none;{% endif %}">
+                              <ul id="bestOfferDocList">
+                                {% if offer_details.documents %}
+                                    {% for item in offer_details.documents %}
+                                      <li rel_id="{{ item.document_id }}" rel_position="{{ forloop.counter }}">
+                                          <figure>
+                                            {% if item.extension == 'pdf' %}
+                                              <i class='fas fa-file-pdf'></i>
+                                            {% elif item.extension == 'docx' %}
+                                              <i class='far fa-file-alt'></i>
+                                            {% elif item.extension == 'doc' %}
+                                              <i class='fas fa-file-word'></i>
+                                            {% else %}
+                                              <i class="fas fa-file-image"></i>
+                                            {% endif %}
+                                          </figure>
+                                          <figcaption>
+                                              <h6>{{ item.original_doc_name|default:'' }}</h6>
+                                              <p>File Size: {{ item.file_size|default:'' }}<br>Uploaded: {{ item.timeStp|default:'' }}</p>
+                                              <div class="actions-btn">
+                                                  <div class="badge-success">
+                                                  <i class="fas fa-check-circle"></i>
+                                                  </div>
+                                                  <a href="javascript:void(0)" data-article-id="'+property_id+'" data-image-id="{{ item.document_id }}" data-image-name="{{ item.doc_file_name|default:'' }}" data-image-section="{{ item.bucket_name|default:'' }}"  class="close-btn confirm_offer_document_delete">
+                                                  <i class="fas fa-times"></i>
+                                                  </a>
+                                              </div>
+                                          </figcaption>
+                                      </li>
+                                  {% endfor %}
+                                {% endif %}
+                              </ul>
+                            </div>
+                          </div>
+
+                          </div><!-- End .upload-doc -->
+                        </div><!-- End .bidder-information -->
+                        <div class="comment-box">
+                          <div class="form-group">
+                            <label for="offer_comment">Comment Box</label>
+                            <textarea class="form-control bdr" name="offer_comment" id="offer_comment" placeholder="If you do not have any financial documentation at this time please leave us a comment here.">{{ offer_details.offer_detail.document_comment|default:'' }}</textarea>
+                          </div>
+                        </div>
+                      <!--<div class="clearfix"></div>-->
+                      <div class="bottom-links">
+                              <button type="button" id="backStepTwo" class="btn btn-secondary-bdr">Back</button>
+                              <button type="button" id="loadStepFour" class="btn btn-secondary">Save and Continue</button>
+                            </div>
+                    </div><!-- End .steps-3 -->
+
+                    <!--<div id="steps-4" class="steps" style="display:none;">
+
+                      <div class="row">
+                        <div class="col-md-12">
+                          Please provide us with the price and terms of your offer. The offer will be delivered to the broker/agent and a copy will be sent to your email. Broker/Agent(s) and Seller(s) take all offers very seriously, please be detailed and accurate with all information you submit. The Seller(s) have the right to accept, reject and counter any and all offers.
+
+                          </div>
+                      </div>
+                      <div class="bottom-links">
+                              <a href="javascript:void(0)" id="backStepThree" class="blue-text">Back</a>
+                              <button type="button" id="loadStepFive" class="btn btn-secondary">Continue</button>
+                            </div>
+                    </div>--><!-- End .steps-3 -->
+
+                    <div id="steps-4" class="steps" style="display:none;">
+                      <div class="step-condition">
+                        <center>
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;width:100%;font-family:'Proxima Nova', '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;font-size:16px;line-height:1;">
+          <tr>
+            <td>
+              <table align="center" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse; width:100%; background: #FFF;">
+                  <tr>
+                    <td colspan="2" style="text-align: center;">
+                      <h1 style="font-size: 30px; font-weight: 600; margin: 0; padding: 0; line-height: 30px; color: #222;"><u>REAL ESTATE LETTER OF INTENT</u></h1>
+                      <h3 style="font-size: 18px; font-weight: 600; margin: 0; padding: 20px 0; line-height: 30px; color: #222;">
+                        PROPERTY: <span style="color: #C71829;">{{ offer_details.property.address_one|default:'' }} {{ offer_details.property.city|default:'' }}, {{ offer_details.property.state|default:'' }}, {{ offer_details.property.postal_code|default:'' }}</span>
+                      </h3>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td width="50%" style="border:none; vertical-align: top;">
+                      <p style="font-size: 15px; color: #222; font-weight: 600; line-height: 22px; font-family: Arial, Helvetica, sans-serif;">
+                        <u>Buyer</u>
+                      </p>
+                      <p style="font-size: 15px; color: #C71829; font-weight: 400; line-height: 28px; font-family: Arial, Helvetica, sans-serif;" id="buyer_contact_info">
+                        {% if offer_details.offer_detail.behalf_of_buyer == True %}
+                          {{ offer_details.user_detail.buyer_first_name|default:'' }} {{ offer_details.user_detail.buyer_last_name|default:'' }}<br>
+                          {{ offer_details.user_detail.buyer_phone_no|default:'' }}<br>{{ offer_details.user_detail.buyer_email|default:'' }}
+                        {% else %}
+                          {{ offer_details.first_name|default:'' }} {{ offer_details.last_name|default:'' }}<br>
+                          {{ offer_details.phone_no|format_phone|default:'' }}<br>{{ offer_details.email|default:'' }}
+                        {% endif %}
+                      </p>
+                    </td>
+                    <td width="50%" style="border:none; vertical-align: top;{% if offer_details.offer_detail.behalf_of_buyer == True %}{% else %}display:none;{% endif %}" id="agent_contact_info_section">
+                      <p style="font-size: 15px; color: #222; font-weight: 600; line-height: 22px; font-family: Arial, Helvetica, sans-serif;">
+                        <u>Buyer’s Agent</u>
+                      </p>
+                      <p style="font-size: 15px; color: #C71829; font-weight: 400; line-height: 28px; font-family: Arial, Helvetica, sans-serif;" id="agent_contact_info">
+                        {% if offer_details.offer_detail.behalf_of_buyer == True %}
+                            {{ offer_details.first_name|default:'' }} {{ offer_details.last_name|default:'' }}<br>
+                            {{ offer_details.phone_no|format_phone|default:'' }}<br>{{ offer_details.email|default:'' }}
+                        {% else %}
+                        -
+                        {% endif %}
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <p style="font-size: 15px; color: #222; line-height: 24px; font-family: Arial, Helvetica, sans-serif;">
+                        This is a non-binding letter of intent only. It does not create a legally binding obligation on the parties or their brokers. The purpose of this letter is to set forth some of the basic terms and conditions to be included and agreed on for a potential future definitive Purchase Agreement Contract. Any additional terms and conditions negotiated will be documented in a future formal Purchase Agreement Contract. The basic terms and conditions to be included are as follows:
+                      </p>
+                      <ul style="list-style: disc inside;">
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;" >Price:
+                          <span style="color: #C71829;" id="offer_price_col">${{ offer_details.offer_detail.current_offer_price|convert_num|intcomma|default:'' }}</span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;" >Earnest Money Deposit:
+                          <span style="color: #C71829;" id="earnest_deposit_col">
+                          {% if offer_details.offer_detail.current_earnest_money_deposit %}
+                            ${{ offer_details.offer_detail.current_earnest_money_deposit|convert_num|intcomma|default:'' }} or {{ offer_details.offer_detail.current_earnest_money_deposit_percent|default:'' }} %
+                          {% else %}
+                            {% if offer_details.property.prop_earnest_money_deposit %}
+                              ${{ offer_details.property.prop_earnest_money_deposit|convert_num|intcomma|default:'' }} or {{ offer_details.property.prop_money_deposit_percent|default:'' }}  %
+                            {% else %}
+                            NA
+                            {% endif %}
+                          {% endif %}
+                          </span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;" >Down Payment:
+                          <span style="color: #C71829;" id="down_payment_col">{% if offer_details.offer_detail.down_payment %}${{ offer_details.offer_detail.down_payment|convert_num|intcomma|default:'' }}{% else %}NA{% endif %}</span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;" >Loan Type:
+                          <span style="color: #C71829;" id="loan_type_col">{% if offer_details.offer_detail.financing %}{{ offer_details.offer_detail.financing|default:'NA' }}{% else %}NA{% endif %}</span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;" >Inspection Contingency:
+                          <span style="color: #C71829;" id="due_diligence_col">{% if offer_details.offer_detail.due_diligence_period %}{{ offer_details.offer_detail.due_diligence_period|default:'NA' }}{% else %}NA{% endif %}</span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;">Financing Contingency:
+                          <span style="color: #C71829;" id="offer_contingent_col">
+                            {% if offer_details.offer_detail.offer_contingent == 1 %}
+                              Yes
+                            {% elif offer_details.offer_detail.offer_contingent == 2 %}
+                              No
+                            {% elif offer_details.offer_detail.offer_contingent == 3 %}
+                              Cash Buyer
+                            {% else %}
+                            NA
+                            {% endif %}
+                          </span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;">Appraisal Contingency:
+                          <span style="color: #C71829;" id="appraisal_contingency_col">
+                            {% if offer_details.offer_detail.appraisal_contingent == True %}Yes{% else %}No{% endif %}
+                          </span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;">Property Sale Contingency:
+                          <span style="color: #C71829;" id="sale_contingency_col">
+                            {% if offer_details.offer_detail.sale_contingency == True %}Yes{% else %}No{% endif %}
+                          </span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;" >Closing Date:
+                          <span style="color: #C71829;" id="closing_period_col">{{ offer_details.offer_detail.closing_period|default:'' }}</span>
+                        </li>
+                        <li style="font-size: 15px; color: #222; font-weight: 600; list-style: inherit; line-height: 26px; font-family: Arial, Helvetica, sans-serif;">Closing Costs:
+                          <span style="color: #C71829;" id="closing_cost_col">
+                            {% if offer.offer_detail.closing_cost == 1 %}
+                              Buyer agrees to pay for all loan-related closing costs and half of the transaction closing costs.
+                            {% elif offer.offer_detail.closing_cost == 2 %}
+                              Buyer agrees to pay for all loan-related closing costs and all of the transaction closing costs.
+                            {% elif offer.offer_detail.closing_cost == 3 %}
+                              Seller to pay for all loan-related closing costs and all of the transaction closing costs.
+                            {% else %}
+                            NA
+                            {% endif %}
+                          </span>
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="font-size: 15px; padding-top: 20px;  color: #222; font-weight: 400; line-height: 24px; font-family: Arial, Helvetica, sans-serif;">
+                      <p id="buyer_date">
+                        Date Feb, 11 2022
+                      </p>
+                      <p id="buyer_name_sign">
+                        Buyer {% if offer_details.offer_detail.behalf_of_buyer == True %}
+                          {{ offer_details.user_detail.buyer_first_name|default:'' }} {{ offer_details.user_detail.buyer_last_name|default:'' }}
+                        {% else %}
+                          {{ offer_details.first_name|default:'' }} {{ offer_details.last_name|default:'' }}
+                        {% endif %}
+                      </p>
+
+                      <p id="buyer_sign">
+                        Signature <i>
+                        {% if offer_details.offer_detail.behalf_of_buyer == True %}
+                          {{ offer_details.user_detail.buyer_first_name|default:'' }} {{ offer_details.user_detail.buyer_last_name|default:'' }}
+                        {% else %}
+                          {{ offer_details.first_name|default:'' }} {{ offer_details.last_name|default:'' }}
+                        {% endif %}
+                      </i>
+                      </p>
+                    </td>
+                  </tr>
+              </table>
+            </td>
+          </tr>
+      </table>
+    </center>
+                      </div>
+                      <div class="terms-links">
+
+                        <div class="check">
+                          <input id="terms" type="checkbox" name="terms" value="1" class="css-checkbox">
+                          <label for="terms" class="check-label">I acknowledge and agree to the Terms of service</label>
+                        </div>
+
+                      </div>
+
+                      <div class="bottom-links pt20">
+                        <button type="button" id="backStepThree" class="btn btn-secondary-bdr">Back</button>
+                        <button type="button" id="loadStepFive" class="btn btn-secondary">Complete</button>
+                      </div>
+                    </div><!-- End .steps-4 -->
+
+                    <div id="steps-5" class="steps" style="display:none;">
+                      <div class="step-done">
+                        <h3>
+                          Congratulations! Your offer has been completed.
+                        </h3>
+                        <p>
+                          The listing broker/agent will be in touch with to you shortly.
+                        </p>
+                        <p>
+                          If at any time you'd like to make changes to your offer please……. Keep track of your offer status in your dashboard.
+                        </p>
+                        <div class="bottom-links">
+                          <a href="/download-loi/?property={{ request.GET.property_id|default:'' }}" class="btn btn-secondary-bdr">View Your Offer</a>
+                          <a href="/asset-details/?property_id={{ request.GET.property_id|default:'' }}" class="btn btn-secondary">Back to your Acquisitions</a>
+                        </div>
+                      </div>
+                    </div><!-- End .steps-5 -->
+
+                  </div><!-- End .best-wrap -->
+
+                  <div class="best-sidebar">
+                    <figure>
+                      <img src="{% if offer_details.property.property_image.image %}{{ aws_url }}{{ offer_details.property.property_image.bucket_name }}/{{ offer_details.property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                    </figure>
+                    <figcaption>
+                      <h4>
+                        {{ offer_details.property.address_one|default:'' }}
+                        <span>
+                          {{ offer_details.property.city|default:'' }}, {{ offer_details.property.state|default:'' }}, {{ offer_details.property.postal_code|default:'' }}
+                        </span>
+                      </h4>
+                      <div id="user_best_offer_terms">
+                        <div class="bdr-sidebar">
+                        <h5 class="heading" id="user_best_offer_heading" style="{% if offer_details.current_offer_detail.current_offer_amount or my_current_step > 2 %}{% if offer_details.property.highest_best_format == 3 %}{% else %}display:none;{% endif %}{% else %}display:none;{% endif %}">
+
+                          {% if my_current_step > 2 and my_current_step < 4 %}
+                          Your Non-Binding Highest & Best Offer
+                          {% else %}
+                            Current Highest and Best Offer
+                          {% endif %}
+                        </h5>
+                        <ul class="best-info" id="current_price_detail" style="{% if my_current_step < 3 and offer_details.property.highest_best_format == 3 %}{% else %}display:none;{% endif %}">
+                          <li class="current_offer_section" id="current_offer_price_section">
+                            Price : <span id="current_offer_price">
+                            {% if offer_details.current_offer_detail.current_offer_amount %}
+                            ${{ offer_details.current_offer_detail.current_offer_amount|convert_num|intcomma|default:'' }}
+                            {% else %}
+                              {% if offer_details.auction_data.un_priced == False %}
+                                {% if offer_details.auction_data.start_price %}
+                                  ${{ offer_details.auction_data.start_price|convert_num|intcomma|default:'' }}
+                                {% else %}
+                                  NA
+                                {% endif %}
+                              {% else %}
+                                Unpriced
+                              {% endif %}
+                            {% endif %}
+                          </span>
+                          </li>
+                        </ul>
+                        <ul class="best-info" id="current_private_offer_detail" style="{% if my_current_step < 3  and offer_details.property.highest_best_format == 2  %}{% else %}display:none;{% endif %}">
+                          <li class="current_private_offer_section" id="current_private_offer_price_section">
+                            Price : <span id="current_private_offer_price">
+                            {% if offer_details.auction_data.un_priced == False %}
+                              {% if offer_details.auction_data.start_price %}
+                                ${{ offer_details.auction_data.start_price|convert_num|intcomma|default:'' }}
+                              {% else %}
+                                  NA
+                              {% endif %}
+                            {% else %}
+                              Unpriced
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section" id="current_private_offer_earnest_money_section">
+                            Earnest Money Deposit : <span id="current_private_offer_earnest_money">
+
+                            {% if offer_details.property.private_current_earnest_money_deposit %}
+                              ${{ offer_details.property.private_current_earnest_money_deposit|convert_num|intcomma|default:'' }} or {{ offer_details.property.private_current_earnest_money_deposit_percent|default:'' }} %
+                            {% else %}
+                            NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section" id="current_private_due_diligence_section">
+                            Due Diligence Period : <span id="current_private_due_diligence">
+                            {% if offer_details.property.due_diligence_period %}
+                              {{ offer_details.property.due_diligence_period|intcomma|default:'' }} days
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section" id="current_private_escrow_period_section">
+                            Escrow Period : <span id="current_private_escrow_period">
+                            {% if offer_details.property.escrow_period %}
+                              {{ offer_details.property.escrow_period|intcomma|default:'' }} days
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_loan_type_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Loan Type : <span id="current_private_loan_type">
+                            {% if offer_details.offer_detail.financing %}
+                              {{ offer_details.offer_detail.financing|default:'' }}
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_down_payment_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Down Payment : <span id="current_private_down_payment">
+                            {% if offer_details.offer_detail.down_payment %}
+                              ${{ offer_details.offer_detail.down_payment|convert_num|intcomma|default:'' }}
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_inspection_contigency_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Inspection Contingency : <span id="current_private_inspection_contigency">
+                            {% if offer_details.offer_detail.due_diligence_period %}
+                              {{ offer_details.offer_detail.due_diligence_period|default:'' }}
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_offer_contingent_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Financing Contingency : <span id="current_private_offer_contingent">
+                            {% if offer_details.offer_detail.offer_contingent == 1 %}
+                              Yes
+                            {% elif offer_details.offer_detail.offer_contingent == 2 %}
+                              No
+                            {% elif offer_details.offer_detail.offer_contingent == 3 %}
+                              Cash Buyer
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_appraisal_contingent_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Appraisal Contingency : <span id="current_private_appraisal_contingent">
+                            {% if offer_details.offer_detail.appraisal_contingent == True %}
+                              Yes
+                            {% elif offer_details.offer_detail.appraisal_contingent == False %}
+                              No
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_sale_contingency_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Property Sale Contingency : <span id="current_private_sale_contingency">
+                            {% if offer_details.offer_detail.sale_contingency == True %}
+                              Yes
+                            {% elif offer_details.offer_detail.sale_contingency == False %}
+                              No
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_closing_period_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Closing Date : <span id="current_private_closing_period">
+                            {% if offer_details.offer_detail.closing_period %}
+                              {{ offer_details.offer_detail.closing_period|default:'' }}
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                          <li class="current_private_offer_section_step2" id="current_private_closing_cost_section" style="{% if my_current_step == 2 %}{% else %}display:none;{% endif %}">
+                            Closing Costs : <span id="current_private_closing_cost">
+                            {% if offer_details.offer_detail.closing_cost == 1 %}
+                               Buyer agrees to pay for all loan-related closing costs and half of the transaction closing costs.
+                            {% elif offer_details.offer_detail.closing_cost == 2 %}
+                              Buyer agrees to pay for all loan-related closing costs and all of the transaction closing costs.
+                            {% elif offer_details.offer_detail.closing_cost == 3 %}
+                              Seller to pay for all loan-related closing costs and all of the transaction closing costs.
+                            {% else %}
+                              NA
+                            {% endif %}
+                          </span>
+                          </li>
+                        </ul>
+                        <ul class="best-info" id="current_highest_offer_detail" style="{% if offer_details.current_offer_detail.current_offer_amount and my_current_step < 3  and offer_details.property.highest_best_format == 3 %}{% else %}display:none;{% endif %}">
+
+                          <li class="current_offer_section">
+                            Earnest Money Deposit : <span id="current_earnest_deposit">
+                              {% if offer_details.current_offer_detail.current_earnest_money_deposit %}
+                                ${{ offer_details.current_offer_detail.current_earnest_money_deposit|convert_num|intcomma|default:'' }} or {{ offer_details.current_offer_detail.current_earnest_money_deposit_percent|default:'' }} %
+                              {% else %}
+                                NA
+                              {% endif %}
+                            </span>
+                          </li>
+                          <li class="current_offer_section">
+                            Down Payment : <span id="current_down_payment">
+                            {% if offer_details.current_offer_detail.down_payment %}
+                              ${{ offer_details.current_offer_detail.down_payment|convert_num|intcomma|default:'' }}
+                            {% else %}
+                            NA
+                            {% endif %}
+                            </span>
+                          </li>
+                          <li class="current_offer_section">
+                            Loan Type : <span id="current_loan_type">
+                            {% if offer_details.current_offer_detail.financing %}
+                              {{ offer_details.current_offer_detail.financing|default:'' }}
+                            {% else %}
+                            NA
+                            {% endif %}
+                            </span>
+                          </li>
+                          <li class="current_offer_section">
+                            Inspection Contingency :
+                            <span id="current_due_diligence">
+                              {% if offer_details.current_offer_detail.due_diligence_period %}
+                                {{ offer_details.current_offer_detail.due_diligence_period|default:'-' }}
+                              {% else %}
+                                NA
+                              {% endif %}
+                            </span>
+                          </li>
+
+                          <li class="current_offer_section">
+                            Financing Contingency : <span id="current_offer_contigent">
+                            {% if offer_details.current_offer_detail.offer_contingent %}
+                              {{ offer_details.current_offer_detail.offer_contingent|default:'' }}
+                            {% else %}
+                            NA
+                            {% endif %}
+                            </span>
+                          </li>
+                          <li class="current_offer_section">
+                            Appraisal Contingency : <span id="current_appraisal_contigent">
+                            {% if offer_details.current_offer_detail.appraisal_contingent == True %}
+                              Yes
+                            {% elif offer_details.current_offer_detail.appraisal_contingent == False %}
+                              No
+                            {% else %}
+                            NA
+                            {% endif %}
+                            </span>
+                          </li>
+                          <li class="current_offer_section">
+                            Property Sale Contingency : <span id="current_sale_contigent">
+                            {% if offer_details.current_offer_detail.sale_contingency == True %}
+                              Yes
+                            {% elif offer_details.current_offer_detail.sale_contingency == False %}
+                              No
+                            {% else %}
+                            NA
+                            {% endif %}
+                          </span>
+                          </li>
+
+                          <li class="current_offer_section">
+                          Closing Date : <span id="current_closing_period">
+                          {% if offer_details.current_offer_detail.closing_period %}
+                            {{ offer_details.current_offer_detail.closing_period|default:'-' }}
+                          {% else %}
+                            NA
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="current_offer_section">
+                          Closing Costs : <span id="current_closing_cost">
+                          {% if offer_details.current_offer_detail.closing_cost == 1 %}
+                            Buyer agrees to pay for all loan-related closing costs and half of the transaction closing costs.
+                          {% elif offer_details.current_offer_detail.closing_cost == 2 %}
+                            Buyer agrees to pay for all loan-related closing costs and all of the transaction closing costs.
+                          {% elif offer_details.current_offer_detail.closing_cost == 3 %}
+                            Seller to pay for all loan-related closing costs and all of the transaction closing costs.
+                          {% else %}
+                          NA
+                          {% endif %}
+                        </span>
+                        </li>
+
+                        </ul>
+                      <ul class="best-info" id="non_binding_offer_details" style="{% if my_current_step > 2 %}{% else %}display:none;{% endif %}">
+                        <li>
+                          Price : <span id="best_asking_price">
+                          {% if offer_details.offer_detail.current_offer_price %}
+                          ${{ offer_details.offer_detail.current_offer_price|convert_num|intcomma|default:'' }}
+                          {% else %}
+                            {% if offer_details.auction_data.start_price and offer_details.auction_data.un_priced == False %}
+                              ${{ offer_details.auction_data.start_price|convert_num|intcomma|default:'' }}
+                            {% else %}
+                            Unpriced
+                            {% endif %}
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="second_step_section">
+                          Earnest Money Deposit : <span id="best_earnest_deposit">
+                          {% if offer_details.offer_detail.current_earnest_money_deposit %}
+                            ${{ offer_details.offer_detail.current_earnest_money_deposit|convert_num|intcomma|default:'' }} or {{ offer_details.offer_detail.current_earnest_money_deposit_percent|default:'' }} %
+                          {% else %}
+                            {% if offer_details.property.prop_earnest_money_deposit %}
+                              ${{ offer_details.property.prop_earnest_money_deposit|convert_num|intcomma|default:'' }} or {{ offer_details.property.prop_money_deposit_percent|default:'' }}  %
+                            {% else %}
+                            NA
+                            {% endif %}
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="third_step_section" >
+                          Down Payment : <span id="best_down_payment">
+                          {% if offer_details.offer_detail.down_payment %}
+                            ${{ offer_details.offer_detail.down_payment|convert_num|intcomma|default:'' }}
+                          {% else %}
+                            NA
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="third_step_section">
+                          Loan Type : <span id="best_loan_type">
+                          {% if offer_details.offer_detail.financing %}
+                            {{ offer_details.offer_detail.financing|default:'' }}
+                          {% else %}
+                            NA
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="second_step_section" id="best_due_diligence_section">
+
+                          {% if offer_details.offer_detail.due_diligence_period %}
+                          Inspection Contingency
+                          {% else %}
+                          Due Diligence Period
+                          {% endif %} :
+                          <span id="best_due_diligence">
+                            {% if offer_details.offer_detail.due_diligence_period %}
+                              {{ offer_details.offer_detail.due_diligence_period|default:'-' }}
+                            {% else %}
+                              {% if offer_details.property.due_diligence_period %}
+                                {{ offer_details.property.due_diligence_period|default:'-' }} days
+                              {% else %}
+                                NA
+                              {% endif %}
+                            {% endif %}
+                          </span>
+                        </li>
+                        <li class="third_step_section">
+                          Financing Contingency : <span id="best_offer_contigent">
+                          {% if offer_details.offer_detail.offer_contingent == 1 %}
+                            Yes
+                          {% elif offer_details.offer_detail.offer_contingent == 2 %}
+                            No
+                          {% elif offer_details.offer_detail.offer_contingent == 3 %}
+                            Cash Buyer
+                          {% else %}
+                            NA
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="third_step_section">
+                          Appraisal Contingency : <span id="best_appraisal_contigent">
+                          {% if offer_details.offer_detail.appraisal_contingent == True %}
+                            Yes
+                          {% elif offer_details.offer_detail.appraisal_contingent == False %}
+                            No
+                          {% else %}
+                            NA
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="third_step_section">
+                          Property Sale Contingency : <span id="best_sale_contigent">
+                          {% if offer_details.offer_detail.sale_contingency == True %}
+                            Yes
+                          {% elif offer_details.offer_detail.sale_contingency == False %}
+                            No
+                          {% else %}
+                          NA
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="second_step_section">
+                          Closing Date : <span id="best_closing_period">
+                          {% if offer_details.offer_detail.closing_period %}
+                            {{ offer_details.offer_detail.closing_period|default:'NA' }}
+                          {% else %}
+                            {% if offer_details.property.escrow_period %}
+                              {{ offer_details.property.escrow_period|default:'NA' }} days
+                            {% else %}
+                              NA
+                            {% endif  %}
+                          {% endif %}
+                        </span>
+                        </li>
+                        <li class="third_step_section" >
+                          Closing Costs : <span id="best_closing_cost">
+                          {% if offer_details.offer_detail.closing_cost == 1 %}
+                            Buyer agrees to pay for all loan-related closing costs and half of the transaction closing costs.
+                          {% elif offer_details.offer_detail.closing_cost == 2 %}
+                            Buyer agrees to pay for all loan-related closing costs and all of the transaction closing costs.
+                          {% elif offer_details.offer_detail.closing_cost == 3 %}
+                            Seller to pay for all loan-related closing costs and all of the transaction closing costs.
+                          {% else %}
+                          -
+                          {% endif %}
+                        </span>
+                        </li>
+
+                      </ul>
+                    </div>
+
+                      <div class="best-time-wrap">
+                        <h5 class="second_step_section" id="offer_timer_text">
+                          {% if todays_date > start_date %}
+                          Highest and Best Offer Ends in
+                          {% else %}
+                          Highest and Best Offer Starts in
+                          {% endif %}
+                        </h5>
+                        <ul class="best-timer best_offer_timer">
+                          <li>
+                            <h5 class="day_remaining">
+
+                            </h5>
+                            <span>Days</span>
+                          </li>
+                          <li>
+                            <h5 class="hr_remaining">
+
+                            </h5>
+                            <span>Hours</span>
+                          </li>
+                          <li>
+                            <h5 class="min_remaining">
+
+                            </h5>
+                            <span>Mins</span>
+                          </li>
+                          <li>
+                            <h5 class="sec_remaining">
+
+                            </h5>
+                            <span>Sec</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      
+                      </div>
+                      <!--<div id="seller_defined_terms">
+                        <h5 class="heading">
+                          Proposed Seller Terms
+                        </h5>
+                        <ul class="best-info">
+                          <li>
+                            Price : <span id="seller_best_asking_price">{% if offer_details.auction_data.start_price and offer_details.auction_data.un_priced == False %}${{ offer_details.auction_data.start_price|convert_num|intcomma|default:'' }}{% else %}Unpriced{% endif %}</span>
+                          </li>
+                          <li>
+                            Due Diligence Period : <span id="seller_best_due_diligence">{{ offer_details.property.due_diligence_period|default:'-' }} days</span>
+                          </li>
+                          <li>
+                            Closing Date : <span id="seller-best_closing_period">{{ offer_details.property.escrow_period|default:'-' }} days</span>
+                          </li>
+                          <li>
+                            Earnest Money Deposit : <span id="seller_best_earnest_deposit">
+                            {% if offer_details.property.prop_earnest_money_deposit %}${{ offer_details.property.prop_earnest_money_deposit|convert_num|intcomma|default:'' }} or {{ offer_details.property.prop_money_deposit_percent|default:'' }}  %{% else %}-{% endif %}
+                          </span>
+                          </li>
+                        </ul>
+                      </div>-->
+
+                    </figcaption>
+                  </div><!-- End .best-sidebar -->
+                </div><!-- End .photo-slide -->
+                </form>
+              </div>
+            </div>
+          </div>
+    </section> <!-- End .main-detail-wrap -->
+
+  </div><!-- end .body-content -->
+
+
+  <div id="offertermModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reality One Group LOI</h5>
+          <button type="button" class="close" id="close_counter_popup_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="counter_offer_frm" id="counter_offer_frm" method="post">
+          <div class="modal-body">
+            <p>This unique and easy to use system allows you to structure and submit offers that fit your specific acquisition requirements. In just a few easy steps you can send a Letter of Intent (LOI) to the listing broker/agent to begin the purchase process. All offers are non-binding and only accessible by the listing broker/agent and owner.</p>
+            <p>
+              The broker/agent may provide guidance in addition to the asking price such as a minimum earnest money deposit or maximum allowable closing period to help guide you toward what the seller is looking for. If no guidance is provided you are free to structure the offer with any Price, Earnest Money Deposit (EMD), Due Diligence Period or Closing Period desired.
+            </p>
+            <p class="font13">
+              Please note any information provided by users is transmitted using the Secure Socket Layer (SSL) protocol, and stored on hardened servers with strict access control policies.
+            </p>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .counterOfferModal -->
+  <div id="confirmOfferDocDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete This Document</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="popup_section" id="popup_section" value=""/>
+                <input type="hidden" name="popup_image_id" id="popup_image_id" value=""/>
+                <input type="hidden" name="popup_image_name" id="popup_image_name" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                     <button type="button" class="btn btn-secondary del_offer_doc" id="del_offer_doc_true">Yes</button> <button type="button" class="btn btn-primary-bdr del_offer_doc" id="del_offer_doc_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+<div id="confirmWorkingAgentModal" class="modal centered-modal confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Contact your Buyer's Agent</h4>
+        <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>-->
+      </div>
+      <div class="modal-body">
+        <p>
+          If you’ve committed to working with a buyer’s agent and/or signed a "Buyer's Agency Agreement", you should have your agent submit your offer for you. Please have your agent verify this listing offers compensation to a buyer’s agent before submitting your offer. All cooperating brokerage commission details can be found on the property listing page or by contacting the listing broker/agent directly.
+        </p>
+        <div class="clearfix center">
+          <p>
+            <button type="" class="btn btn-secondary confirm_bid_btn" id="confirm_working_agent_true">OK</button>
+          </p>
+          <a href="javascript:void(0)" class="agent-btn" id="confirm_working_agent_false"><strong>I haven’t committed to working with an agent</strong></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .confirmBidModal -->
+<div id="notAgentModal" class="modal centered-modal confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Attention</h4>
+        <button type="button" class="close" id="back_to_offer_top">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Our records indicate that you are not a licensed real estate agent. Please check your account to make sure that you have signed up as an agent correctly or contact our real estate company if you find this to be an error.
+        </p>
+        <div class="clearfix center">
+          <button type="button" class="btn btn-secondary confirm_bid_btn" id="back_to_offer">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .notAgentModal -->
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/custom_validator.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/mask_input.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/custom_dropzone.js' %}?v=1.1"></script>
+
+<script>
+  var start_date = '{{ offer_details.auction_data.start_date|default:'' }}';
+  var end_date = '{{ offer_details.auction_data.end_date|default:'' }}';
+  var local_date = getLocalDate(start_date, 'm j, Y','');
+  var local_end_date = getLocalDate(end_date, 'm j, Y','');
+  var countDownDate = new Date(local_date).getTime();
+  var countDownEndDate = new Date(local_end_date).getTime();
+  $(document).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip()
+  });
+</script>
+
+<script type="text/javascript" src="{% static 'theme-common/js/best_offer.js' %}?v=2.1"></script>
+{% endblock %}

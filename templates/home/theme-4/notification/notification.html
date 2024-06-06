@@ -1,0 +1,86 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+
+{% endblock %}
+{% block content %}
+{% load humanize %}
+<div class="body-content blog-body">
+  
+  <div class="blog-header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-10 col-md-12 col-lg-offset-1">
+          <div class="blog-header-inner">
+            <div class="heading">
+              <span class="line"></span>
+              <h3>
+                All
+              </h3>
+              <h1>
+                Notification
+              </h1>
+            </div>
+          </div>
+        </div><!-- End .col-lg-12 -->
+      </div><!-- End .row -->
+    </div><!-- End .container-fluid -->
+  </div><!-- End .blog-header -->
+  
+  <div class="noti-view">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 col-md-12 col-lg-offset-1">
+          <ul id="notifi_list">
+            {% if notification_list %}
+            {% for notification in notification_list %}
+            <li class="notiMenu">
+              <i class="fas fa-bell"></i>
+              <a href="{% if notification.redirect_url %}{{ notification.redirect_url }}{% else %}{% endif %}">
+                <h6>
+                  {{ notification.title|default:'' }}
+                  <span class="convert_notification_date_time" data-value="{{ notification.added_on|default:'' }}"></span>
+                </h6>
+                <small class="date">{{ notification.content|default:''|safe }}</small>
+              </a>
+            </li>
+            {% endfor %}
+            {% else %}
+            <li class="notiMenu">
+              <img src="{% static 'theme-4/images/no-data-image.png' %}" class=" center mb0" alt="real estate sales" role="img" />
+            </li>
+            {% endif %}
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    
+  </div>
+  <div class="pagination-wrap">
+      <!--<ul>
+        <li class="page-item">Result Per Page:</li>
+        <li class="page-item">
+          <select name="pagi" id="pagi" onchange="getresult('our_listing',1,'','','','');">
+
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+          </select>
+        </li>
+      </ul>-->
+      <ul class="pagination" id="notification_listing_pagination_list">
+        {{ pagination_html }}
+      </ul>
+    </div><!-- End .pagination-wrap -->
+</div>
+{% endblock %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+  <script type="text/javascript" src="{% static 'theme-common/js/notifications.js' %}?v=1.1"></script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% load static %}
+{% load dashboard_extra %}
+<h4>
+  Proof of Funds <span class="hr-line"></span>
+</h4>
+<p class="gray-text">
+  To provide the seller with the necessary information to evaluate you bid, please upload supporting documentation. For cash purchase, please attach a bank statement, investment account or similar document to verify adequate funds to close. For financed purchases, please attach a copy of a pre-approval letter from your selected financial institution.
+</p>
+<div class="bidder-information">
+  <div class="upload-doc">
+    <input type="hidden" name="reg_id" id="reg_id" value=""/>
+    <div class="form-group">
+      <input id="is_submit_proof_fund_yes" type="radio" name="is_submit_proof_fund" value="1" class="css-radio">
+      <label for="is_submit_proof_fund_yes" class="radio-label"> Upload Proof of Funds and/or Bank Letter of Credit Document(s)</label>
+    </div>
+    <div class="form-group">
+      <input id="is_submit_proof_fund_no" type="radio" name="is_submit_proof_fund" value="0" class="css-radio">
+      <label for="is_submit_proof_fund_no" class="radio-label"> Do not have Proof of Funds and/or Bank Letter of Credit Document(s)</label>
+    </div>
+    <ul class="radio-list" id="doc_reason_section">
+      <li>
+        <div class="form-group">
+          <input id="doc_reason_first" type="radio" name="doc_reason" value="1" class="css-radio">
+          <label for="doc_reason_first" class="radio-label"> Currently Working With My Lender To Obtain Financing</label>
+
+        </div>
+        <div class="form-group">
+          <input id="doc_reason_sec" type="radio" name="doc_reason" value="2" class="css-radio">
+          <label for="doc_reason_sec" class="radio-label"> Put Me In Contact With Lender(s) To Obtain Financing</label>
+
+        </div>
+        <div class="form-group">
+          <input id="doc_reason_thrd" type="radio" name="doc_reason" value="3" class="css-radio">
+          <label for="doc_reason_thrd" class="radio-label"> Request Listing Agent Approval, Based On Our Working Relationship</label>
+        </div>
+      </li>
+    </ul>
+    <div id="upload_document_section" style="display:none;">
+      <!-- <h6>
+        Upload Doc(s)
+      </h6> -->
+      <div class="upload-fav">
+        <div class="item">
+          <div class="dropzone" id="bidderDocFrm">
+              <input type="hidden" id="bidder_doc_id" name="bidder_doc_id" value=""/>
+
+                <input type="hidden" name="bidder_doc_name" id="bidder_doc_name" value=""/>
+                <div class="dz-default dz-message" data-dz-message="">
+                  <div class="block">
+                    <button type="button" class="btn btn-secondary" tabindex="3"><i class="fas fa-upload"></i> Upload Doc(s)</button>
+                  </div>
+                  <div class="block">
+                    OR
+                  </div>
+                  <div class="block">
+                    <h6>
+                      Drag & Drop Docs
+                      <span>Supported Files: pdf, doc, docx</span>
+                    </h6>
+                  </div>
+                </div>
+
+          </div>
+        </div>
+      </div>
+
+    <p id="custom_doc_error"  class="custom_doc_error" style="display:none;">Document is required.</p>
+    
+    <div class="doc-show-list" id="bidderDocDiv" style="display:none;">
+      <ul id="bidderDocList">
+
+      </ul>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 ptb10">
+      <p>
+        <strong>By checking below, you agree:</strong>
+      </p>
+      <div class="form-group">
+        <input id="term_accepted" type="checkbox" name="term_accepted" value="1" class="css-checkbox">
+        <label for="term_accepted" class="check-label">I have read and agree to the <a href="/terms/" target="_blank" class="red-text" role="button" tabindex="1">Terms Of Use</a> and <a href="/privacy-policy/" target="_blank" class="red-text" role="button" tabindex="2">Privacy Policy</a>.</label>
+      </div>
+      <div class="form-group">
+        <input id="age_validate" type="checkbox" name="age_validate" value="1" class="css-checkbox">
+        <label for="age_validate" class="check-label">I am 18 years of age or older</label>
+      </div>
+      
+    </div>
+  </div>
+    
+  </div><!-- End .upload-doc -->
+  <div class="doc-info">
+    <h6>
+      Bidder Information 
+    </h6>
+    <div class="info-box">
+      <ul>
+        <li id="bidder_name">
+          <span class="icon icon-user"></span>
+          {{ bidder.first_name|default:'' }} {{ bidder.last_name|default:'' }}
+        </li>
+        
+        <li id="bidder_address">
+          <span class="icon icon-address"></span>
+          {{ bidder.address.address_first|default:'1561  Cerullo Road' }}, {{ bidder.address.city|default:'' }}, {{ bidder.address.state_name|default:'' }} {{ bidder.address.postal_code|default:'' }}
+        </li>
+        <li id="bidder_email">
+          <span class="icon icon-mail"></span>
+          {{ bidder.email|default:'' }}
+        </li>
+        <li id="bidder_phone">
+          <span class="icon icon-phone"></span>
+          {{ bidder.phone_no|format_phone|default:'' }}
+        </li>
+      </ul>
+    </div>
+  </div><!-- End .doc-info -->
+</div><!-- End .bidder-information -->
+<div class="clearfix">
+  <button role="button" type="button" class="btn btn-primary" id="bidderPreviousBtn" tabindex="4">Back to Register</button> <button role="button" type="button" class="btn btn-secondary" id="submitBidderReg" tabindex="5">Submit</button>
+</div>

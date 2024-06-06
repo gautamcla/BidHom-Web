@@ -1,0 +1,107 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Time Zone List {% endblock title %}
+
+{% block style %}
+  {{ block.super }}
+  <link href="{% static 'admin/vendors/jQuery-Multiple-Select/dist/css/selectize.bootstrap3.css' %}" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+
+<link href="{% static 'admin/vendors/jQuery-Multiple-Select/dist/css/selectize.bootstrap3.css' %}" type="text/css" rel="stylesheet" />
+
+<div class="dashboard-body">
+  
+    <div class="listing-top">
+      <div class="block">
+        <h6>
+          Time Zone List 
+          <span>
+            Total Count :-  <b id="totalCount">Loading...</b>
+          </span>
+        </h6>
+      </div>
+
+        <div class="block">
+          <form action="" class="search-field last">
+            <div class="search-icon"><i class="fas fa-search"></i></div>
+            <input type="text" id="search" class="form-control input-sm" placeholder="Search for...">
+            <button class="btn btn-primary btn-sm pl20 searchBtn"  type="submit">Go!</button>
+          </form>
+        </div>
+
+    </div>
+    
+    <div class="listing-bottom">
+      <div class="block right">
+        <i class="fa fa-filter"></i> Filters
+      </div>
+      <div class="block" style="min-width: 130px;">
+        <select class="select form-control" name="per_page_record" id="per_page_record">
+          <option value="10">10 Records</option>
+          <option value="20" selected>20 Records</option>
+          <option value="30">30 Records</option>
+          <option value="40">40 Records</option>
+          <option value="50">50 Records</option>
+        </select>
+      </div>
+    </div>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>{{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+      <input type="hidden" name="page-timezone-list" id="page-timezone-list" value="1">						
+      
+    <span id="span-ajax-timezone-list">
+      <div class="table-responsive">
+      <table class="table table-striped jambo_table bulk_action">
+        <thead>
+            <tr class="headings">
+            <th class="column-title">ID </th>
+              <th class="column-title">Timezone </th>
+              <th class="column-title">Offset </th>
+              <th class="column-title"> Offset DST</th>
+              <th class="column-title">Status </th>
+              <th class="column-title no-link last" style="width:20%"><span class="nobr">Action</span>
+              </th>
+            </tr>
+          </thead>
+            
+          <tbody>							  			  
+          </tbody>
+        </table>
+      </div>
+    </span> 
+    
+</div>
+
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+
+
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/timezone-list.js' %}?v=1.0"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/jquery-ui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/jQuery-Multiple-Select/dist/js/standalone/selectize.js' %}"></script>
+
+
+
+
+{% endblock %}

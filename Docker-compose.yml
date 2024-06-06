@@ -1,0 +1,42 @@
+
+version: '3'
+services:
+  web:
+    container_name: bidhom_web
+    build: .
+    command: python manage.py runserver 0.0.0:8181
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - "8181:8181"
+  #  depends_on:
+  #    - db
+    networks:
+      - gsa_auction_ntwk
+
+  cache:
+    container_name: bidhom_web_redis
+    image: redis:7.2
+    command: redis-server
+    restart: always
+    ports:
+      - '6379:6379'
+    # command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      # - REDIS_PASSWORD=p@$$w0rd!23
+    # volumes: 
+    #   - cache:/data
+    networks:
+      - gsa_auction_ntwk 
+
+networks:
+  gsa_auction_ntwk:
+    name: gsa_auction_network
+    driver: bridge
+    external: true
+    # ipam:
+    #  config:
+    #    - subnet: 172.28.0.0/16
+    #      gateway: 172.28.0.1

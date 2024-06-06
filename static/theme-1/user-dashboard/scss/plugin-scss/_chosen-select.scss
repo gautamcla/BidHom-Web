@@ -1,0 +1,34 @@
+.chosen-container {
+  border: none !important;
+  border-bottom: 1px solid $bordercolor !important;
+  .chosen-drop {
+    .selectallSection {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      font-size: $font14;
+    }
+  }
+  .chosen-results li {
+    font-size: $font14;
+    .checkBox {
+      margin-right: 10px;
+    }
+  }
+}
+.chosen-container-multi .chosen-choices {
+  line-height: 44px !important;
+}
+.chosen-container-single {
+  .chosen-single {
+    padding: 0 !important;
+    text-align: left;
+    div {
+      right: 0 !important;
+    }
+  }
+}
+
+.chosen-container .chosen-results li.new-feature {
+  border-bottom: 1px solid #ddd;
+}

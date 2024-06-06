@@ -1,0 +1,630 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load tz %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>{{ title }}</title>
+  <!-- Meta Tags -->
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="format-decetion" content="telephone=no" />
+  <!-- links -->
+  <link rel="icon" href="{% if site_detail.favicon.image_name %}{{ aws_url}}{{ site_detail.favicon.bucket_name }}/{{ site_detail.favicon.image_name }}{% else %}{% static 'admin/images/favicon.png' %}{% endif %}" type="image/png" sizes="16x16">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" media="screen" rel="stylesheet" type="text/css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+
+  <link href="{% static 'admin/css/style.css' %}" type="text/css" rel="stylesheet" />
+  <link href="{% static 'admin/css/all.css' %}?v=3" type="text/css" rel="stylesheet" />
+  <link href="{% static 'admin/css/jquery.growl.css' %}" type="text/css" rel="stylesheet" />
+  <link href="{% static 'admin/css/custom_style.css' %}?v=2.3" type="text/css" rel="stylesheet" />
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--about-us.html-->
+
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  <!--[if lte IE 7]> <html class="ie7"> <![endif]-->
+  <!--[if IE 8]>     <html class="ie8"> <![endif]-->
+  <!--[if IE 9]>     <html class="ie9"> <![endif]-->
+  <!--[if !IE]><!-->
+
+</head>
+
+<body>
+
+  <div id="main-container" class="dashboard-wrap openSidebar">
+    <div  class="right-sidebar offer-list-sidebar">
+
+
+      <div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            <div class="back-btn">
+              <a href="/admin/listing/?auction_type=traditional offer"><i class="fas fa-chevron-left"></i> Back to Listing </a>
+            </div>
+            <div class="viewoffer-wrap">
+
+              <div class="offer-main">
+                <h5>
+                  Offers
+                </h5>
+                <div class="offer-main-bg">
+                  <div class="default-table offerTable">
+                    <div class="block">
+                      <div class="item">
+                        Buyer
+                      </div>
+                      <div class="item">
+                        Offer Amount
+                      </div>
+                      <div class="item">
+                        Date
+                      </div>
+                      <!--<div class="item">
+                        Chat
+                      </div>-->
+                    </div><!-- End .block -->
+                    <div class="block sscroll" id="view_offer_list">
+                      {% if seller_offer_list|length > 0 %}
+                        {% for offer in seller_offer_list %}
+                      <div class="block-item {% if forloop.counter0 == 0 %}current{% endif %}" id="offer_row_{{ offer.id }}">
+                        <div class="item">
+
+                          <input type="checkbox" class="css-checkbox offer_checbox" id="search_icon_{{ offer.id }}" value="{{ offer.id }}" onclick="propertyOfferDetails({{ offer.id }}, this)" {% if forloop.counter0 == 0 %}checked{% endif %}>
+                          <label for="search_icon_{{ offer.id }}" class="check-label" title="{{ offer.buyer.first_name }} {{ offer.buyer.last_name }}">{{ offer.buyer.first_name }} {{ offer.buyer.last_name }}</label>
+                        </div>
+                        <div class="item">
+                          {% if offer.offer_price %}${{ offer.offer_price|convert_float|intcomma|default:'0' }}{% else %}-{% endif %}
+                        </div>
+                        <div class="item convert_to_local_date_time" data-value="{{ offer.date|default:'' }}">
+                          {{ offer.date|default:'' }}
+                        </div>
+                        <!--<div class="item">
+                          <a href="javascript:void(0)" onclick="show_offer_chat('{{ offer.property|default:'' }}','{{ offer.buyer.id }}')"><i class="far fa-envelope"></i></a>
+                        </div>-->
+                      </div><!-- End .block-item -->
+                      {% endfor %}
+                      {% else %}
+                      <div class="block-item">
+                        <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                      </div>
+                      {% endif %}
+
+                    </div><!-- End .block -->
+                  </div><!-- End .create-table -->
+                </div>
+              </div><!-- End .offer-main -->
+
+              <div class="offerdetail-main" id="offer_details">
+                <div class="head">
+                  <h5>
+                    Details
+                  </h5>
+                  {% if offer.is_sold %}
+                    {% if offer.is_accepted %}
+                      {% if offer.is_accepted.accepted and offer.is_accepted.accepted_by|lower == 'seller' %}
+                        {% define_var 'Offer Accepted' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                      {% else %}
+                        {% define_var 'Offer Accepted by buyer' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                      {% endif %}
+                    {% elif offer.is_rejected %}
+                      {% if offer.is_rejected.declined and offer.is_rejected.declined_by|lower == 'seller' %}
+                        {% define_var 'Offer Rejected' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                      {% else %}
+                        {% define_var 'Offer Rejected by buyer' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                      {% endif %}
+                    {% else %}
+                      {% define_var 'Sold' as offer_text %}
+                      {% define_var 2 as offer_val %}
+                    {% endif %}
+                  {% else %}
+                    {% if offer.is_accepted %}
+                      {% if offer.is_accepted.accepted and offer.is_accepted.accepted_by|lower == 'seller' %}
+                        {% define_var 'Offer Accepted' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                      {% else %}
+                        {% define_var 'Offer Accepted by buyer' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                      {% endif %}
+                    {% elif offer.is_rejected %}
+                      {% if offer.is_rejected.declined and offer.is_rejected.declined_by|lower == 'seller' %}
+                        {% define_var 'Offer Rejected' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                      {% else %}
+                        {% define_var 'Offer Rejected by buyer' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                      {% endif %}
+                    {% else %}
+                      {% define_var 'Offer Pending' as offer_text %}
+                      {% define_var 2 as offer_val %}
+                    {% endif %}
+                  {% endif %}
+                  <div class="btns">
+                    <a href="#" class="btn btn-danger btn-sm">{{ offer_text }}</a>
+                    {% if offer.buyer_id != session_user_id %}<a class="btn btn-secondary btn-sm" href="javascript:void(0)" onclick="show_offer_chat('{{ offer.property|default:'' }}','{{ offer.buyer_id }}')">Chat</a>{% endif %}
+                  </div>
+
+                </div>
+
+                <div class="offerdetail-main-bg">
+                  <div class="bidderrecord-top">
+                    <figure>
+                      {% if offer.idx_property_id %}
+                        <img src="{% if offer.idx_property_image.upload %}{{offer.idx_property_image.upload}}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt="">
+                      {% else %}
+                        <img src="{% if offer.property_detail.property_image.image %}{{ aws_url }}{{ offer.property_detail.property_image.bucket_name }}/{{ offer.property_detail.property_image.image }}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt="">
+                      {% endif %}
+                    </figure>
+                    <figcaption>
+                      <h6>
+                        {{ offer.property_detail.address_one|default:'' }}
+                        <span><i class="fas fa-map-marker-alt"></i> {{ offer.property_detail.city|default:'' }}, {{ offer.property_detail.state|default:'' }}, {{ offer.property_detail.postal_code|default:'' }}</span>
+                      </h6>
+                    </figcaption>
+                    <ul>
+                      <li>
+                        <span>Listing type:</span> Traditional Sale
+                      </li>
+                      <li>
+                        <span>Asking Price:</span> ${{ offer.asking_price|convert_float|intcomma|default:'0' }}
+                      </li>
+                      {% if offer.winning_amount > 0 %}
+                      <li>
+                        <span>Winning Amount:</span> ${{ offer.winning_amount|convert_float|intcomma|default:'0' }}
+                      </li>
+                      {% endif %}
+                    </ul>
+                  </div>
+
+                  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingOne">
+                          <h4 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="">
+                                Buyer Information
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="collapseOne">
+                        <div class="panel-body">
+                          <div class="table-responsive">
+                            <table class="offerdetailListtable">
+                              <tr>
+                                <td>
+                                  Buyer
+                                </td>
+                                <td>
+                                  {{ offer.user_detail.first_name|default:'' }} {{ offer.user_detail.last_name|default:'' }}
+                                </td>
+                                <td>
+                                  Phone
+                                </td>
+                                <td>
+                                  {{ offer.user_detail.phone_no|format_phone|default:'' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Buyer Email
+                                </td>
+                                <td>
+                                  {{ offer.user_detail.email|default:'' }}
+                                </td>
+                                <td>
+                                  Date
+                                </td>
+                                <td>
+                                  <p class="convert_to_local_date_time" data-value="{{ offer.added_on|default:'' }}">{{ offer.added_on|default:'' }}</p>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Address
+                                </td>
+                                <td colspan="3">
+                                  {{ offer.user_detail.address_first|default:'' }} {{ offer.user_detail.city|default:'' }}, {{ offer.user_detail.state|default:'' }}, {{ offer.user_detail.postal_code|default:'' }}
+                                </td>
+                                <!--<td>
+                                  Price
+                                </td>
+                                <td>
+                                  ${{ offer.asking_price|convert_float|intcomma|default:'0' }}
+                                </td>-->
+                              </tr>
+
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingTwo">
+                          <h4 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" class="">
+                                Buyer Questionnaire
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                          <ul class="offerdetailList">
+                            {% if offer.user_type == 2 %}
+                              <li>
+                                <span>Have you committed to working with an agent yet?: </span>
+                                {% if offer.working_with_agent %}Yes, I have{% else %} No, I haven’t{% endif %}</label>
+
+                              </li>
+                              {% if not offer.working_with_agent %}
+                              <li>
+                                <span>Have you toured the property in person?: </span>
+                                {% if offer.property_in_person == 1 %}Yes, I have{% elif offer.property_in_person == 2 %} No, not yet{% else %}I would like to see it{% endif %}</label>
+
+                              </li>
+                              <li>
+                                <span>Have you been pre-qualified by your lender?: </span>
+                                {% if offer.pre_qualified_lender == 1 %}Yes, I have{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %} I’m buying with all cash{% endif %}</label>
+
+                              </li>
+                              {% endif %}
+                            {% else %}
+                              <li>
+                                <span>Have you toured the property with your client in person?: </span>
+                                {% if offer.property_in_person == 1 %}Yes, we have{% elif offer.property_in_person == 2 %} No, not yet{% else %} We would like to see it{% endif %}</label>
+
+                              </li>
+                              <li>
+                                <span>Has your client been pre-qualified by a lender?: </span>
+                                {% if offer.pre_qualified_lender == 1 %}Yes{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %}  Buying with all cash{% endif %}</label>
+
+                              </li>
+                            {% endif %}
+                          </ul>
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingThree">
+                        <h4 class="panel-title">
+                          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree" class="">
+                            Offer Documents
+                            <span class="icon"></span>
+                          </a>
+                        </h4>
+                      </div>
+                      <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingThree">
+                        <div class="panel-body">
+                          <div class="buyer-doc">
+                            <h6>Buyer Documents</h6>
+                            <div class="btns">
+                              {% if offer.document %}<a href="javascript:void(0)" class="btn btn-secondary btn-sm" onclick="get_offer_documents('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}');"><i class="fas fa-eye"></i> View Document</a>{% else %}-{% endif %}
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingFour">
+                          <h4 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="true" aria-controls="collapseFour" class="">
+                                Offer Details
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFour">
+                        <div class="panel-body">
+                          <div class="table-responsive">
+                            <table width="100%" class="table table-scroll offerdetailTable">
+                              <thead>
+                                <tr>
+                                  <th>
+                                    User
+                                  </th>
+                                  <th>
+                                    Offer Amount
+                                  </th>
+                                  <th>
+                                    Status
+                                  </th>
+                                  
+                                  <th>
+                                    Action
+                                  </th>
+                                  <th>
+                                    Date
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% if offer.offer_history|length > 0 %}
+                                  {% for history in offer.offer_history %}
+                                  <tr>
+                                    <td>
+                                      {% if user_id == history.user %}
+                                      You
+                                    {% else %}
+                                      {{ history.first_name }} {{ history.last_name }}
+                                    {% endif %}
+                                    </td>
+                                    <td>
+                                      ${{ history.offer_price|convert_float|intcomma|default:'0' }}
+                                    </td>
+                                    <td>
+                                      <span class="badge badge-success">
+                                        {{ history.status }}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <a href="javascript:void(0)" onclick="show_offer_message('{{ history.comments|escape_char|default:'NA' }}');" class="blue-text" title="View Message">View Details</a>
+                                    </td>
+                                    <td class="convert_to_local_date_time" data-value="{{ history.added_on|default:'' }}">
+                                      {{ history.added_on|default:'' }}
+                                    </td>
+                                  </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                  <td colspan="5">
+                                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                                  </td>
+                                </tr>
+                                {% endif %}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                  </div><!-- End .panel-group -->
+
+                </div>
+                <div class="clearfix">
+                  <button class="btn btn-green btn-sm" id="accept_offer" {% if offer.can_accept %}onclick="confirm_seller_accept_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_accept %}disabled{% endif %}>Accept Offer</button> <button class="btn btn-primary btn-sm" id="counter_offer" {% if offer.can_counter %}onclick="counter_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_counter %}disabled{% endif %} >Make Counter Offer</button>
+                  <button class="btn btn-secondary btn-sm" id="reject_offer"  {% if offer.can_reject %}onclick="confirm_seller_reject_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_reject %}disabled{% endif %}>Decline Offer</button>
+                </div>
+              </div><!-- End .offerdetail-main -->
+
+            </div><!-- End .viewoffer-wrap -->
+
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+
+    </div><!-- End .right-sidebar -->
+  </div><!-- End .dashboard-wrap -->
+
+
+  <div id="sendLoiModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Send LOI</h5>
+          <button type="button" class="close" id="close_send_loi_pop_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="send_loi_frm" id="send_loi_frm" method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <input type="hidden" name="property_id" id="loi_property_id" value="" />
+            <input type="hidden" name="negotiated_id" id="loi_negotiated_id" value="" />
+            <input type="hidden" name="user_id" id="loi_user_id" value="" />
+
+            <div class="form-group">
+              <label for="loi_email" class="pb10">Email</label>
+              <input type="email" class="form-control bdr" name="loi_email" id="loi_email" placeholder="Enter Email">
+            </div>
+            <div class="form-group">
+              <label for="loi_comment" class="pb10">Message</label>
+              <textarea name="loi_comment" class="form-control textarea bdr" id="loi_comment" cols="30" rows="4" placeholder="Enter Your Message"></textarea>
+            </div>
+
+            <div class="clearfix center">
+              <button type="submit" class="btn btn-secondary">Send</button> <button type="button" data-dismiss="modal" class="btn btn-primary-bdr" id="close_send_loi_pop">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .sendLoiModal -->
+<div id="viewOfferDocumentModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Documents</h5>
+          <button type="button" class="close" id="close_offer_doc_popup_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <ul class="document-list" id="offer_doc_list">
+
+              </ul>
+
+            </div>
+
+            <div class="clearfix center">
+               <button type="button" data-dismiss="modal" class="btn btn-primary-bdr" id="close_offer_doc_popup">Close</button>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div><!-- End .viewOfferDocumentModal -->
+<div id="offerChatModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+      <div class="modal-header">
+          <h5 class="modal-title">Chat</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <form name="offerChatFrm" id="offerChatFrm" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="property_id" id="chat_property_id"/>
+          <input type="hidden" name="user_id" id="chat_user_id"/>
+      <div class="modal-body">
+          <div class="form-group">
+              <label for="user_message" class="pb10">Enter your message</label>
+              <textarea name="user_message" id="user_message" cols="30" rows="10" class="form-control bdr" placeholder="Type a message"></textarea>
+          </div>
+          <div class="center">
+              <button type="submit" class="btn btn-secondary width100">Send</button>
+          </div>
+      </div>
+      </form>
+      </div>
+  </div>
+  </div><!-- End .chatagentModal -->
+<div id="counterOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Counter Offer</h5>
+          <button type="button" class="close" id="close_counter_popup_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="counter_offer_frm" id="counter_offer_frm" method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <input type="hidden" name="property_id" id="counter_property_id" value="" />
+            <input type="hidden" name="negotiated_id" id="negotiated_id" value="" />
+            <div class="form-group">
+              <label for="existing_offer_price" class="pb10">Existing Offer amount</label>
+              <input type="text" class="form-control bdr" name="existing_offer_price" id="existing_offer_price" placeholder="Enter Existing Offer Amount" readonly>
+            </div>
+            <div class="form-group">
+              <label for="offer_price" class="pb10">Counter Offer amount</label>
+              <input type="text" class="form-control bdr" name="offer_price" id="offer_price" placeholder="Enter Counter Offer amount" maxlength="14">
+            </div>
+            <div class="form-group">
+              <label for="offer_comment" class="pb10">Message</label>
+              <textarea name="offer_comment" class="form-control textarea bdr" id="offer_comment" cols="30" rows="4" placeholder="Enter Your Message"></textarea>
+            </div>
+            <!--<p class="font13">
+              By clicking Submit Counter Offer you understand that if the participant accept, <br>
+              your listing will immediately end per the <span class="blue-text">listing agreement.</span>
+            </p>-->
+            <div class="clearfix center">
+              <button class="btn btn-secondary">Submit Counter Offer</button> <button type="button" class="btn btn-primary-bdr" id="close_counter_popup">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .counterOfferModal -->
+<div id="confirmRejectOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Reject Confirmation</h5>
+                  <button type="button" class="close" id="reject_offer_false_top">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="property_id" id="rej_property_id" value=""/>
+                <input type="hidden" name="negotiated_id" id="rej_negotiated_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Do you want to Reject Offer?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button" class="btn btn-primary reject_offer_btn" id="reject_offer_true" onclick="reject_traditional_offer()">Yes</button> <button type="button" data-dismiss="modal" class="btn btn-primary-bdr reject_offer_btn" id="reject_offer_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .confirmRejectOfferModal -->
+<div id="confirmAcceptOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Accept Confirmation</h5>
+                  <button type="button" class="close" id="accept_offer_false_top">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="property_id" id="accept_property_id" value=""/>
+                <input type="hidden" name="negotiated_id" id="accept_negotiated_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Do you want to Accept Offer?
+                  </p>
+                  <div class="clearfix center">
+                     <button type="button" class="btn btn-primary accept_offer_btn" id="accept_offer_true" onclick="accept_traditional_offer()">Yes</button> <button type="button" data-dismiss="modal" class="btn btn-primary-bdr accept_offer_btn" id="accept_offer_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .confirmAcceptOfferModal -->
+<div id="viewMsgHistoryModal" class="modal centered-modal personalModalwrap confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Message</h5>
+        <button type="button" class="close" id="msg_close_true" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="user_msg">
+
+        </p>
+        <div class="clearfix center">
+          <p>
+            <button data-dismiss="modal" type="" class="btn btn-secondary confirm_bid_btn" id="msg_true">OK</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+  <script type="text/javascript" src="{% static 'admin/js/all.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/toggle-nav.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/ckeditor/ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/article.js' %}?v=1.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=3.8"></script>
+    <script type="text/javascript" src="{% static 'admin/js/properties.js' %}?v=4.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+      <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+
+</body>
+</html>

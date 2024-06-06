@@ -1,0 +1,211 @@
+@mixin breakpoint($point) {
+  @if $point == laptop {
+    @media (max-width: 1500px) {
+      @content;
+    }
+  } @else if $point == lg {
+    @media (max-width: 1280px) {
+      @content;
+    }
+  } @else if $point == md {
+    @media (max-width: 1199px) {
+      @content;
+    }
+  } @else if $point == sm {
+    @media (max-width: 991px) {
+      @content;
+    }
+  } @else if $point == xs {
+    @media (max-width: 767px) {
+      @content;
+    }
+  } @else if $point == xxs {
+    @media (max-width: 479px) {
+      @content;
+    }
+  }
+}
+
+.makeOfferModalwrap {
+  .modal-content {
+    background: #FFF;
+    border-radius: 0;
+    .modal-header {
+      border-bottom: none;
+      padding: 25px 50px;
+      h4 {
+        font-family: 'PT Serif';
+        line-height: 24px;
+        font-weight: 500;
+        font-size: 28px;
+        color: $black;
+        text-align: center;
+        margin-bottom: 0px;
+        @include breakpoint(lg) {
+          font-size: 20px;
+        }
+      }
+      
+    }
+    .modal-body {
+      padding: 0 50px 0;
+      h6 {
+        color: $gray;
+        font-size: $fontMedium;
+        font-weight: normal;
+        line-height: 22px;
+        text-align: center;
+        padding: 0 50px 20px;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #E8E8E8;
+      }
+    }
+    .modal-footer {
+      padding: 10px 50px 30px;
+      border: none;
+      text-align: left;
+    }
+    .list-price {
+      .form-control {
+        padding-left: 10px;
+      }
+      .dollar {
+        position: absolute;
+        left: 0;
+        top: 31px;
+        z-index: 1;
+        color: rgba($color: $black, $alpha: 0.5);
+      }
+    }
+    
+    .listing-type {
+      display: flex;
+      align-items: center;
+      padding-top: 10px;
+      li {
+        padding-right: 30px;
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+    }
+
+  }
+}
+
+.personalModalwrap {
+  .modal-content {
+    background: #FFF;
+    border-radius: 0;
+    .modal-header {
+      border-bottom: none;
+      h5 {
+        line-height: 24px;
+        font-weight: 500;
+        text-align: center;
+      }
+    }
+  }
+}
+
+
+
+.innovation-popup {
+  .modal-header {
+    border-bottom: none;
+    padding: 0;
+  }
+  .modal-head {
+    h2 {
+      @include font-bold();
+      color: $secondary;
+      span {
+        font-size: 80%;
+      }
+      em {
+        @include font-regular();
+        color: rgba($color: #242424, $alpha: 0.9);
+        font-style: normal;
+        font-size: $fontExtraLarge;
+      }
+    }
+  }
+  .modal-bottom {
+    h4 {
+      color: #000;
+      @include font-bold();
+    }
+    a {
+      color: #103ab1;
+    }
+    ul {
+      margin-bottom: 20px;
+      li {
+          padding: 0 0 5px 25px;
+          color: #000;
+          list-style: none;
+          position: relative;
+          @media screen and (max-width: 1600px) {
+              font-size: $fontExtraLarge;
+          }
+          &:before {
+              content: "";
+              position: absolute;
+              left: 0;
+              top: 15px;
+              width: 6px;
+              height: 6px;
+              background: #949494;
+              @include border-radius(100%);
+          }
+          &:last-child {
+              padding-bottom: 0;
+              margin-bottom: 0;
+          }
+      }
+    }
+    .pink-box {
+      background: #c2103a;
+      padding: 30px;
+      color: $white;
+      margin-top: 20px;
+      @include border-radius(10px);
+      .table {
+        padding-bottom: 20px;
+        .table-cell {
+          vertical-align: middle;
+          h2 {
+            @include font-black();
+            span {
+              @include font-semi();
+            }
+          }
+          &:first-child {
+            width: 30%;
+            border-right: 2px solid #8b0e2c;
+          }
+          &:last-child {
+            padding-left: 30px;
+          }
+        }
+      }
+      ul {
+        margin-bottom: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        li {
+          color: $white;
+          padding: 0;
+          list-style: none;
+          &:before {
+            content: none;
+          }
+        }
+      }
+    }
+  }
+  .scroll {
+    max-height: 550px;
+  }
+}

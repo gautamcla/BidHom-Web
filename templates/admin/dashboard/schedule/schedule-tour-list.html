@@ -1,0 +1,83 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if schedule_tour_list %}
+                {% for schedule in schedule_tour_list %}
+                <div class="listing_blocks" id="schedule_row_{{ schedule.id }}">
+                  <ul class="bottom">
+                    <li>
+                      No :  {{ forloop.counter0|add:sno }}
+                    </li>
+                    <li>
+                      Availability | {{ schedule.availability|default:"" }}
+                    </li>
+                    <li>
+                      Scheduled Date | {{ schedule.schedule_date|parse_iso|date:'m-d-Y'|default:'' }}
+                    </li>
+                    <li>
+                      Created Date | {{ schedule.added_on|parse_iso|date:'m-d-Y'|default:'' }}
+                    </li>
+                  </ul>
+                  <ul class="top">
+                    <li>
+                      <span class="badge {% if schedule.status|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                        {{ schedule.status|default:'' }}
+                      </span>
+                      <h6 class="name">
+                        <a href="/asset-details/?property_id={{ schedule.property_id }}" target="_blank" class="blue-text">{{ schedule.property_address_one|default:"" }}, {{ schedule.property_city|default:"" }}, {{ schedule.property_state|default:"" }} {{ schedule.property_postal_code|default:"" }}</a>
+                      </h6>
+                    </li>
+                    <li>
+                      <h6 class="buyer-name">
+                        <i class="fa-solid fa-user"></i>
+                        {{ schedule.first_name|default:"" }} {{ schedule.last_name|default:"" }}
+                        <span>
+                          Name
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      <div class="email-text">
+                        <i class="fa-solid fa-envelope"></i>
+                        {{ schedule.email|default:"" }}
+                      </div>
+                      <div class="email-text">
+                        <i class="fa-solid fa-phone"></i>
+                        {{ schedule.phone_no|default:''|format_phone }}
+                      </div>
+                    </li>
+                    <li>
+                      <h6 class="buyer-name">
+                        <i class="fa-solid fa-user"></i>
+                        {{ schedule.tour_type|default:"" }}
+                        <span>
+                          Tour Type
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      <div class="email-text">
+                        <i class="fa-solid fa-comment-dots"></i>
+                        <a href="javascript:void(0)" onclick='msg_detail("{{ schedule.message }}")'>View Message</a>
+                      </div>
+                    </li>
+                  </ul>
+                </div><!-- End .block-item -->
+                {% endfor %}
+                {% else %}
+                <div class="parcel_blocks">
+                  <ul class="bottom">
+                    <li>
+                      No data Available
+                    </li>
+                  </ul>
+                  <ul class="top">
+                    <li class="fullwidth">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" />
+                    </li>
+                  </ul>
+                </div><!-- End .block-item -->
+                {% endif %}
+
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.6"></script>
+{% endblock %}

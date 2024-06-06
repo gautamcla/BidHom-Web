@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <g id="edit" transform="translate(-1327 -192)">
+    <g id="Ellipse_282" data-name="Ellipse 282" transform="translate(1327 192)" fill="none" stroke="#528ac1" stroke-width="2">
+      <circle cx="10.5" cy="10.5" r="10.5" stroke="none"/>
+      <circle cx="10.5" cy="10.5" r="9.5" fill="none"/>
+    </g>
+    <path id="edit-2" data-name="edit" d="M6.475,11.55h6.65a.475.475,0,1,1,0,.95H6.475a.475.475,0,1,1,0-.95ZM6,9.175l4.75-4.75L12.175,5.85,7.425,10.6H6ZM11.225,3.95l.95-.95L13.6,4.425l-.951.951Z" transform="translate(1327.699 194.358)" fill="#528ac1" fill-rule="evenodd"/>
+  </g>
+</svg>

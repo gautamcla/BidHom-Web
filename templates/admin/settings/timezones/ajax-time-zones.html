@@ -1,0 +1,73 @@
+{% load static %}
+
+<div class="table-responsive">
+<table class="table table-striped jambo_table bulk_action">
+    <thead>
+    <tr class="headings">
+    <th class="column-title">ID </th>
+        <th class="column-title">Timezone </th>
+        <th class="column-title">Offset </th>
+        <th class="column-title"> Offset DST</th>
+        <th class="column-title">Status </th>
+        <th class="column-title no-link last" style="width:20%"><span class="nobr">Action</span>
+        </th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% if data.total > 0 %}
+        {% for time in data.data %}
+        <tr class="even pointer">
+                <td class=" ">{{ forloop.counter|add:start_index }}</td>
+            <td>
+                {{time.timezone}}
+            </td>
+            <td>{{time.offset|default:'-'}}</td>
+            <td>
+            {{time.offset_dst}} 
+            </td>
+            <td>
+                {% if time.is_active %}
+                    <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{time.id}}">Active</button> 
+                    {% else %}
+                    <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{time.id}}">Inactive</button> 
+                {% endif %}
+            </td>
+           <td class="last">
+                <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                <form method="post" data-id="{{time.id}}" action="{% url 'admin-time-zones-status-change' %}" class="ActiveInactive" >
+                    {% csrf_token %}
+                    <input type="hidden" name="timezone_id" value="{{time.id}}">
+                    <input type="hidden" class="status-change" name="status" value="{{time.is_active|yesno:"0,1"}}">
+                    {% if time.is_active%}
+                    <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                    {% endif %}
+                </form>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>  <td class=" ">No Timezone available </td></tr>
+    {% endif %}
+    
+    </tbody>
+</table>
+</div>
+
+{% if data.total > 0 %}
+<nav aria-label="Page navigation example" style="float:right;">
+  <ul class="pagination justify-content-end">
+    {{pagination|safe}}
+  </ul>
+</nav>
+{% endif %}
+{% block js_content %}
+  <script>
+  $(function() {
+    $('#totalCount').html('{{data.total}}')
+  });
+  </script>
+{% endblock %}

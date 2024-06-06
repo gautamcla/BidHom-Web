@@ -1,0 +1,159 @@
+
+a.menu-link {
+    color: $white;
+    background: $secondary;
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    display: block;
+    text-decoration: none;
+    i {
+      line-height: 45px;
+    }
+  }
+  
+  
+  
+  .menu-link:hover span { border-color: #666; }
+  
+  .menu, .menu > ul, .menu > ul ul {
+    clear: both;
+    display: flex;
+    flex-flow: column;
+    margin: 0;
+  }
+  
+  .menu.active {
+    background: #FFF;
+    border-bottom: 1px solid #d8d8d8;
+    border-top: 1px solid #d8d8d8;
+    margin: 0;
+    max-height: 55em;
+    width: 100vw;
+    position: absolute;
+    left: 0;
+    top: 50px;
+  }
+  
+  .js .menu > ul ul.active {
+    margin: 0;
+    max-height: 55em;
+    padding: 0;
+  }
+  
+  .menu > ul { padding: 0; }
+  
+  nav li {
+    display: inline-block;
+    margin: 0;
+    position: relative;
+  }
+  
+  .menu li a {
+    color: #000;
+    display: inline-block;
+    font-size: $fontExtraLarge;
+    line-height: 46px;
+    padding: 0 25px;
+    text-decoration: none;
+    
+  }
+  
+  span.has-subnav {
+    display: block;
+    font-size: 1em;
+    line-height: 46px;
+    position: absolute;
+    right: 20px;
+    padding: 0 0.5em;
+    top: 0;
+  }
+   @media screen and (max-width:800px) {
+  
+  .menu,  .menu > ul ul {
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  
+  .menu li a {
+    border-bottom: 1px solid #d8d8d8;
+    display: block;
+    padding-left: 15px;
+  }
+  
+  .menu li li a { padding-left: 50px; }
+  
+  .menu li:last-child a { border: none; }
+  
+  .menu li li:last-child a { border-bottom: 1px solid #d8d8d8; }
+  
+  .menu li:hover { background: #EDEDED; }
+  }
+  @media screen and (min-width: 801px) {
+  
+  nav { }
+  
+  a.menu-link { display: none; }
+  
+  .js .menu,  .js .menu > ul ul {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  .js .menu > ul li:hover > ul { display: flex; }
+  
+  .menu ul {
+    display: flex;
+    flex-flow: row;
+    height: 45px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .menu span.has-subnav { display: none; }
+  
+  .menu li a:hover { 
+    color: $secondary; 
+  }
+  
+  
+  .menu li li a:hover {
+    background: rgba(164,208,94,0.1);
+    color: #000;
+  }
+  
+  .menu ul ul {
+    background: #fff;
+    border: solid 1px rgba(164,208,94,1);
+    border-radius: 2px 2px 5px 5px;
+    border-top: solid 2px transparent;
+    display: none;
+    height: auto;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    text-align: left;
+    top: 43px;
+    width: 150px;
+    z-index: 999;
+  }
+  
+  .chrome .js .menu > ul ul { top: 43px; }
+  
+  .menu ul ul.wide { width: 300px; }
+  
+  .menu ul ul li {
+    border-bottom: solid 1px rgba(164,208,94,0.5);
+    display: inline-block;
+    position: relative;
+  }
+  
+  .menu > ul ul li:last-child { border-bottom: none; }
+  
+  .menu ul ul li a {
+    display: block;
+    padding-left: 10px;
+  }
+  }
+  

@@ -1,0 +1,173 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if bidder_list %}
+  {% if bidder_list|length > 3 %}
+    {% define_var bidder_list|length|add:'-1' as first_row %}
+    {% define_var bidder_list|length as second_row %}
+  {% else %}
+    {% define_var 0 as first_row %}
+    {% define_var 0 as second_row %}
+  {% endif %}
+{% for bidder in bidder_list %}
+<div class="listing_blocks {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}" id="row_{{ bidder.id }}" id="row_{{ bidder.id }}"  data-auction="{{ bidder.auction_id }}" data-property="{{ bidder.property }}" data-user="{{ bidder.user_id }}">
+  <ul class="bottom">
+    <li>
+      Approval Status:  <span style="margin-left: 2px;" class=" {% if bidder.is_approved|lower == 'pending' %} {% elif bidder.is_approved|lower == 'approved' %} {% elif bidder.is_approved|lower == 'declined' %} {% else %} {% endif %}">{{ bidder.is_approved|default:'' }}</span>
+    </li>
+    <li>
+      <i class="fa-solid fa-calendar-days"></i> IP Address | {{ bidder.ip_address|default:'' }}
+    </li>
+    <li>
+      <i class="fa-solid fa-calendar-days"></i> Registration Date | <span class="convert_to_local_date_time" data-value="{{ bidder.added_on|default:'' }}">{{ bidder.added_on|default:'' }}</span>
+    </li>
+    <li>
+      <i class="fa-solid fa-calendar-days"></i> Last update | <span class="convert_to_local_date_time" data-value="{{ bidder.updated_on|default:'' }}">{{ bidder.updated_on|default:'' }}</span>
+    </li>
+  </ul>
+  <ul class="top">
+    <li>
+      <span class="badge {% if bidder.is_reviewed|lower == 'reviewed' %}badge-success{% elif bidder.is_reviewed|lower == 'not reviewed' %}badge-info{% else %}badge-warning{% endif %}">{{ bidder.is_reviewed|default:'' }}</span>
+      <h6 class="name">
+        Review Status
+      </h6>
+      <p class="company">
+        {% comment %} 
+          <span>Company:</span> {{ bidder.company|default:'' }}
+        {% endcomment %}
+      </p>
+    </li>
+    <li>
+      <div class="location">
+        <i class="fas fa-map-marker-alt"></i> <a href="/asset-details/?property_id={{ bidder.property }}" target="_blank" class="blue-text">{{ bidder.property_address_one|default:'' }}, {{ bidder.property_city|default:'' }}, {{ bidder.property_state|default:'' }} {{ bidder.property_postal_code|default:'' }}</a>
+      </div>
+    </li>
+    <li>
+      <h5 class="buyer-name">
+        <i class="fa-solid fa-user-large"></i>
+        {{ bidder.registrant|default:'' }}
+        <span>
+          Buyer Name
+        </span>
+      </h5>
+    </li>
+    <li>
+      <div class="email-text">
+        <i class="fa-solid fa-envelope"></i> {{ bidder.email|default:'' }}
+      </div>
+      <div class="email-text">
+        <i class="fa-solid fa-phone"></i> {{ bidder.phone_no|default:''|format_phone }}
+      </div>
+    </li>
+    <li>
+      <div class="action-icon">
+        <span class="view-list">
+          <i class="fa-solid fa-ellipsis"></i>
+          <ul>
+            <li>
+              <a href="/admin/bidder-registration-details/?id={{ bidder.id }}"><i class="fas fa-edit"></i> Edit</a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" onclick="bidder_delete_confirmation({{ bidder.id }}, {{ bidder.auction_id }}, {{ bidder.property }}, {{ bidder.user_id }},'{{ bidder.bid_count|default:'0' }}')"><i class="fas fa-trash-alt"></i> Delete</a>
+            </li>
+          </ul>
+        </span>
+      </div>
+      <div class="bid-text">
+        <div class="icons">
+          <i class="fa-solid fa-user-tie fa-2x"></i>
+        </div>
+        <h4>
+          {{ bidder.user_type|default:'' }}
+          <span>
+            Buyer Type
+          </span>
+        </h4>
+      </div>
+    </li>
+
+    <!-- <li class="bidder-regis">
+        <p class="mb10 pt10">
+          <strong><label for="">Property Address</label></strong><br>
+          <a href="/asset-details/?property_id={{ bidder.property }}" target="_blank" class="blue-text">{{ bidder.property_address_one|default:'' }}, {{ bidder.property_city|default:'' }}, {{ bidder.property_state|default:'' }} {{ bidder.property_postal_code|default:'' }}</a>
+        </p>
+        <div class="block-status pb0">
+          <div class="item">
+            <strong><label for="">Email</label></strong><br>
+            {{ bidder.email|default:'' }}
+          </div>
+          <div class="item">
+            <strong><label for="">Phone </label></strong><br>
+            {{ bidder.phone_no|default:''|format_phone }}
+          </div>
+        </div>
+    </li> -->
+    <!-- <li>
+      <div class="block-status">
+        <div class="item">
+          <strong><label for="">Review Status</label></strong><br>
+          <span class="badge {% if bidder.is_reviewed|lower == 'reviewed' %}badge-success{% elif bidder.is_reviewed|lower == 'not reviewed' %}badge-info{% else %}badge-warning{% endif %}">{{ bidder.is_reviewed|default:'' }}</span>
+        </div>
+        <div class="item">
+          <strong><label for="">Approval Status </label></strong><br>
+          <span class="badge {% if bidder.is_approved|lower == 'pending' %}badge-warning{% elif bidder.is_approved|lower == 'approved' %}badge-success{% elif bidder.is_approved|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">{{ bidder.is_approved|default:'' }}</span>
+        </div>
+      </div>
+      <div class="block-status pb0">
+        <div class="item">
+          <strong><label for="">Buyer Name</label></strong><br>
+          {{ bidder.registrant|default:'' }}
+        </div>
+        <div class="item">
+          <strong><label for="">Buyer Type </label></strong><br>
+          {{ bidder.user_type|default:'' }}
+        </div>
+      </div>
+    </li> -->
+    <!-- <li>
+      <div class="action-icon">
+        <span class="view-list">
+          <i class="fa-solid fa-ellipsis"></i>
+          <ul>
+            <li>
+              <a href="/admin/bidder-registration-details/?id={{ bidder.id }}"><i class="fas fa-edit"></i> Edit</a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" onclick="bidder_delete_confirmation({{ bidder.id }}, {{ bidder.auction_id }}, {{ bidder.property }}, {{ bidder.user_id }},'{{ bidder.bid_count|default:'0' }}')"><i class="fas fa-trash-alt"></i> Delete</a>
+            </li>
+          </ul>
+        </span>
+      </div>
+      
+      <div class="block-status pt10">
+        <div class="item">
+          <strong><label for="">Registration Date</label></strong><br>
+          <span class="convert_to_local_date_time" data-value="{{ bidder.added_on|default:'' }}">{{ bidder.added_on|default:'' }}</span>
+        </div>
+        <div class="item">
+          <strong><label for="">Last Updated </label></strong><br>
+          <span class="convert_to_local_date_time" data-value="{{ bidder.updated_on|default:'' }}">{{ bidder.updated_on|default:'' }}</span>
+        </div>
+      </div>
+
+      <div class="block-status pb0">
+        <div class="item">
+          <strong><label for="">IP Address</label></strong><br>
+          {{ bidder.ip_address|default:'' }}
+        </div>
+        <div class="item">
+          {% comment %} 
+          <strong><label for="">Company </label></strong><br>
+            {{ bidder.company|default:'' }}
+          {% endcomment %}          
+        </div>
+      </div>
+    </li> -->
+  </ul>
+</div>
+{% endfor %}
+{% else %}
+<div class="block-item">
+  <div class="item fullwidth"><img src="{% static 'admin/images/no-data-image.png' %}"/></div>
+</div>
+{% endif %}
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}"></script>

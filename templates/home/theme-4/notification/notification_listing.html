@@ -1,0 +1,24 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if notification_list %}
+{% for notification in notification_list %}
+<li class="notiMenu">
+  <i class="fas fa-bell"></i>
+  <a href="{% if notification.redirect_url %}{{ notification.redirect_url }}{% else %}{% endif %}">
+    <h6>
+      {{ notification.title|default:'' }}
+      <span class="convert_notification_date_time" data-value="{{ notification.added_on|default:'' }}"></span>
+    </h6>
+    <small class="date">{{ notification.content|default:''|safe }}</small>
+  </a>
+</li>
+{% endfor %}
+{% else %}
+<li class="notiMenu">
+  <img src="{% static 'theme-4/images/no-data-image.png' %}" class=" center mb0" alt="real estate sales" role="img" />
+</li>
+{% endif %}
+
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+{% endblock %}

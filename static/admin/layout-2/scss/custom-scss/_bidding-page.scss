@@ -1,0 +1,331 @@
+.bidding-header {
+    padding: 15px 0 3px;
+    ul {
+        display: flex;
+        justify-content: space-between;
+        li {
+            padding: 0 1px 0 0;
+            width: 33.3%;
+            &:last-child {
+                padding-right: 0;
+            }
+            &.active {
+                a {
+                    color: $secondary;
+                    border-color: $secondary;
+                    .circle {
+                        background: $secondary;
+                    }
+                }
+            }
+            a {
+                color: rgba($color: #000000, $alpha: 0.5);
+                font-size: 20px;
+                padding: 10px;
+                line-height: 26px;
+                border-bottom: 3px solid #707070;
+                display: inline-block;
+                width: 100%;
+                text-align: center;
+                @include breakpoint(lg) {
+                    font-size: $fontExtraLarge;
+                }
+                @include breakpoint(xs) {
+                    font-size: $font14;
+                }
+                &:hover {
+                    color: $secondary;
+                }
+                .circle {
+                    width: 24px;
+                    height: 24px;
+                    line-height: 24px;
+                    color: $white;
+                    background: #9E9E9E;
+                    display: inline-block;
+                    @include border-radius (100%);
+                    @include breakpoint(xxs) {
+                        width: 20px;
+                        height: 20px;
+                        line-height: 20px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.bidding-body {
+    background: #F6F6F6;
+    padding: 15px 40px 40px 40px;
+    margin-bottom: 30px;
+    @include breakpoint(lg) {
+        padding: 10px 20px 20px 20px;
+    }
+    @include breakpoint(xs) {
+        padding: 10px;
+    }
+    .bidding-property {
+        display: flex;
+        align-items: center;
+        padding-bottom: 25px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #CFCFCF;
+        figure {
+            width: 80px;
+            height: 60px;
+            img {
+                width: 100%;
+                height: 100%;
+                max-width: 100%;
+                @include border-radius (4px);
+            }
+        }
+        figcaption {
+            width: calc(100% - 80px);
+            padding-left: 15px;
+            h5 {
+                margin-bottom: 0;
+                font-weight: 500;
+                color: #666;
+                span {
+                    font-weight: 400;
+                    color: #666;
+                    font-size: $fontMedium;
+                    line-height: 20px;
+                    display: block;
+                }
+            }
+        }
+    }
+    .error-msg {
+        padding: 15px 20px;
+        background: #E6EBFF;
+        border: 1px dashed $secondary;
+        margin-bottom: 20px;
+        p {
+            margin-bottom: 0;
+            font-size: $fontMiddle;
+            line-height: 20px;
+        }
+    }
+    .bidder-information {
+        display: flex;
+        justify-content: space-between;
+        .upload-doc {
+            width: 50%;
+            .upload-fav {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-bottom: 20px;
+                .dropzone {
+                    background: #F2F2F2;
+                    border: 1px dashed #8F8F8F;
+                    min-height: inherit;
+                    padding: 30px;
+                    @include breakpoint(lg) {
+                        padding: 20px;
+                    }
+                    .dz-default {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin: 0;
+                        .block {
+                            &:nth-child(2){
+                                font-size: $fontXS;
+                                color: rgba($color: #000000, $alpha: 0.5); 
+                            }
+                        }
+                        .btn {
+                            padding: 0 30px;
+                            @include breakpoint(lg) {
+                                padding: 0 20px;
+                            }
+                        }
+                        h6 {
+                            line-height: 16px;
+                            font-size: $fontMedium;
+                            margin-bottom: 0;
+                            font-weight: 400;
+                            span {
+                                font-size: $fontXS;
+                                display: block;
+                                color: rgba($color: #000000, $alpha: 0.5);
+                            }
+                        }
+                    }
+                }
+                
+                .singleitem {
+                    position: relative;
+                    width: 100%;
+                    .dropzone {
+                        padding: 0;
+                        min-height: auto;
+                        background: transparent;
+                        .dz-message {
+                            margin: 0;
+                            text-align: left;
+                        }
+                    }
+                }
+                .item {
+                    width: 100%;
+                    position: relative;
+                }
+            }
+            
+            .doc-show-list {
+                clear: both;
+                margin-bottom: 30px;
+                ul {
+                    margin: 0;
+                    li {
+                        padding: 0 0 20px;
+                        margin: 0 0 20px;
+                        position: relative;
+                        display: flex;
+                        align-items: center;
+                        border-bottom: 1px solid #D1D1D1;
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                        figure {
+                            width: 25px;
+                            i {
+                                font-size: 22px;
+                            }
+                        }
+                        figcaption {
+                            width: calc(100% - 25px);
+                            padding-left: 10px;
+                            .close-btn {
+                                position: absolute;
+                                right: 0;
+                                color: $black;
+                                line-height: 15px;
+                                font-size: $fontMiddle;
+                            }
+                        }
+                        h6 {
+                            margin-bottom: 0;
+                            line-height: 20px;
+                            font-size: $fontMedium;
+                            font-weight: 400;
+                        }
+                        p {
+                            display: none;
+                            margin-bottom: 0;
+                        }
+                        
+                    }
+                }
+            }
+        }
+        .doc-info {
+            width: 35%;
+            h6 {
+                display: flex;
+                justify-content: space-between;
+                font-size: $fontMedium;
+                font-weight: 500;
+                margin-bottom: 10px;
+                a {
+                    font-weight: 400;
+                    color: $secondary;
+                }
+            }
+            .info-box {
+                padding: 20px 30px;
+                background: $white;
+                border: 1px dashed #B1B1B1;
+                @include border-radius (12px);
+                ul {
+                    li {
+                        font-size: $fontMedium;
+                        line-height: 25px;
+                        padding: 0 0 15px 25px;
+                        position: relative;
+                        &:last-child {
+                            padding-bottom: 0;
+                        }
+                        .icon {
+                            position: absolute;
+                            left: 0;
+                            top: 6px;
+                            width: 15px;
+                            height: 14px;
+                            background: $iconBg;
+                            &.icon-user {
+                                background-position: -285px -572px;
+                            }
+                            &.icon-business {
+                                background-position: -316px -572px;
+                            }
+                            &.icon-address {
+                                background-position: -194px -572px;
+                            }
+                            &.icon-mail {
+                                background-position: -225px -572px;
+                            }
+                            &.icon-phone {
+                                background-position: -254px -572px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    h4 {
+        font-family: 'PT Serif';
+        color: $black;
+        font-size: 28px;
+        line-height: 28px;
+        font-weight: bold;
+        padding-left: 10px;
+        margin-bottom: 40px;
+        border-left: 2px solid $secondary;
+        display: flex;
+        align-items: center;
+        @include breakpoint(lg) {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        @include breakpoint(sm) {
+            margin-bottom: 20px;
+        }
+        .hr-line {
+            margin-left: 15px;
+            width: 75px;
+            height: 1px;
+            background: $secondary;
+            display: inline-block;
+        }
+    }
+    .form-control {
+        background: transparent;
+        border-color: #687480;
+        color: rgba($color: #000000, $alpha: 0.7);
+    }
+    .chosen-container-single .chosen-single {
+        background: transparent;
+        color: rgba($color: #000000, $alpha: 0.7);
+    }
+    .bidding-success {
+        text-align: center;
+        padding: 5% 0;
+        h4 {
+            font-family: "Roboto";
+            font-weight: 400;
+            border-left: none;
+            display: inherit;
+            margin-bottom: 10px;
+        }
+        
+    }
+}

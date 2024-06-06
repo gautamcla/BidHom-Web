@@ -1,0 +1,144 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+{% load humanize %}
+<div class="dashboard-body">
+  <form method="post" name="update_membership_frm" id="update_membership_frm" autocomplete="off">
+    {% csrf_token %}
+    <div class="row dashboard_section payment_section">
+            <div class="col-md-12 col-sm-12">
+              <div class="website-plan-back">
+                <a href="/admin/" class="dashboard_back_btn_new"><i class="fas fa-chevron-left"></i> Back</a>
+              </div>
+
+              <div class="website-plan">
+                <div class="steps">
+                  <ul class="progress-barr">
+                    <li class="active">
+                      <a href="javascript:void(0)">
+                        <span class="circle">
+                          <div class="icon plan-icon"></div>
+                        </span>
+                      </a>
+                      <span class="name">Select Plan</span>
+                    </li>
+                    {% comment %}
+                    <li class="active">
+                      <a href="javascript:void(0)">
+                        <span class="circle">
+                          <div class="icon website-icon"></div>
+                        </span>
+                      </a>
+                      <span class="name">Select Website Theme</span>
+                    </li>
+                    {% endcomment %}
+                    <li class="active">
+                      <a href="javascript:void(0)">
+                        <span class="circle">
+                          <div class="icon payment-icon"></div>
+                        </span>
+                      </a>
+                      <span class="name">Payment</span>
+                    </li>
+                  </ul>
+                </div>
+              </div><!-- End .website-plan -->
+              
+              <div class="payment-plan">
+                <div class="block">
+                  <div class="item-block">
+                    <h6>
+                      Payment Method
+                    </h6>
+
+                    <div class="pt20 center">
+<!--                      <button type="button" name="pay_now" id="pay_now" class="btn btn-primary">Pay Now</button>-->
+<!--                          <stripe-buy-button id="stripe_button_id" buy-button-id='{% if show_active_plan %}{{ data.stripe_active_button_id }}{% else %}{{ data.stripe_button_id }}{% endif %}' publishable-key='{{ stripe_publishable_key }}' success_url="google.com" customer-email="{{email}}"></stripe-buy-button>-->
+                        <stripe-buy-button id="stripe_button_id" buy-button-id='{{ data.stripe_active_button_id }}' publishable-key='{{ stripe_publishable_key }}' success_url="" customer-email="{{email}}"></stripe-buy-button>
+                          <p>Please use your registered email with the account at the of payment.</p>
+                    </div>
+                  </div><!-- End .item-block -->
+                </div><!-- End .block -->
+                <div class="block">
+
+                  <div class="item-block">
+                    <h6>
+                      <span class="card-icon"></span> Your Order
+                    </h6>
+                    {% comment %}
+                    <p>
+                      <small id="selectedThemeName">Selected Design: <strong class="blue-text">{{ data.theme_name|default:'Real Estate' }}</strong></small>
+                    </p>
+                    {% endcomment %}
+                    <div class="clear"></div>
+                      <a class="btn btn-secondary" href="/admin/?change_plan=yes">Change Plan</a>
+                    <div class="clear"></div>
+                    <div class="payment-image">
+                      <ul>
+                          {% if data.theme_id == 1 %}
+                            <li class="theme_img" id="theme_1" style="">
+                              <img src="{% static 'admin/images/order-item.jpg' %}" alt="">
+                            </li>
+                          {% elif data.theme_id == 5 %}
+                            <li class="theme_img" id="theme_2" style="display:none;">
+                              <img src="{% static 'admin/images/order-item-2.jpg' %}" alt="">
+                            </li>
+                          {% else %}
+                              <li class="theme_img" id="theme_3" style="display:none;">
+                                <img src="{% static 'admin/images/order-item-3.jpg' %}" alt="">
+                              </li>
+                          {% endif %}
+                      </ul>
+                    </div>
+
+                    <h5 id="selectedPlanName">
+                      {{ data.plan_name }}
+                    </h5>
+                    <small id="selectedPlanCost">
+                      Setup fee: ${{ data.cost }}
+                    </small>
+                  </div><!-- End .item-block -->
+                </div><!-- End .block -->
+              </div><!-- End .payment-plan -->
+            </div><!-- End .col-md-12 -->
+    </div><!-- End .row -->
+  </form>
+</div><!-- End .dashboard-body -->
+
+<div class="overlay" style="display:none;">
+  <div class="loader">Loading...</div>
+</div>
+{% endblock %}
+
+{% block js_content %}
+    <script>
+      var current_plan_id = '{{ plan_details.subscription_id }}';
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+      function theme_preview(theme_id){
+      window.open('/admin/preview-theme/?theme='+theme_id, '_blank', 'width=1100, height=600');
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.5"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dashboard.js' %}?v=2.7"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/payments.js' %}?v=2.7"></script>
+    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+    <script>
+      var stripe = Stripe('{{ stripe_publishable_key }}');
+      setInterval(function(){
+        checkPayment();
+      }, 10000);
+    </script>
+{% endblock %}

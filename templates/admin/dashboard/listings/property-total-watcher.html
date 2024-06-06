@@ -1,0 +1,39 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if all_data %}
+{% for data in all_data %}
+    <tr>
+        <td>
+        {{ forloop.counter|add:start_index }}
+        </td>
+        <td>
+        {% if data.first_name %}
+        {{data.first_name}} {{data.last_name}}
+        {% else %}
+            Anonymous
+        {% endif %}
+        </td>
+         <td>
+        {% if data.email %}
+             <a href="mailto:{{data.email}}">{{data.email}}</a>
+        {% else %}
+            -
+        {% endif %}
+        </td>
+        <td>
+        {% if data.phone_no %}
+        {{data.phone_no|default:''|format_phone}}
+        {% else %}
+            -
+        {% endif %}
+        </td>
+        <td class="convert_to_local_date_time" data-value="{{ data.added_on|default:'' }}">
+        </td>
+    </tr>
+{% endfor %}
+{% endif %}
+
+{% block js_content %}
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+{% endblock %}

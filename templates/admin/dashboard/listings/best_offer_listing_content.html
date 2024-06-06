@@ -1,0 +1,36 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if seller_offer_list|length > 0 %}
+{% for offer in seller_offer_list %}
+
+<div class="block-item {% if forloop.counter0 == 0 %}current{% endif %} {% if offer.is_declined %}declined_offer{% endif %}" id="offer_row_{{ offer.id }}">
+  <div class="item">
+
+    <input type="checkbox" class="css-checkbox offer_checbox" id="search_icon_{{ offer.id }}" value="{{ offer.id }}" onclick="propertyBestOfferDetails({{ offer.id }}, this)" {% if forloop.counter0 == 0 %}checked{% endif %}>
+    <label for="search_icon_{{ offer.id }}" class="check-label" title="{{ offer.buyer.first_name }} {{ offer.buyer.last_name }}">{{ offer.buyer.first_name }} {{ offer.buyer.last_name }}</label>
+  </div>
+  <div class="item">
+    {% if offer.offer_price %}${{ offer.offer_price|convert_float|intcomma|default:'0' }} {% if offer.buyer.id == offer.highest_offer_user %}<span class="highlight">Highest</span>{% endif %}{% else %}-{% endif %}
+  </div>
+  <div class="item convert_to_local_date_time" data-value="{{ offer.date|default:'' }}">
+    {{ offer.date|default:'' }}
+  </div>
+  <!--<div class="item">
+    <a href="javascript:void(0)" onclick="show_offer_chat('{{ offer.property|default:'' }}','{{ offer.buyer.id }}')"><i class="far fa-envelope"></i></a>
+  </div>-->
+</div><!-- End .block-item -->
+{% endfor %}
+{% else %}
+<div class="block-item">
+  <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+</div>
+{% endif %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+  <script>
+    $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+  </script>
+{% endblock %}

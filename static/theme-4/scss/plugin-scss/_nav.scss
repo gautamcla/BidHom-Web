@@ -1,0 +1,361 @@
+@font-face {
+	font-family: "icon-font";
+	src: url('../fonts/icon-font.eot');
+	src: url('../fonts/icon-font.eot?#iefix') format('eot'), url('../fonts/icon-font.woff') format('woff'), url('../fonts/icon-font.ttf') format('truetype'), url('../fonts/icon-font.svg#icon-font') format('svg');
+}
+
+.icon-desktop:before,
+.icon-menu-close:before,
+.icon-menu:before,
+.icon-mobile:before,
+.icon-submenu-down:before,
+.icon-submenu-right:before,
+.icon-world:before,
+header h1:before,
+.nav-button:before,
+.nav-close:before,
+.nav .nav-submenu > a:after,
+.nav > ul > .nav-submenu > a:after {
+	font-family: "icon-font";
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: normal;
+	text-decoration: none;
+	text-transform: none;
+	vertical-align: top;
+}
+
+.nav-button,
+.nav-close {
+	// position: fixed;
+	position: absolute;
+	// top: 18px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 30px;
+	height: 30px;
+	overflow: hidden;
+	z-index: 902;
+	cursor: pointer;
+	text-decoration: none;
+	line-height: 30px;
+	color: $gray;
+	
+	// @include breakpoint(sm) {
+	// 	top: 6px;
+	// }
+}
+
+.nav-button:before,
+.nav-close:before {
+	display: block;
+	text-align: center;
+}
+
+.nav-button {
+	display: block;
+	right: 1rem;
+	font-size: 25px;
+}
+
+.nav-button:before {
+	content: "\E003";
+}
+
+.nav-close {
+	display: none;
+	right: 4rem;
+	font-size: 1.9rem;
+}
+
+.nav-close:before {
+	content: "\E002";
+}
+
+.nav {
+	margin-top: 65px;
+	line-height: 4.4rem;
+	color: $white;
+
+	@include breakpoint(lg) {
+		line-height: 2rem;
+	}
+	@include breakpoint(xs) {
+		margin-top: 48px;
+	}
+}
+
+.nav ul ul {
+  position: relative;
+  left: 0;
+  z-index: 1;
+}
+
+.nav ul ul ul {
+	background: $white;
+}
+
+.nav ul ul ul ul {
+	background: $white;
+}
+
+.nav ul ul ul ul ul {
+	background: $white;
+}
+
+.nav li {
+	cursor: pointer;
+}
+.nav > li {
+  display: inline-block;
+}
+.nav li:hover > a,
+.nav li.nav-active > a {
+	color: $secondary;
+}
+
+.nav .nav-submenu > ul {
+	margin-left: 10px;
+}
+
+.nav a,
+.nav a:hover,
+.nav a:active,
+.nav a:visited {
+	padding: 10px 15px;
+	font-size: $fontLarge;
+	color: $gray;
+	text-decoration: none;
+	display: block;
+	position: relative;
+
+	@include breakpoint(laptop) {
+		padding: 10px 12px;
+	}
+
+	@include breakpoint(lg) {
+		padding: 10px;
+		font-size: $fontMiddle;
+	}
+	@include breakpoint(md) {
+		padding: 10px 8px;
+		font-size: $fontSmall;
+	}
+}
+.nav a:hover {
+	color: $secondary;
+}
+
+.nav .nav-submenu > a:after {
+	position: absolute;
+	display: block;
+	right: 10px;
+	top: 1px;
+	content: "\E005";
+}
+@media only screen and (min-width: 1680px) {
+	.nav a,
+	.nav a:hover,
+	.nav a:active,
+	.nav a:visited {
+		padding: 10px 25px;
+		font-size: $fontExtraLarge;
+	}
+	.nav .nav-submenu > ul {
+		min-width: 260px !important;
+	}
+}
+@media only screen and (min-width: 960px) {
+
+	.nav-button {
+		display: none;
+	}
+
+	.nav {
+		margin: 0 !important;
+	}
+
+	.nav > ul > li {
+		border-top: none;
+	}
+
+	.nav ul ul ul li:first-child {
+		border-top: none;
+	}
+
+	.nav .nav-submenu li {
+		border-bottom: 1px solid #e4e4e4;
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+	.nav .nav-submenu li a {
+		color: $gray;
+		padding: 10px 15px;
+        line-height: 30px;
+		position: relative;
+
+		&:before {
+			content: "\f0da";
+			position: absolute;
+			left: 10px;
+			top: 8px;
+			width: 10px;
+			font-size: 12px;
+			opacity: 0;
+			transition: all 500ms ease;
+			font-family: "Font Awesome 6 Pro";
+			font-weight: 900;
+		}
+
+		&:hover {
+			color: $secondary;
+			padding-left: 30px;
+
+			&:before {
+				opacity: 1;
+			}
+		}
+		
+	}
+
+	.nav .nav-submenu > ul {
+		margin: 0;
+		min-width: 220px;
+		padding: 0;
+		background: $white;
+        border-top: 1px solid #e4e4e4;
+        border-radius: 0 0 10px 10px;
+	}
+
+	.nav > ul > .nav-submenu > a:after {
+		// content: "\E005";
+		content: none;
+	}
+	.nav .nav-submenu > a:after {
+		content: "\E006";
+	}
+	
+
+}
+
+
+.nav-lock-scroll {
+	overflow: hidden;
+}
+
+.nav {
+	display: none;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	// z-index: 900;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.nav ul {
+	display: block;
+	position: relative;
+	zoom: 1;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.nav a,
+.nav a:hover,
+.nav a:active,
+.nav a:visited {
+	display: block;
+	position: relative;
+}
+
+@media only screen and (min-width: 960px) {
+
+	.nav {
+		display: block;
+		position: relative;
+		bottom: auto;
+		overflow: visible;
+	}
+
+	.nav li {
+		position: relative;
+		white-space: nowrap;
+	}
+
+	.nav > ul > li {
+		display: inline-block;
+
+		&.register-btn {
+			display: none;
+		}
+	}
+
+	.nav ul {
+		display: block;
+	}
+
+	.nav ul ul {
+		display: none;
+		position: absolute;
+		top: 100%;
+		left: 0;
+		z-index: 901;
+	}
+
+	.nav ul ul ul {
+		top: 5px;
+		left: 95%;
+		z-index: 902;
+	}
+
+	.nav ul ul ul ul {
+		z-index: 903;
+	}
+
+	.nav ul ul ul ul ul {
+		z-index: 904;
+	}
+
+	.nav ul ul li.nav-left > ul {
+		left: auto;
+		right: 95%;
+	}
+
+	.nav-no-js .nav li:hover > ul {
+		display: block;
+	}
+
+}
+
+@media only screen and (max-width: 959px) {
+
+	.nav-no-js .nav-button:hover + .nav,
+	.nav-no-js .nav:hover,
+	.nav-no-js .nav-button:hover + .nav + .nav-close,
+	.nav-no-js .nav:hover + .nav-close {
+		display: block;
+	}
+
+	.nav ul {
+		background: $white;
+	}
+
+}
+
+@include breakpoint(lg) {
+
+    .nav .nav-submenu > ul {
+		min-width: 200px;
+	}
+	.nav .nav-submenu li a {
+		padding: 8px 15px;
+        line-height: 22px;
+	}
+}

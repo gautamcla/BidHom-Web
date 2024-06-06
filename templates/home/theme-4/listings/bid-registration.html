@@ -1,0 +1,464 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" media="screen" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+{% load humanize %}
+
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Bidder
+                </h3>
+                <h1>
+                  Registration
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <div class="bidding-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <ul class="bidding-tab">
+              <li>
+                <a role="button" href="#get-started" id="get_started" tabindex="1"><span class="circle">1</span> Register</a>
+              </li>
+              <li>
+                <a role="button" href="#proff-funds" id="proff_funds" tabindex="2"><span class="circle">2</span> Get Approved</a>
+              </li>
+              <li>
+                <a role="button" href="#confirmation" id="confirm_reg" tabindex="3"><span class="circle">3</span> Start Bidding</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div><!-- End .tabs-header -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 ">
+          <form method="post" name="bidderRegFrm" id="bidderRegFrm" autocomplete="off">
+            {% csrf_token %}
+          <input type="hidden" id="asset_type" name="asset_type" value="{{bidder.property.property_asset}}"/>
+          
+          <div class="bidding-body">
+            <div id="get-started">
+              <div class="bidding-property">
+                <figure>
+                  <img src="{% if bidder.property.property_image.image %}{{ aws_url }}{{ bidder.property.property_image.bucket_name }}/{{ bidder.property.property_image.image }}{% else %}{% static 'theme-4/images/experties-4.jpg' %}{% endif %}" alt="real estate sales">
+                </figure>
+                <figcaption>
+                  <h5>
+                    <span>
+                      {{ bidder.property.city|default:'' }}, {{ bidder.property.state|default:'' }} {{ bidder.property.postal_code|default:'' }}
+                    </span>
+                    {{ bidder.property.address_one|default:'' }}
+                  </h5>
+                </figcaption>
+              </div>
+              <div class="customscroll bidding-accordian">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+                  <div class="panel panel-default completed">
+                      <div class="panel-heading" role="tab" id="headingOne">
+                          <h5 class="panel-title">
+                              <a role="button" data-parent="#accordion" href="javascript:void(0)" aria-expanded="true" tabindex="4" aria-controls="collapseOne" class="panel_heading_link">
+                                <i class="fas fa-check-circle" role="presentation"></i> Bidder Information
+                              </a>
+                              <a role="button" href="javascript:void(0)" tabindex="7" id="edit_bidder_info" class="edit-link" style="display:none;">Edit</a>
+                          </h5>
+                      </div>
+                      <div id="collapseOne" class="panel-collapse in" role="tabpanel" aria-labelledby="headingOne">
+                          <div class="panel-body">
+                            <div class="row">
+                              <input type="hidden" id="property_id" name="property_id" value="{{ request.GET.property|default:'' }}"/>
+                              <div class="col-lg-12">
+                                <div class="form-group">
+                                  <label for="">What describes you best?</label>
+                                  <div class="lh45">
+                                    <input id="user_type_buyer" type="radio" name="user_type" value="2" class="css-radio" checked>
+                                    <label for="user_type_buyer" class="radio-label"> Buyer</label>
+                                    <input id="user_type_agent" type="radio" name="user_type" value="4" class="css-radio">
+                                    <label for="user_type_agent" class="radio-label ml50"> Agent</label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-lg-12">
+                                <div class="form-group">
+                                  <label for="working_with_agent_yes">Are you working with an agent?</label>
+                                  <div class="lh45" id="work_with_div">
+                                    <input id="working_with_agent_yes" type="radio" name="working_with_agent" value="1" class="css-radio" checked>
+                                    <label for="working_with_agent_yes" class="radio-label"> Yes</label>
+                                    <input id="working_with_agent_no" type="radio" name="working_with_agent" value="0" class="css-radio">
+                                    <label for="working_with_agent_no" class="radio-label ml50"> No</label>
+                                  </div>
+                                </div>
+                                <div class="error-msg" id="buyer_rel_text" style="display:none;">
+                                  <p>
+                                    * Buyer confirms that Buyer is not working with a licensed real estate agent and has not received assistance from a licensed real estate agent with respect to this property.
+                                  </p>
+                                  <p>
+                                    * Buyer understands and acknowledges that the listing broker may exclusively represent the seller and as such, is not in a position to offer guidance or advice to buyer.
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <div class="col-lg-12">
+                                <button type="button" id="continueBuyerInfo" class="btn btn-secondary">Continue</button>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingTwo">
+                          <h5 class="panel-title">
+                              <a class="panel_heading_link collapsed" role="button" data-parent="#accordion" tabindex="5" href="javascript:void(0)" aria-expanded="false" aria-controls="collapseTwo" id="bidder_heading">
+                                <i class="fas fa-check-circle" role="presentation"></i> Buyer Information
+                              </a>
+                            <a role="button" href="javascript:void(0)" tabindex="8" id="edit_buyer_info" class="edit-link">Edit</a>
+                          </h5>
+                      </div>
+                      <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                          <div class="panel-body">
+                            <div class="row">
+                              <div class="col-lg-12 col-md-12">
+                                <p class="red-text">
+                                  Please review and ensure that we have all your current contact information below. It’s important that all information is filled out accurately in case we need to contact you before, during, or after the auction.
+                                </p>
+                              </div>
+                              <div class="clearfix"></div>
+
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="first_name">First Name</label>
+                                  <input type="text" class="form-control alphaAccpt" name="first_name" id="first_name" placeholder="Enter First Name" value="{{ bidder.first_name|default:'' }}" maxlength="40" aria-label="First Name" role="textbox">
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="last_name">Last Name</label>
+                                  <input type="text" class="form-control alphaAccpt" name="last_name" id="last_name" placeholder="Enter Last Name" value="{{ bidder.last_name|default:'' }}" maxlength="40" aria-label="Last Name" role="textbox">
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="email">Email</label>
+                                  <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" value="{{ bidder.email|default:'' }}" aria-label="Email" role="textbox">
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="phone">Phone</label>
+                                  <input type="text" class="form-control" name="phone" id="phone" placeholder="Enter Phone" value="{{ bidder.phone_no|default:'' }}" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true" aria-label="Phone" role="textbox">
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group bidder-country">
+                                  <label for="state">Country</label>
+                                  <select class="select chosen-select form-control" name="buyer_country" id="buyer_country" data-placeholder="Select">
+                                      <option value="">Select</option>
+                                      {% for country in country_list %}
+                                        <option value="{{ country.id }}" data-short-code="{{ country.alpha2_code }}" {% if country.id == 1%}selected{% endif %}>{{ country.country_name }}</option>
+                                      {% endfor %}
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="address">Address</label>
+                                  <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address" value="{{ bidder.address.address_first|default:'' }}" aria-label="Address" role="textbox">
+                                </div>
+                              </div>
+
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="bidder_zip_code">Zip Code</label>
+                                  <input type="text" class="form-control" id="bidder_zip_code" name="bidder_zip_code" placeholder="Enter Zip Code" value="{{ bidder.address.postal_code|default:'' }}" aria-label="Zipcode" role="textbox">
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                  <label for="address">City</label>
+                                  <input type="text" class="form-control" name="city" id="city" placeholder="Enter City" value="{{ bidder.address.city|default:'' }}" aria-label="City" role="textbox">
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group bidder-state">
+                                  <label for="state">State</label>
+                                  <select class="select chosen-select form-control" name="state" id="state" data-placeholder="Select">
+                                      <option value="">Select</option>
+                                      {% for state in state_list %}
+                                        <option value="{{ state.id }}" data-short-code="{{ state.iso_name }}" {% if state.id == bidder.address.state %}selected{% endif %}>{{ state.state_name }}</option>
+                                      {% endfor %}
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" style="display:none;" id="bidder_company_section">
+                                <div class="form-group">
+                                  <label for="bidder_company_name">Real Estate Company Name</label>
+                                  <input type="text" class="form-control" id="bidder_company_name" name="bidder_company_name" placeholder="Enter Company Name" value="{{ bidder.company_name|default:'' }}" aria-label="Real Estate Company Name" role="textbox">
+                                </div>
+                              </div>
+
+                              <div class="clearfix"></div>
+                              <div class="col-lg-12">
+                                <button type="button" id="continueBidderInfo" class="btn btn-secondary">Continue</button>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default" id="agent_buyer_info">
+                    <div class="panel-heading" role="tab" id="headingThree">
+                        <h5 class="panel-title">
+                            <a class="panel_heading_link collapsed" role="button" data-parent="#accordion" tabindex="6" href="javascript:void(0)" aria-expanded="false" aria-controls="collapseThree" id="agent_buyer_heading">
+                              <i class="fas fa-check-circle" role="presentation"></i> Agent Information
+                              <span class="icon"></span>
+                            </a>
+                          <a role="button" href="javascript:void(0)" tabindex="9" id="edit_agent_buyer_info" class="edit-link">Edit</a>
+                        </h5>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        <div class="panel-body">
+                          <div class="row">
+                            <div class="col-lg-12 col-md-12">
+                              <p class="red-text">
+                                Please review and ensure that we have all your current contact information below. It’s important that all information is filled out accurately in case we need to contact you before, during, or after the auction.
+                              </p>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="agent_buyer_first_name">First Name</label>
+                                <input type="text" class="form-control alphaAccpt" name="agent_buyer_first_name" id="agent_buyer_first_name" placeholder="Enter First Name" maxlength="40" aria-label="First name" role="textbox">
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="agent_buyer_last_name">Last Name</label>
+                                <input type="text" class="form-control alphaAccpt" name="agent_buyer_last_name" id="agent_buyer_last_name" placeholder="Enter Last Name" maxlength="40" aria-label="Last Name" role="textbox">
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="agent_buyer_email">Email</label>
+                                <input type="text" class="form-control" name="agent_buyer_email" id="agent_buyer_email" placeholder="Enter Email" aria-label="Email" role="textbox">
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="agent_buyer_phone">Phone</label>
+                                <input type="text" class="form-control" name="agent_buyer_phone" id="agent_buyer_phone" placeholder="Enter Phone" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true" aria-label="Phone" role="textbox">
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group bidder-country">
+                                <label for="state">Country</label>
+                                <select class="select chosen-select form-control" name="agent_buyer_country" id="agent_buyer_country" data-placeholder="Select">
+                                    <option value="">Select</option>
+                                    {% for country in country_list %}
+                                      <option value="{{ country.id }}" data-short-code="{{ country.alpha2_code }}" {% if country.id == 1%}selected{% endif %}>{{ country.country_name }}</option>
+                                    {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="agent_buyer_address">Address</label>
+                                <input type="text" class="form-control" name="agent_buyer_address" id="agent_buyer_address" placeholder="Enter Address" aria-label="Address" role="textbox">
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="agent_buyer_zipcode">Zip Code</label>
+                                <input type="text" class="form-control" name="agent_buyer_zipcode" id="agent_buyer_zipcode" placeholder="Enter Zip Code" aria-label="Zip Code" role="textbox">
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group">
+                                <label for="agent_buyer_city">City</label>
+                                <input type="text" class="form-control" name="agent_buyer_city" id="agent_buyer_city" placeholder="Enter City" value="" aria-label="City" role="textbox">
+                              </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                              <div class="form-group bidder-state">
+                                <label for="agent_buyer_state">State</label>
+                                <select class="select chosen-select form-control" name="agent_buyer_state" id="agent_buyer_state" data-placeholder="Select">
+                                    <option value="">Select</option>
+                                    {% for state in state_list %}
+                                      <option value="{{ state.id }}" data-short-code="{{ state.iso_name }}">{{ state.state_name }}</option>
+                                    {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" id="agent_buyer_company_section">
+
+                              <div class="form-group">
+                                <label for="agent_buyer_company_name">Real Estate Company Name</label>
+                                <input type="text" class="form-control" id="agent_buyer_company_name" name="agent_buyer_company_name" placeholder="Enter Company Name" value="" aria-label="Real Estate Company Name" role="textbox">
+                              </div>
+                            </div>
+
+                            <div class="clearfix"></div>
+
+
+                          </div>
+                        </div>
+                    </div>
+                  </div><!-- End .panel -->
+
+              </div><!-- panel-group -->
+              </div><!-- End .customscroll -->
+              <div class="row">
+
+                <!--<div class="col-md-12 ptb10">
+                  <p>
+                    <strong>By checking below, you agree:</strong>
+                  </p>
+                  <div class="form-group">
+                    <input id="term_accepted" type="checkbox" name="term_accepted" value="1" class="css-checkbox">
+                    <label for="term_accepted" class="check-label">I have read and agree to the <a href="/terms/" target="_blank" class="red-text">Terms Of Use</a> and <a href="/privacy-policy/" target="_blank" class="red-text">Privacy Policy</a>.</label>
+                  </div>
+                  <div class="form-group">
+                    <input id="age_validate" type="checkbox" name="age_validate" value="1" class="css-checkbox">
+                    <label for="age_validate" class="check-label">I am 18 years of age or older</label>
+                  </div>
+                  <div class="form-group current-info">
+                    <input id="correct_info" type="checkbox" name="correct_info" value="1" class="css-checkbox">
+                    <label for="correct_info" class="check-label">Please review and ensure that we have all your current contact information below. It’s important that all information is filled out accurately in case we need to contact you before, during, or after the auction.</label>
+                  </div>
+                </div>-->
+                <div class="col-md-12">
+                  <button type="button" id="nextGetStarted" class="btn btn-secondary">Continue</button>
+                </div>
+
+              </div>
+
+            </div><!-- End .get-started -->
+
+            <div id="proff-funds">
+              {% if bidder.property.is_deposit_required %}
+                {% include 'home/theme-4/listings/registration-payment.html' %}
+              {% else %}
+                {% include 'home/theme-4/listings/registration-proof-fund.html' %}
+              {% endif %}
+            </div><!-- End .proff-funds -->
+
+            <div id="confirmation">
+              <h4>
+                Confirmation <span class="hr-line"></span>
+              </h4>
+              <input type="hidden" id="is_uploaded" value="0"/>
+              <div class="bidding-success">
+                <p>
+                  <img src="{% static 'theme-4/images/green-check.png' %}" alt="real estate sales">
+                </p>
+                <h4 class="pb20">
+                  <strong>Bid registration completed successfully</strong>
+                </h4>
+                <h5 id="success_text">
+                  Your request has been sent to the listing agent to review.
+                </h5>
+                <p class="red-text" id="success_paragraph">
+                  The listing agent will either promptly approve your request to bid or contact you with any questions before granting you permission to bid. Once approved you will be sent an email to johndoe@gmail.com granting you approval to bid. 
+                  If you do not receive the approval email within the next few hours please check your junk/spam folder first or contact the listing agent for help
+                </p>
+                <div class="clearfix">
+                  <button type="button" id="backToProofFund" class="btn btn-primary-bdr">Back to Get Approved</button> <a class="btn btn-secondary" href="/asset-details/?property_id={{ request.GET.property }}">Go To Property</a>
+                </div>
+
+              </div><!-- End .bidding-success -->
+
+            </div><!-- End .confirmation -->
+
+          </div>
+          </form>
+        </div>
+      </div>
+    </div><!-- End .container-fluid -->
+
+  </div><!-- end .body-content -->
+ <div id="videoModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <iframe width="100%" height="495" src="https://www.youtube.com/embed/y9j-BL5ocW8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .logoutModal -->
+<div id="confirmBidderDocDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="popup_section" id="popup_section" value=""/>
+                <input type="hidden" name="popup_image_id" id="popup_image_id" value=""/>
+                <input type="hidden" name="popup_image_name" id="popup_image_name" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button" class="btn btn-primary-bdr del_user_btn" id="del_image_false">No</button> <button type="button" class="btn btn-secondary del_user_btn" id="del_image_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/custom_validator.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/mask_input.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/custom_dropzone.js' %}?v=1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  var site_id = "{{ site_detail.site_id }}";
+  var session_user_id = "{{ request.session.user_id|default:'' }}";
+  var auction_id = "{{ bidder.auction_id|default:'' }}";
+  var property_id = "{{ request.GET.property|default:'' }}";
+  const socket_domain = "{{ node_url }}";
+  // var stripe = Stripe('pk_test_51LcQvbSAnhL0wO1t4SemFQfvMrATBX9WVfHLxjdcMjA1UXYDNF91uUzZHFvOwWS24JhDqfKsNp7yD2ZsHnyVUHAU00ngA5z7my');
+  var stripe = Stripe('{{ stripe_publishable_key }}');
+</script>
+<script type="text/javascript" src="{% static 'theme-common/js/bidder-registration.js' %}?v=3.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/payments.js' %}?v=3.1"></script>
+{% endblock %}

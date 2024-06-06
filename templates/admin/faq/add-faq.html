@@ -1,0 +1,120 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Add FAQ {% endblock title %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+
+  <h3>Add FAQ</h3>
+
+  <div class="box">
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>{{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" id="addFaq" action="{% url 'admin-ajax-add-faq' %}" class="form-horizontal form-label-left" data-parsley-validate>
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="site">Choose Domain
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <select class="select form-control" id="site" name="site" >
+              <option value="" selected>Choose Available Domain</option>
+              {% for obj in domain_list %}
+                  {% if obj.is_active %}
+                      <option value="{{obj.id}}">{{obj.domain_name}}</option>
+                  {% endif %}
+              {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="site">Status <span class="required">*</span>
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <select class="select form-control" id="status" name="status" required="required" >
+              <option value="" selected>Choose Status</option>
+              {% for obj in status_list %}
+                  {% if obj.is_active %}
+                      <option value="{{obj.id}}">{{obj.status_name}}</option>
+                  {% endif %}
+              {% endfor %}
+          </select>
+        </div>
+        <a href="{% url 'admin-lookup-status' %}#add-status" target="_blank" type="button" class="btn btn-primary btn-round"> Add more <i class="fa fa-external-link"></i></a>
+      </div>
+
+      <div class="form-group">
+        <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="site">User Type <span class="required">*</span>
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <select class="select form-control" id="user_type" name="user_type" required="required" >
+                <option value="" selected>Choose User Type</option>
+                <option value="1">Buyer</option>
+                <option value="2">Broker</option>
+                <option value="3">Agent</option>
+            </select>
+        </div>
+      </div>
+      
+      <h4>FAQ Info</h4>
+
+      <div class="form-group">
+        <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="question">Question<span class="required">*</span>
+        </label>
+        <div class="col-md-8 col-sm-8 col-xs-12">
+          <textarea class="form-control description" id="question" name="question" required="required" rows="3" placeholder="Enter page content..." style="height: 120px;" spellcheck="true"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="answer">Answer <span class="required">*</span>
+        </label>
+        <div class="col-md-8 col-sm-8 col-xs-12">
+          <textarea class="form-control description" id="answer" name="answer" required="required" rows="3" placeholder="Enter page content..." style="height: 120px;" spellcheck="true"></textarea>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="col-md-3 col-sm-3 col-xs-12"></div>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <button type="reset" class="btn btn-primary-bdr">Reset</button>
+          <button id="submitAddCms" type="submit" class="btn btn-primary">Add</button>
+        </div>
+      </div>
+    </form>
+  </div>
+          
+</div>
+
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/add-faq.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/tinymce/tinymce.min.js' %}"></script>
+
+
+
+{% endblock %}

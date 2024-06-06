@@ -1,0 +1,208 @@
+{% load static %}
+{% load dashboard_extra %}
+{% block content %}
+{% load humanize %}
+{% if bid_listing %}
+                {% for listing in bid_listing %}
+
+                <div class="list block-item" id="bid_row_{{ listing.property }}" data-property="{{listing.property}}" data-auction="{{listing.auction_id}}" data-row="{{ listing.id }}" data-increment="{{listing.bid_increment}}" data-minimum="{{listing.start_price}}" data-registration="{{listing.id}}">
+                  
+                  <div class="list-left">
+                    <figure>
+                      <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+                        <img class="slide-fixed" src="{% static 'theme-4/user-dashboard/images/transparent.png' %}" alt="real estate sales">
+                        <img class="slide-img" src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                      </a>
+                    </figure>
+                    <figcaption>
+                      <div class="item status">
+                        <span class="badge {% if listing.registration_status|lower == 'pending' %}badge-warning{% elif listing.registration_status|lower == 'approved' %}badge-success{% elif listing.registration_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+                          {{ listing.registration_status }}
+                        </span>
+                      </div>
+                      <div class="type">
+                        {{ listing.auction_type }}
+                      </div>
+                      <h6 class="name">
+                        <span title="{{ listing.property_address_one }}">{% if listing.property_address_one|length > 18 %}{{ listing.property_address_one|slice:":15" }}...{% else %}{{ listing.property_address_one|default:'' }}{% endif %}</span>
+                      </h6>
+                      <div class="location">
+                        <i class="fa-solid fa-location-dot"></i> {{ listing.property_city }}, {{ listing.property_state }} {{ listing.property_postal_code }}
+                      </div>
+                    </figcaption>
+                  </div><!-- End .list-left -->
+  
+                  <div class="list-right">
+                    <ul class="top-list">
+                      
+                      {% comment %}
+                      <li>
+                        <h6>
+                          {{ listing.broker_name }}
+                          <span class="blue-text">
+                            <a href="{{ listing.domain_url }}" target="_blank">{{ listing.company }}</a>
+                          </span>
+                        </h6>
+                      </li>
+                      {% endcomment %}
+                      <li>
+                        <h6>
+                          Starting Bids
+                          <span class="blue-text current_bids">
+                            ${{ listing.start_price|convert_num|intcomma|default:'0' }}
+                          </span>
+                        </h6>
+                      </li>
+                      <li>
+                        <h6>
+                          Bid Increment
+                          <span class="blue-text bid_increment">
+                            ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+                          </span>
+                        </h6>
+                      </li>
+                      <li>
+                        <h6>
+                          Bid Count
+                          <span class="badge badge-info bids-limit">{{ listing.bid_count }}</span>
+                          </h6>
+                      </li>
+                      <li>
+                        <h6>
+                          My Bid 
+                          <span class="blue-text my_bid">
+                            ${{ listing.my_bid|convert_num|intcomma|default:'0' }}
+                          </span>
+                        </h6>
+                      </li>
+                      <li class="item bidding_timer" rel_id="{{ listing.id }}" id="bidding_timer_{{ listing.id }}" data-start-date="{% if listing.auction_status == 1 %}{{listing.bid_start_date|default:''}}{% endif %}" data-end-date="{% if listing.auction_status == 1 %}{{listing.bid_end_date|default:''}}{% endif %}">
+                        <h6>
+                          Time Left
+                          <div class="countdown_text"></div><div class="time"><span class="day_remaining blue-text">00</span><span class="hr_remaining blue-text">00</span><span class="min_remaining blue-text">00</span><span class="sec_remaining blue-text">00</span></div>
+                        </h6>
+                      </li>
+                    </ul>
+                    
+                    {% if listing.auction_status != 1 %}
+                    <div class="bid-form bid">
+                      <span class="badge badge-success">Auction completed</span>
+                    </div>
+                  {% elif listing.is_approved %}
+                    {% now "U" as todays_date %}
+                    {% define_var listing.bid_start_date|parse_iso|date:"U" as start_date %}
+                    {% define_var listing.bid_end_date|parse_iso|date:"U" as end_date %}
+                    {% if todays_date >= start_date and todays_date <= end_date %}
+                      <div class="bid-form bid" >
+                        <form action="" class="make0ffer-form">
+                          <span class="dollar">$</span>
+                          <input type="text" class="form-control input-sm bid_amount bid_amount_{{ listing.property }}" name="bid_amount" value="{{listing.next_bid}}" maxlength="10" onkeypress="return ((event.charCode == 46) || (event.charCode == 44) || (event.charCode >= 48 && event.charCode <= 57))">
+                          <button type="button" class="btn btn-primary btn-sm bid_now">Place Bid</button>
+                        </form>
+                      </div>
+                    {% elif todays_date > end_date %}
+                      <div class="bid-form bid">
+                        <span class="badge badge-success">Auction completed</span>
+                      </div>
+                    {% else %}
+                      <div class="bid-form bid">
+                          Registration Approved But Auction Not Started Yet
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="bid-form bid">
+                      {{ listing.approval_status }}
+                    </div>
+                  {% endif %}
+                  </div><!-- End .list-right -->
+                  
+                  <!-- <div class="item">
+                   {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+                    <div class="user-pics">
+                      <span class="user-pic"><img src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales"></span>
+                      <h6>
+                        <span class="blue-text" title="{{ listing.property_address_one }}">{% if listing.property_address_one|length > 18 %}{{ listing.property_address_one|slice:":15" }}...{% else %}{{ listing.property_address_one|default:'' }}{% endif %}</span>
+                        <i class="fas fa-map-marker-alt"></i> {{ listing.property_city }}, {{ listing.property_state }} {{ listing.property_postal_code }}
+                      </h6>
+                    </div>
+                    </a>
+                  </div>
+                  <div class="item">
+                    {{ listing.auction_type }}
+                  </div>
+                  {% comment %} <div class="item">
+                    <div class="brokr-nme">
+                      <span>{{ listing.broker_name }}</span>
+                      <small class="blue-text"><a href="{{ listing.domain_url }}" target="_blank">{{ listing.company }}</a></small>
+                    </div>
+                  </div> {% endcomment %}
+                  <div class="item current_bids">
+                    ${{ listing.start_price|convert_num|intcomma|default:'0' }}
+                  </div>
+                  <div class="item bid_increment">
+                    ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+                  </div>
+                  <div class="item my_bid">
+                    ${{ listing.my_bid|convert_num|intcomma|default:'0' }}
+                  </div>
+                  <div class="item bid_count">
+                    <button class="badge badge-info bids-limit">{{ listing.bid_count }}</button>
+                  </div>
+                  <div class="item status">
+                    <span class="badge {% if listing.registration_status|lower == 'pending' %}badge-warning{% elif listing.registration_status|lower == 'approved' %}badge-success{% elif listing.registration_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+                      {{ listing.registration_status }}
+                    </span>
+                  </div>
+                  {% if listing.auction_status != 1 %}
+                    <div class="item bid">
+                        Auction completed
+                    </div>
+                  {% elif listing.is_approved %}
+                    {% now "U" as todays_date %}
+                    {% define_var listing.bid_start_date|parse_iso|date:"U" as start_date %}
+                    {% define_var listing.bid_end_date|parse_iso|date:"U" as end_date %}
+                    {% if todays_date >= start_date and todays_date <= end_date %}
+                      <div class="item bid" >
+                        <form action="" class="make0ffer-form">
+                          <span>$</span>
+                          <input type="text" class="form-control input-sm bid_amount bid_amount_{{ listing.property }}" name="bid_amount" value="{{listing.next_bid}}" maxlength="10" onkeypress="return ((event.charCode == 46) || (event.charCode == 44) || (event.charCode >= 48 && event.charCode <= 57))">
+                          <button type="button" class="btn btn-primary btn-sm bid_now">Bid Now</button>
+                        </form>
+                      </div>
+                    {% elif todays_date > end_date %}
+                      <div class="item bid">
+                        Auction completed
+                      </div>
+                    {% else %}
+                      <div class="item bid">
+                          Registration Approved But Auction Not Started Yet
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="item bid">
+                      {{ listing.approval_status }}
+                    </div>
+                  {% endif %}
+                  <div class="item bidding_timer" rel_id="{{ listing.id }}" id="bidding_timer_{{ listing.id }}" data-start-date="{% if listing.auction_status == 1 %}{{listing.bid_start_date|default:''}}{% endif %}" data-end-date="{% if listing.auction_status == 1 %}{{listing.bid_end_date|default:''}}{% endif %}">
+                   <div class="time" style="text-align: left;"><div class="countdown_text"></div><span class="day_remaining red-text">00</span>:<span class="hr_remaining red-text">00</span>:<span class="min_remaining red-text">00</span>:<span class="sec_remaining red-text">00</span></div>
+                  </div> -->
+
+                </div><!-- End .list -->
+                {% endfor %}
+                {% else %}
+                <div class="list">
+                  <div class="fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+                  </div>
+                </div>
+                {% endif %}
+
+{% endblock %}
+{% block js_content %}
+
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/countdown_timer.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dashboard_listing.js' %}?v=4.7"></script>
+{% endblock %}

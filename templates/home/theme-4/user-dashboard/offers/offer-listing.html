@@ -1,0 +1,115 @@
+{% load static %}
+{% load dashboard_extra %}
+{% block content %}
+{% load humanize %}
+{% if offer_listing %}
+    {% for listing in offer_listing %}
+
+    <div class="list" id="bid_row_{{ listing.id }}" data-property="{{listing.id}}" data-row="{{ listing.id }}">
+      <div class="list-left">
+        <figure>
+          <a href="/asset-details/?property_id={{ listing.id }}" target="_blank">
+            <img class="slide-fixed" src="{% static 'theme-4/user-dashboard/images/transparent.png' %}" alt="real estate sales">
+            <img class="slide-img" src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+          </a>
+        </figure>
+        <figcaption>
+          <span class="badge {% if listing.property_status|lower == 'pending' %}badge-warning{% elif listing.property_status|lower == 'approved' %}badge-success{% elif listing.property_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+            {{ listing.property_status }}
+          </span>
+          <div class="type">
+            {{ listing.auction_type }}
+          </div>
+          <h6 class="name">
+            <span title="{{ listing.address_one }}">{% if listing.address_one|length > 18 %}{{ listing.address_one|slice:":15" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+          </h6>
+          <div class="location">
+            <i class="fa-solid fa-location-dot"></i> {{ listing.city }}, {{ listing.state }} {{ listing.postal_code }}
+          </div>
+        </figcaption>
+      </div><!-- End .list-left -->
+
+      <div class="list-right">
+        <ul class="top-list">
+          <li>
+            <h6>
+              Asking Price
+              <span class="blue-text">
+                ${{ listing.asking_price|convert_num|intcomma|default:'0' }}
+              </span>
+            </h6>
+          </li>
+          <li>
+            <h6>
+              My Offer
+              <span class="blue-text">
+                ${{ listing.your_max_offer|convert_num|intcomma|default:'0' }}
+              </span>
+            </h6>
+          </li>
+          <li>
+            <h6>
+              Offer Status
+              <span> 
+                <button class="badge {% if listing.offer_status|lower == 'offer sent' %}badge-success{% else %}badge-danger{% endif %}" onclick="viewOfferDetails('{{ listing.id }}')">
+                  {{ listing.offer_status }}
+                </button>
+              </span>
+            </h6>
+          </li>
+        </ul>
+      </div><!-- End .list-right -->
+
+
+      <!-- <div class="item">
+       {{ forloop.counter0|add:sno }}
+      </div>
+      <div class="item">
+        <a href="/asset-details/?property_id={{ listing.id }}" target="_blank">
+        <div class="user-pics">
+          <span class="user-pic"><img src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales"></span>
+          <h6>
+            <span class="blue-text" title="{{ listing.address_one }}">{% if listing.address_one|length > 18 %}{{ listing.address_one|slice:":15" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+            <i class="fas fa-map-marker-alt"></i> {{ listing.city }}, {{ listing.state }} {{ listing.postal_code }}
+          </h6>
+        </div>
+        </a>
+      </div>
+      <div class="item">
+        {{ listing.auction_type }}
+      </div>
+
+      <div class="item current_bids">
+        ${{ listing.asking_price|convert_num|intcomma|default:'0' }}
+      </div>
+      <div class="item bid_increment">
+        ${{ listing.your_max_offer|convert_num|intcomma|default:'0' }}
+      </div>
+      <div class="item bid">
+        <button class="badge {% if listing.offer_status|lower == 'offer sent' %}badge-success{% else %}badge-danger{% endif %}" onclick="viewOfferDetails('{{ listing.id }}')">
+          {{ listing.offer_status }}
+        </button>
+      </div>
+      <div class="item status">
+        <span class="badge {% if listing.property_status|lower == 'pending' %}badge-warning{% elif listing.property_status|lower == 'approved' %}badge-success{% elif listing.property_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+          {{ listing.property_status }}
+        </span>
+      </div> -->
+
+
+    </div><!-- End .list -->
+
+    {% endfor %}
+    {% else %}
+    <div class="list">
+      <div class="fullwidth">
+        <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+      </div>
+    </div>
+    {% endif %}
+{% endblock %}
+{% block js_content %}
+
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dashboard_listing.js' %}?v=4.7"></script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" media="screen" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+{% load humanize %}
+
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Bidder
+                </h3>
+                <h1>
+                  Registration Failed
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <!-- <div class="bidding-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <ul class="bidding-tab">
+              <li>
+                <a href="#get-started" id="get_started"><span class="circle">1</span> Register</a>
+              </li>
+              <li>
+                <a href="#proff-funds" id="proff_funds"><span class="circle">2</span> Get Approved</a>
+              </li>
+              <li>
+                <a href="#confirmation" id="confirm_reg"><span class="circle">3</span> Start Bidding</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <!-- End .tabs-header -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 ">
+          <div class="bidding-body">
+            <div id="confirmation">
+              <!-- <h4>
+                Confirmation <span class="hr-line"></span>
+              </h4> -->
+              <input type="hidden" id="is_uploaded" value="0"/>
+              <div class="bidding-success">
+                <p>
+                  <i class="fa-solid fa-circle-xmark fa-4x" style="color:#C71829;"></i>
+                </p>
+                <h4 class="pb20">
+                  <strong>Payment Not Completed</strong>
+                  
+                </h4>
+                <p>Bid Registration Not Completed Please Try Again</p>
+                <h5 id="success_text">
+                  Your request has not been sent to the listing agent to review.<br/> Please try again.
+                </h5>
+
+              </div><!-- End .bidding-success -->
+
+            </div><!-- End .confirmation -->
+
+          </div>
+        </div>
+      </div>
+    </div><!-- End .container-fluid -->
+
+  </div><!-- end .body-content -->
+ 
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/custom_validator.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/mask_input.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/custom_dropzone.js' %}?v=1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+
+</script>
+<script type="text/javascript" src="{% static 'theme-common/js/payments.js' %}?v=3.1"></script>
+{% endblock %}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <g id="decline" transform="translate(-1427 -192)">
+    <g id="Ellipse_282" data-name="Ellipse 282" transform="translate(1427 192)" fill="none" stroke="#d6656c" stroke-width="2">
+      <circle cx="10.5" cy="10.5" r="10.5" stroke="none"/>
+      <circle cx="10.5" cy="10.5" r="9.5" fill="none"/>
+    </g>
+    <path id="close-round" d="M13.236,12.045,10.18,8.989l3.056-3.056a.842.842,0,1,0-1.191-1.191L8.989,7.8,5.933,4.742A.842.842,0,1,0,4.742,5.933L7.8,8.989,4.742,12.045a.842.842,0,1,0,1.191,1.191L8.989,10.18l3.056,3.056a.842.842,0,1,0,1.191-1.191Z" transform="translate(1428.512 193.511)" fill="#d6656c"/>
+  </g>
+</svg>

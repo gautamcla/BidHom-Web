@@ -1,0 +1,188 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% load tz %}
+{% if auction_data|length > 0 %}
+{% for property in auction_data %}
+    <div class="block-item {% if not property.read_by_auction_dashboard %}focused-bid-row{% endif %} " data-property="{{ property.id }}" data-auction="{{property.auction_data.id}}">
+        <div class="item">
+        {{ forloop.counter0|add:sno }}
+        </div>
+        <div class="item">
+        <div class="user-pics">
+        <a href="/asset-details/?property_id={{ property.id }}" class="go-to-listing" target="_blank">
+            <span class="user-pic"><img src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt=""></span>
+            <h6>
+            <span class="blue-text" title="{{ property.address_one }}, {{property.city}}, {{property.state}}, {{property.postal_code}}">
+            {% with property.address_one|add:', '|add:property.city|add:', '|add:property.state|add:', '|add:property.postal_code as pname %}
+                {% if pname|length > 22 %}
+                    {{pname|slice:22}}...
+                {% else  %}
+                    {{ppnamel }}
+                {% endif %}
+            {% endwith %}
+            </span>
+            <i class="fas fa-map-marker-alt"></i> {{property.city}}, {{property.state}}
+            <em class="user-info listing-broker-info" data-id='{{property.id}}' data-first-name="{{property.property_owner.first_name}}" data-last-name="{{property.property_owner.last_name}}" data-company="{{property.property_owner.company}}" data-phone="{{property.property_owner.phone_no|default:''|format_phone}}" data-email="{{property.property_owner.email}}" ><i class="fas fa-info-circle"></i></em>
+            </h6>
+        </a>
+        </div>
+        </div>
+        <!-- <div class="item">
+        {{property.status}}
+        </div> -->
+        <div class="item bidding_timer" id="timerProperty{{property.id}}" data-status-id="" data-status="" data-property="{{property.id}}"  data-start-date="{% if property.auction_data.status == 1 %}{{property.auction_data.start_date|default:''}}{% endif %}" data-end-date="{% if property.auction_data.status == 1 %}{{property.auction_data.end_date|default:''}}{% endif %}" >
+        <div class="time" style="text-align: left;">
+            <div class="countdown_text">Loading... </div>
+            <span id="timerCounter{{property.id}}" style="display: none;"><span class="day_remaining red-text">00</span>:<span class="hr_remaining red-text">00</span>:<span class="min_remaining red-text">00</span>:<span class="sec_remaining red-text">00</span></span>
+        </div>
+        </div>
+        <div class="item" id="auctionStatus{{property.id}}">
+        {% if property.status_id %}
+            {% if property.status_id == 1 %}
+            {% if property.auction_data.start_date|in_the_future %}
+                <div class="text-warning"><strong>Coming Soon</strong></div>
+            {% else %}
+                <div class="text-success"><strong>Active</strong></div>
+            {% endif %}
+            {% elif property.status_id == 17 %}
+            <div class="text-warning"><strong>Coming Soon</strong></div>
+            {% elif property.status_id == 10 %}
+            <div class="text-success"><strong> Auction Ended</strong></div>
+            {% elif property.status_id == 9 %}
+            <div class="text-success"><strong>Sold</strong></div>
+            {% elif property.status_id == 16 %}
+            <div class="text-warning"><strong>Pending Review</strong></div>
+            {% elif property.status_id == 8 %}
+            <div class="red-text"><strong>Not Sold</strong></div>
+            {% endif %}
+        {% else %}
+        NA
+        {% endif %}
+        </div>
+        <div class="item">
+            <div class="text" id="highBidderParent{{property.id}}" data-id="{{property.high_bidder.user_id|default:''}}">
+            {% if property.high_bidder %}
+            <span id="highBid{{property.id}}" >${{property.high_bidder.bid_amount|convert_num|intcomma|default:'0'}}</span><br />
+            <a href="javascript:void(0);" data-id="{{property.id}}" class="blue-text show-detailed-info"><strong>{{property.high_bidder.first_name}}&nbsp;{{property.high_bidder.last_name}}&nbsp;<i class="fas fa-chevron-down" id="arrowPositionHighBidder{{property.id}}"></i></strong></a><br>
+            <p id="showDetailedinfoBidder{{property.id}}" style="display:none">
+                {% if property.high_bidder.address_first %}
+                <span class="blue-text">
+                {{property.high_bidder.address_first}},
+                </span><br>
+                {% endif %}
+                <span class="blue-text">
+                {% if property.high_bidder.city %}
+                {{property.high_bidder.city}},
+                {% endif %}
+                {% if property.high_bidder.state %}
+                {{property.high_bidder.state}},
+                {% endif %}
+                {% if property.high_bidder.postal_code %}
+                {{property.high_bidder.postal_code}}
+                {% endif %}
+                </span><br>
+                <span class="blue-text">{{property.high_bidder.phone_no|default:''|format_phone}}</span><br>
+                <span class="blue-text">{{property.high_bidder.email}}</span><br>
+                {{property.high_bidder.ip_address|default:''}}
+            </p>
+            {% else %}
+            NA
+            {% endif %}
+            </div>
+        </div>
+        <div class="item">
+        <button class="badge badge-info bids-limit bidder-record-modal" id="totalBidCount{{property.id}}" data-id="{{property.id}}" onclick="propertyBidHistorySearch(event, {{ property.id }} ,1)" >{{property.total_bids|default:'0'}}</button>
+        </div>
+        <div class="item">
+        <button class="badge badge-info bids-limit bidder-list-modal" id="totalBidderCount{{property.id}}" data-id="{{property.id}}" onclick="propertyBidderListingSearch(event, {{ property.id }} ,1)" >{{property.bidder|default:'0'}}</button>
+        </div>
+        <div class="item">
+        <button class="badge badge-default bids-limit property-atchers-modal" id="totalWatcherCount{{property.id}}" data-id="{{property.id}}" onclick="propertyWatcherListingSearch(event, {{ property.id }} ,1)" >{{property.watcher|default:'0'}}</button>
+        </div>
+        <div class="item">
+        <div class="bid-increment" style="display:none" id="propertyIncBid{{property.id}}">
+            <form action="" id="bidIncremementForm" >
+            {% csrf_token %}
+            <input type="text" data-id='{{property.id}}' id="bidIncremementValue{{property.id}}" value="{{property.auction_data.bid_increments|default:'0'}}" class="form-control input-xs numbersOnly" maxlength="10" pattern="[0-9]{10}" placeholder="Enter Bid Inc.">
+            <button class="btn btn-primary btn-xs bidincrementupdate" id="bidIncrementUpdate{{property.id}}" data-id="{{property.id}}" ><i class="fas fa-check"></i></button>
+            </form>
+            <a href="#" class="red-text show-bid-text" data-id='{{property.id}}'><i class="fa fa-times"></i></a>
+        </div>
+        <span id="bidIncText{{property.id}}" ><span>${{property.auction_data.bid_increments|convert_num|intcomma|default:'0'}}</span><a href="#" data-id='{{property.id}}' class="ml10 property-bid-incremennt-edit"><i class="fa fa-edit"></i></a></span>
+        </div>
+        <div class="item">
+        <form action="" class="nxt-bid">
+            <input type="text" readonly id="nextBid{{property.id}}" value="${{property.next_bid|convert_num|intcomma|default:'0'}}" class="form-control input-xs">
+        </form>
+        </div>
+        <div class="item" id="noReserveAuction{{property.id}}">
+        {% if property.reserve_price %}
+            <span class="badge badge-success">
+            Yes
+            </span>
+        {% else %}
+            <span class="badge badge-danger">
+            No
+            </span>
+        {% endif %}
+        {% comment %} <input type="checkbox" {% if property.reserve_price %}checked="checked"{% endif %} disabled="disabled" class="css-checkbox no-reserve-auction" data-id="{{property.id}}" id="noReserveAuction{{property.id}}">
+        <label for="noReserveAuction{{property.id}}" class="check-label">&nbsp;</label> {% endcomment %}
+        </div>
+        <div class="item">
+        <div class="bid-increment" style="display:none" id="propertyReservePrice{{property.id}}">
+            <form action="" id="reservePriceForm" >
+            {% csrf_token %}
+            <input type="text" id="reservePriceValue{{property.id}}" value="{{property.reserve_price|default:'0'}}" class="form-control input-xs numbersOnly" maxlength="10" pattern="[0-9]{10}" placeholder="Enter Price" >
+            <button class="btn btn-primary btn-xs reservepriceupdate" id="reservePriceUpdate{{property.id}}" data-id="{{property.id}}"><i class="fas fa-check"></i></button>
+            </form>
+            <a href="#" class="red-text show-reserve-price-text" data-id='{{property.id}}' ><i class="fa fa-times"></i></a>
+        </div>
+        <span id="reservePriceText{{property.id}}" ><span>${{property.reserve_price|convert_num|intcomma|default:'0'}}</span><a href="#" data-id='{{property.id}}' class="ml10 property-reserve-price-edit"><i class="fa fa-edit"></i></a></span>
+        </div>
+        <div class="item" id="reserveMet{{property.id}}">
+        {% if property.reserve_met|lower == 'no' %}
+        <span class="badge badge-danger">
+            No
+        </span>
+        {% else %}
+        <span class="badge badge-success">
+            Yes
+        </span>
+        {% endif %}
+        </div>
+        
+        <div class="item action-btnn">
+        <a href="#" id="editAuctionDetails{{property.id}}"  data-id="{{property.id}}" data-start-date="{{property.auction_data.start_date|default:''}}" data-end-date="{{property.auction_data.end_date|default:''}}" class="btn btn-blue btn-xs edit-auction-details"><div class="tooltipp"><i class="far fa-edit"></i>
+            <span class="tooltipp__content top width100">Edit Auction </span>
+        </div></a> 
+        {% if property.auction_data %}
+        {% if property.auction_data.status == 1 %}
+            <a href="#" id="stopAuctionDetails{{property.id}}" data-id="{{property.id}}" data-text="Stop Auction?" class="btn btn-secondary btn-xs stop-auction-details"><div class="tooltipp"><i id="startStopAuctionIcon{{property.id}}" class="fas fa-circle"></i>
+            <span class="tooltipp__content top width100" id="startStopAuctionTooltip{{property.id}}">Stop Auction </span>
+            </div></a>
+        {% else %}
+            <a href="#" {% if property.auction_data.status != 2 %}style="display:none"{% endif %} id="stopAuctionDetails{{property.id}}" data-id="{{property.id}}" data-text="Start Auction?" class="btn btn-secondary btn-xs stop-auction-details"><div class="tooltipp"><i id="startStopAuctionIcon{{property.id}}" class="fas fa-play"></i>
+            <span class="tooltipp__content top width100" id="startStopAuctionTooltip{{property.id}}">Start Auction </span>
+            </div></a>
+        {% endif %}
+        {% endif %}
+        </div>
+    </div><!-- End .block-item -->
+{% endfor %}
+{% else %}
+
+<div class="block-item">
+    <div class="item fullwidth">
+        <div class="item fullwidth">
+            <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+        </div>
+    </div>
+</div>
+{% endif %}
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+    <script>
+    $('.select').chosen();
+    </script>
+{% endblock %}

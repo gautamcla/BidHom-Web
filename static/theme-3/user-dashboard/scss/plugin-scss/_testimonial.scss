@@ -1,0 +1,94 @@
+
+/* Testimonial CSS Code Start */
+/* background */
+.carousel-bg {
+  background-color: none;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+/* quote */
+.quote-image {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: auto;
+  padding-top: 60px;
+  width: 80px;
+}
+/* text-style */
+.testimonial-style .testimonial-caption-style {
+  bottom: 40%;
+  text-shadow: none;
+  top: 10%;
+}
+.testimonial-style .testimonial-caption-style {
+  .quote {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px 0 20px;
+    .icon {
+      @include iconBg();
+      width: 27px;
+      height: 23px;
+      display: inline-block;
+      background-position: -714px -246px;
+    }
+  }
+  
+  .text {
+    color: $black;
+    line-height: 36px;
+    @include font-light();
+  }
+  h4 {
+    color: $secondary;
+    margin-bottom: 5px;
+    @include font-semi();
+  }
+}
+
+.testimonial-style .testimonial-authors {
+  font-size: $fontExtraLarge;
+  color: $black;
+  margin-bottom: 0;
+  @include font-regular();
+}
+/* carousel-height-control */
+.testimonial-style .carousel-inner > .item {
+  padding-top: auto;
+  padding-bottom: auto;
+  height: 380px;
+}
+/* carousel-left-right-control */
+.testimonial-style .carousel-control.left {
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  left: -60px;
+}
+.testimonial-style .carousel-control.right {
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  right: -60px;
+}
+.testimonial-style .carousel-control {
+  color: #354052;
+}
+.testimonial-style .carousel-control:hover {
+  color: #354052;
+  text-decoration: none;
+  transition: background-color 1s ease;
+}
+/* indicators */
+.testimonial-style .carousel-indicators .active {
+  background-color: #fff;
+  width: 14px;
+  height: 14px;
+  transition: background 1s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.testimonial-style .carousel-indicators li {
+  border: 2px solid #354052;
+  background-color: #354052;
+}
+/* Textimonial CSS Code End */

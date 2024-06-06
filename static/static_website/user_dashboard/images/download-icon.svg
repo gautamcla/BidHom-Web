@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <g id="download" transform="translate(-1532 -192)">
+    <g id="Ellipse_282" data-name="Ellipse 282" transform="translate(1532 192)" fill="none" stroke="#979798" stroke-width="2">
+      <circle cx="10.5" cy="10.5" r="10.5" stroke="none"/>
+      <circle cx="10.5" cy="10.5" r="9.5" fill="none"/>
+    </g>
+    <path id="bxs-download" d="M16.1,8.749h-2.64V3.5H9.506V8.749H6.866l4.619,5.279Z" transform="translate(1531.102 194.352)" fill="#979798"/>
+  </g>
+</svg>

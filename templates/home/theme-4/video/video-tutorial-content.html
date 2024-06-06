@@ -1,0 +1,31 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if video_list|length > 0 %}
+    {% for video in video_list %}  
+        <li>
+            <a href="javascript:void(0);" onclick="videoPlay('{{ video.video_url }}');">
+            <div class="item">
+                <figure>
+                    <img src="{% static 'theme-2/images/transparent.png' %}" alt="real estate sales">
+                    <img class="article-pic" src="https://i.ytimg.com/vi/{{ video.video_url|cut:'https://www.youtube.com/watch?v=' }}/maxresdefault.jpg" alt="real estate sales">
+                    <span class="play-icon"></span>
+                </figure>
+                <figcaption>
+                    <h5>
+                        {{ video.title|default:'' }}
+                    </h5>
+                    {% autoescape off %}
+                        {{ video.description|default:'' }}
+                    {% endautoescape %}
+                </figcaption>
+            </div>
+            </a>
+        </li>
+    {% endfor %}
+    {% else %}
+        <li class="text-center text-danger" style="width:100%;">
+            <img src="{% static 'admin/images/no-data-image.png' %}" alt="No Data Found" role="img" class="center mb0" />
+        </li>
+    {% endif %}
+  

@@ -1,0 +1,74 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if contact_list %}
+                {% for contact in contact_list %}
+                <div class="parcel_blocks" id="contact_row_{{ contact.id }}">
+                  <ul class="bottom">
+                    <li>
+                      No :  {{ forloop.counter0|add:sno }}
+                    </li>
+                    <li>
+                        Submit Date |
+                        <span class="item convert_to_local_date_time date-block" data-value="{{ contact.added_on|default:'' }}">
+                          {{ contact.added_on }}
+                        </span>
+                    </li>
+                  </ul>
+                  <ul class="top">
+                    <li>
+                      <h6 class="name">
+                        {{ contact.first_name|default:"" }}
+                        <span>
+                          Name
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      <div class="buyer-name">
+                        <i class="fa-solid fa-user"></i>
+                        <h6>
+                          {{ contact.user_type|default:'' }}
+                          <span>
+                            User Type
+                          </span>
+                        </h6>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="email-text">
+                        <i class="fa-solid fa-envelope"></i>
+                        {{ contact.email|default:"" }}
+                      </div>
+                      <div class="email-text">
+                        <i class="fa-solid fa-phone"></i>
+                        {{ contact.phone_no|default:''|format_phone }}
+                      </div>
+                    </li>
+                    <li>
+                      <div class="email-text">
+                        <i class="fa-solid fa-comment-dots"></i>
+                        <a href="javascript:void(0)" onclick="contact_detail({{ contact.id }})">View Message</a>
+                      </div>
+                    </li>
+                  </ul>
+                </div><!-- End .block-item -->
+                {% endfor %}
+                {% else %}
+                <div class="parcel_blocks">
+                  <ul class="bottom">
+                    <li>
+                      No data Available
+                    </li>
+                  </ul>
+                  <ul class="top">
+                    <li class="fullwidth">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" class=""/>
+                    </li>
+                  </ul>
+                </div><!-- End .block-item -->
+                {% endif %}
+
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.6"></script>
+
+{% endblock %}

@@ -1,0 +1,303 @@
+{% extends "layout/theme-4/user-dashboard/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+
+      <div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  Edit Profile
+                </h6>
+              </div>
+              <div class="block">
+                <ul class="profile-tab">
+                  <li class="{% if not request.GET.tab %}active{% endif %}">
+                    <a role="button" href="#personal-info" id="personal_info">Personal Info</a>
+                  </li>
+                  <li class="{% if request.GET.tab == 'change_password' %}active{% endif %}">
+                    <a role="button" href="#change-pwd" id="change_password">Change Password</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="profile-box">
+              
+              <div class="tab-body">
+                <div id="personal-info" style="{% if not request.GET.tab %}display:block;{% else %}display:none;{% endif %}">
+                  <div class="row">
+                    <div class="col-lg-12 col-sm-12">
+                      <form enctype="multipart/form-data" name="uploadPic" id="uploadPic" method="post">
+                        <div class="upload-photo">
+                          <div class="item">
+                            <a role="button" href="javascript:void(0)" id="delete_profile_pic" onclick="confirm_delete_profile_image('{{ profile_data.profile_image.upload_id|default:'' }}','{{ profile_data.profile_image.bucket_name|default:'' }}','{{ profile_data.profile_image.doc_file_name|default:'' }}');" class="delete-icon" style="{% if profile_data.profile_image.doc_file_name %}display:block;{% else %}display:none;{% endif %}"><i class="fas fa-trash"></i></a>
+                            <img id="user_profile" src="{% if profile_data.profile_image.doc_file_name %}{{ aws_url }}{{ profile_data.profile_image.bucket_name }}/{{ profile_data.profile_image.doc_file_name }}{% else %}{% static 'theme-4/user-dashboard/images/no-image.png' %}{% endif %}" alt="real estate sales">
+                          </div>
+                          <div class="item">
+                            A photo helps personalize your account<br>
+                            <div class="upload-pic" id="profile_pic">
+                              <input type="file" name="profile_pic" id="profile_pic" />
+                              <label for="profile_pic"><i class="fa-solid fa-plus"></i> Upload</label>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+
+                      <form id="editProfile" name="editProfile" method="post">
+                        <input type="hidden" name="profile_image" id="profile_image" value="{{ profile_data.profile_image.upload_id|default:'' }}">
+                        <input type="hidden" name="pic_name" id="pic_name" value="{{ profile_data.profile_image.doc_file_name|default:'' }}">
+                        
+                        {% comment %} 
+                        
+                        <div class="form-group {% if profile_data.described_by %}focused{% endif %}">
+                          <label class="form-label" for="describedBy">What Describes You Best?</label>
+                          <select id="describedBy" name="described_by" class="select form-control" required>
+                            <option value="1" {% if profile_data.described_by == 1 %}selected{% endif %} >Buyer</option>
+                            <option value="2" {% if profile_data.described_by == 2 %}selected{% endif %}>Seller </option>
+                            <option value="3" {% if profile_data.described_by == 3 %}selected{% endif %}>Broker/Agent </option>
+                          </select>
+                        </div> {% endcomment %}
+
+                        <div class="row">
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group {% if profile_data.first_name %}focused{% endif %}">
+                              <label class="form-label" for="first_name">First Name</label>
+                              <input type="text" class="form-input" placeholder="" id="first_name" name="first_name" value="{% if profile_data.first_name %}{{ profile_data.first_name }}{% endif %}" maxlength="40" onkeypress="return validateAlpha(event);">
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group {% if profile_data.last_name %}focused{% endif %}">
+                              <label class="form-label" for="last_name">Last Name</label>
+                              <input type="text" class="form-input" placeholder="" id="last_name" name="last_name" value="{% if profile_data.last_name %}{{ profile_data.last_name }}{% endif %}" maxlength="40"  onkeypress="return validateAlpha(event);">
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group {% if profile_data.email %}focused{% endif %}">
+                              <label class="form-label" for="email">Email</label>
+                              <input type="text" class="form-input" placeholder="" id="email" name="email" value="{{ profile_data.email|default:'' }}">
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group {% if profile_data.phone_no %}focused{% endif %}">
+                              <label class="form-label" for="phone_no">Phone number</label>
+                              <input type="text" class="form-input" placeholder="" id="phone_no" name="phone_no" value="{% if profile_data.phone_no %}{{ profile_data.phone_no }} {% endif %}" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true">
+                            </div>
+                          </div>
+                          {% csrf_token %}
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group focused">
+                              <label class="form-label" for="state">Country</label>
+                              <select class="select chosen-select form-control" name="country" id="country" data-placeholder="Select">
+                                  <option value="">Select</option>
+                                  {% for country in country_list %}
+                                    <option value="{{ country.id }}" data-short-code="{{ country.alpha2_code }}" {% if country.id == profile_data.address.country%}selected{% endif %}>{{ country.country_name }}</option>
+                                  {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group focused">
+                              <label class="form-label" for="address_first">Address</label>
+                              <input type="text" class="form-input" placeholder="" id="address_first" name="address_first" value="{{ profile_data.address.address_first|default:'' }}">
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group focused {% if profile_data.postal_code %}focused{% endif %}">
+                              <label class="form-label" for="zip_code">Zip Code</label>
+                              <input type="text" class="form-input" placeholder="" id="zip_code" name="zip_code" value="{{ profile_data.address.postal_code|default:'' }}">
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group focused">
+                              <label class="form-label" for="address_city">City</label>
+                              <input type="text" class="form-input" placeholder="" id="address_city" name="address_city" value="{{ profile_data.address.city|default:'' }}">
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group focused">
+                              <label class="form-label" for="state">State</label>
+                              <select class="select form-control" name="state" id="state">
+                                <option value="">Select</option>
+                                {% for state in state_list %}
+                                  <option value="{{ state.id }}" data-short-code="{{ state.iso_name }}" {% if state.id == profile_data.address.state %}selected{% endif %}>{{ state.state_name }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group brokerage-name {% if profile_data.brokerage_name %}focused{% endif %}" {% if profile_data.described_by != 3 %} style="display:none"{% endif %} >
+                              <label class="form-label" for="brokerage_name">Brokerage Name</label>
+                              <input type="text" class="form-input" placeholder="" id="brokerage_name" name="brokerage_name" value="{{ profile_data.brokerage_name|default:'' }}">
+                            </div>
+                          </div>
+                          <div class="col-md-4 col-sm-6">
+                            <div class="form-group licence-number {% if profile_data.licence_number %}focused{% endif %}" {% if profile_data.described_by != 3 %} style="display:none"{% endif %} >
+                              <label class="form-label" for="licence_number">License State and Number (EX: KS 012345678)</label>
+                              <input type="text" class="form-input" placeholder="" id="licence_number" name="licence_number" value="{{ profile_data.licence_number|default:'' }}">
+                            </div>
+                          </div>
+                          <div class="col-md-12 col-sm-12 pt10">
+                            <button role="button" type="submit" id="btn_editProfile" class="btn btn-secondary">Save</button>
+                          </div>
+
+                        </div>
+                        
+                      </form>
+                    </div>
+                  </div>
+                </div><!-- End .personal-info -->
+                <div id="change-pwd" style="{% if request.GET.tab == 'change_password' %}display:block;{% else %}display:none;{% endif %}">
+                  <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                      <form id="changePassword" name="changePassword" method="post">
+                        <input type="hidden" name="change_password" id="change_password" value="1">
+                        <div class="form-group">
+                          <span class="icon eye-icon" onmouseenter="view_password('password')" onmouseleave="remove_view_password('password')"><i class="far fa-eye"></i></span>
+                          <label class="form-label" for="password">Current Password</label>
+                          <input type="password" id="password" name="password" class="form-input" placeholder="" value="">
+                        </div>
+                        <div class="form-group">
+                          <span class="icon eye-icon" onmouseenter="view_password('new_password')" onmouseleave="remove_view_password('new_password')"><i class="far fa-eye"></i></span>
+                          <label class="form-label" for="new_password">New Password</label>
+                          <input type="password" id="new_password" name="new_password" class="form-input" placeholder="" value="">
+                        </div>
+                        <div class="form-group">
+                          <span class="icon eye-icon" onmouseenter="view_password('confirm_password')" onmouseleave="remove_view_password('confirm_password')"><i class="far fa-eye"></i></span>
+                          <label class="form-label" for="confirm_password">Confirm Password</label>
+                          <input type="password" id="confirm_password" name="confirm_password" class="form-input" placeholder="" value="">
+                        </div>
+                        <ul class="security-list" id="security-list">
+                        </ul>
+                        <div class="pt10 clearfix">
+                          <button type="submit" id="btn_pwd" class="btn btn-secondary">Save</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+
+                </div><!-- End .change-pwd -->
+              </div><!-- End .tab-body -->
+            </div><!-- End .profile-box -->
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+
+      {% if show_begin_setup %}
+      <div id="welcomeModal" class="modal centered-modal welcomeModalwrap" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Welcome to Gsa, {{request.session.first_name}}</h5>
+              <button type="button" class="close close-welcome-modal" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>
+                <img src="{% static 'theme-4/user-dashboard/images/welcome.png' %}" alt="real estate sales">
+              </p>
+              <p>
+                The first thing you need to do is to create your company profile. We just need some basic information to get you setup. If you ever get lost during the setup process just look for the next step in the bottom left hand corner.
+              </p>
+              <div class="clearfix right">
+                <button class="btn btn-secondary close-welcome-modal" data-dismiss="modal" aria-label="Close">Begin Setup</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+<div class="overlay" style="display:none;">
+  <div class="loader">Loading...</div>
+</div>
+<div id="confirmProfileImageDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="popup_section" id="popup_section" value=""/>
+                <input type="hidden" name="popup_image_id" id="popup_image_id" value=""/>
+                <input type="hidden" name="popup_image_name" id="popup_image_name" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button" class="btn btn-primary-bdr del_profile_pic_btn" id="del_profile_pic_false">No</button> <button type="button" class="btn btn-primary del_profile_pic_btn" id="del_profile_pic_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .conformation delete profile pic modal -->
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static '/theme-common/js/mask_input.js' %}"></script>
+<script type="text/javascript" src="{% static '/theme-common/js/profile.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static '/theme-common/js/common.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static '/theme-common/js/custom_validator.js' %}?v=2.0"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/profile_tour.js' %}?v=3.1"></script>
+<script>
+    var is_first_login = {{request.session.is_first_login}};
+    $(function(){
+      var openModal = '{{show_begin_setup}}'
+      if(openModal.toLowerCase() == 'true'){
+        $('#welcomeModal').modal('show')
+      }
+    });
+    $('#state, #describedBy').chosen();
+    try{
+      var tab = '{{ request.GET.tab }}';
+      if(!tab){
+        $('.profile-tab li:first').addClass('active');
+        $('.tab-body > div').hide();
+        $('.tab-body > div:first').show();
+      }
+    }catch(ex){
+      console.log(ex);
+    }
+
+
+    $('.profile-tab a').click(function() {
+      $('.profile-tab li').removeClass('active');
+      $(this).parent().addClass('active');
+      var activeTab = $(this).attr('href');
+      $('.tab-body > div:visible').hide();
+      $(activeTab).show();
+      return false;
+    });
+  </script>
+
+<script>
+  $('.form-input').focus(function(){
+    $(this).parents('.form-group').addClass('focused');
+  });
+
+  $('.form-input').blur(function(){
+    var inputValue = $(this).val();
+    if ( inputValue == "" ) {
+      $(this).removeClass('filled');
+      $(this).parents('.form-group').removeClass('focused');  
+    } else {
+      $(this).addClass('filled');
+    }
+  });
+</script>
+{% endblock %}  

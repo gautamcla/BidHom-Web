@@ -1,0 +1,69 @@
+{% load static %}
+{% load dashboard_extra %}
+
+<div class="box">
+  <h5>
+    <span>Blog Categories</span>
+  </h5>
+  <div class="whitebox">
+    <ul class="category-list">
+      {% if blog_category %}
+      {% for cat in blog_category %}
+      {{ absolute}}
+      <li>
+        <a href="javascript:void(0)" role="button" tabindex="4" onclick="blogListingSearch(1,{{ cat.id }})">{{ cat.name }}</a>
+      </li>
+      {% endfor %}
+      {% endif %}
+
+    </ul>
+  </div>
+</div><!-- End .box -->
+
+<div class="box">
+  <h5>
+    <span>Recent Posts</span>
+  </h5>
+  <div class="whitebox recent-post">
+    {% if blog_recent_post %}
+      {% for recent_post in blog_recent_post %}
+      <div class="item">
+        <div class="block">
+          <figure>
+            <img src="{% if recent_post.article_image.image_name %}{{ aws_url }}{{ recent_post.article_image.bucket_name }}/{{ recent_post.article_image.image_name }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+          </figure>
+        </div>
+        <div class="block">
+          <h6>
+            <a role="button" tabindex="5" href="/blog-details/?id={{ recent_post.id }}">{{ recent_post.title|default:'' }} </a>
+          </h6>
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+  </div>
+</div><!-- End .box -->
+
+<div class="box">
+  <h5>
+    <span>Enquire</span>
+  </h5>
+  <form id="blogEnquiryFrm" name="blogEnquiryFrm" method="post">
+    {% csrf_token %}
+  <div class="whitebox">
+    <div class="form-group">
+      <input type="text" name="user_first_name" id="user_first_name" placeholder="Name" class="form-control" aria-label="name" role="textbox">
+    </div>
+    <div class="form-group">
+      <input type="email" name="usr_email" id="usr_email" placeholder="Email" class="form-control" aria-label="Email" role="textbox">
+    </div>
+    <div class="form-group">
+      <input type="text" name="user_phone_no" id="user_phone_no" placeholder="Phone" class="form-control" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true" aria-label="Phone" role="textbox">
+    </div>
+    <div class="form-group">
+      <input type="text" name="user_message" id="user_message" placeholder="Message" class="form-control" aria-label="Message" role="textbox">
+    </div>
+    <button role="button" class="btn btn-primary-fill width100">Submit</button>
+  </div>
+  </form>
+</div><!-- End .box -->

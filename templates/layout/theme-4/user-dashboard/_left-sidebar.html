@@ -1,0 +1,88 @@
+{% load static %}
+<div id="sidebar" class="sidebar open">
+      <!-- <div class="logo">
+        <img class="logo_full" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-4/user-dashboard/images/logo-white.svg' %}{% endif %}" alt="" width="160">
+        <img class="logo_icon" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-4/user-dashboard/images/logo-icon.png' %}{% endif %}" alt="">
+      </div> -->
+      <div class="profile-top">
+        <figure>
+          <img id="user_dashboard_img" src="{% if request.session.profile_image.doc_file_name %}{{ aws_url }}{{ request.session.profile_image.bucket_name }}/{{ request.session.profile_image.doc_file_name }}{% else %}{% static 'theme-4/user-dashboard/images/user-pic.png' %}{% endif %}" alt="">
+        </figure>
+        <figcaption>
+          <h6>
+<!--             {% if request.session.first_name %}{{request.session.first_name}} {% if request.session.user_type_name %}<br />({{ request.session.user_type_name}}){% endif %}{% else %} William{% endif %}-->
+            {% if request.session.first_name %}{{request.session.first_name}} {% else %} {% endif %}
+          </h6>
+          <!--<p class="designation">(User)</p>-->
+        </figcaption>
+      </div>
+      <div class="sidemenu">
+        <ul>
+          <!--<li>
+            <span class="customTooltip">My Bids</span>
+            <a href="/my-bids/" class="{% if active_menu == 'my_bid' %}active{% endif %}">
+              <i class="fas fa-gavel"></i> <span class="namelabel">My Bids</span>
+            </a>
+          </li>-->
+          <li>
+            <span class="customTooltip">My Bids</span>
+            <a role="button" tabindex="24" href="/my-bids/" class="{% if active_menu == 'my_bid' %}active{% endif %}">
+              <i class="fas fa-gavel" role="presentation"></i> <span class="namelabel">My Bids</span>
+            </a>
+            <!-- <ul style="{% if active_menu == 'insider_bid' or active_menu == 'my_bid' %}display:block;{% else %}display:none;{% endif %}">
+              <li>
+                <a href="/my-bids/" class="{% if active_menu == 'my_bid' %}active{% endif %}">
+                  <i class="fas fa-laptop"></i> <span class="namelabel">Classic Online</span>
+                </a>
+              </li>
+              <li>
+                <a href="/insider-bids/" class="{% if active_menu == 'insider_bid' %}active{% endif %}">
+                  <i class="fas fa-laptop"></i> <span class="namelabel">Insider Auction</span>
+                </a>
+              </li>
+            </ul> -->
+          </li>
+          <li>
+            <span class="customTooltip">My Offers</span>
+            <a role="button" tabindex="25" href="/my-offers/">
+              <i class="fas fa-gift" role="presentation"></i> <span class="namelabel">My Offers</span>
+            </a>
+            <!-- <ul style="{% if active_menu == 'traditional_offer' or active_menu == 'best_offer' %}display:block;{% else %}display:none;{% endif %}">
+              <li>
+                <a href="/best-offers/" class="{% if active_menu == 'best_offer' %}active{% endif %}">
+                  <i class="fas fa-gift"></i> <span class="namelabel">Highest & Best Offer</span>
+                </a>
+              </li>
+              <li>
+                <a href="/my-offers/" class="{% if active_menu == 'traditional_offer' %}active{% endif %}">
+                  <i class="fas fa-gift"></i> <span class="namelabel">Traditional Sale</span>
+                </a>
+              </li>
+            </ul> -->
+          </li>
+          <li>
+            <span class="customTooltip">Favorite Listings</span>
+            <a role="button" tabindex="26" href="/favourite-listings/" class="{% if active_menu == 'favourite_listing' %}active{% endif %}">
+              <i class="fas fa-star" role="presentation"></i> <span class="namelabel">Favorite Listings</span>
+            </a>
+          </li>
+          <!--<li>
+            <a href="#">
+              <i class="fas fa-briefcase"></i> Save Search
+            </a>
+          </li>-->
+          <li>
+            <span class="customTooltip">Edit Profile</span>
+            <a role="button" tabindex="27" href="/edit-profile/" class="{% if active_menu == 'edit_profile' %}active{% endif %}">
+              <i class="fas fa-user" role="presentation"></i> <span class="namelabel">Edit Profile</span>
+            </a>
+          </li>
+          <li>
+            <span class="customTooltip">Chat</span>
+            <a role="button" tabindex="28" href="/chat/" class="{% if active_menu == 'chat' %}active{% endif %}">
+              <i class="fas fa-comments" role="presentation"></i> <span class="namelabel">Chat</span> <span id="userDashboardChatCount" class="circle" style="display:none;">5</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div><!-- End .sidebar -->

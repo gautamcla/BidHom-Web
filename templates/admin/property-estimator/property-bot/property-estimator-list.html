@@ -1,0 +1,207 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% block title %} Property Estimator List {% endblock title %}
+
+{% block style %}
+  <link href="{% static 'admin/vendors/jQuery-Multiple-Select/dist/css/selectize.bootstrap3.css' %}" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>Property Estimator List</h3>
+        </div>
+          <div class="title_right">
+            <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+            <div class="input-group">
+                <input type="text" id="estimator_search" class="form-control" placeholder="Search for..." value="{{search|default:''}}">
+                <span class="input-group-btn">
+                <button class="btn btn-secondary searchBtn"  type="button" onclick="ajax_estimate_list(1)">Go!</button>
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="listing-filter">
+          <div class="block right">
+            <i class="fa fa-filter"></i> Filters
+          </div>
+          <div class="block" style="min-width: 130px;">
+              <select class="form-control" id="domain_id" name="domain_id" required="required" multiple onchange="ajax_estimate_list(1)">
+                  <option  value="" selected disabled>All Domains</option>
+                  {% for obj in domain_list %}
+                      {% if obj.is_active %}
+                          <option value="{{obj.id}}">{{obj.domain_name}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </div>
+          <!--<div class="block">
+            <a href="/admin/save-estimator-question/" type="button" class="btn btn-primary" style="float:right;" id="addEstimatorQuestion"><i class="fa fa-plus-circle"></i> Add Question</a>
+          </div>-->
+        </div>
+
+        <div class="clearfix"></div>
+
+
+
+
+      <div class="row">
+
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_content">
+
+              {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+              <div class="table-responsive">
+                <table class="table table-striped bulk_action">
+                  <thead>
+                    <tr class="headings">
+                      <th class="column-title">ID </th>
+                      <th class="column-title">Name </th>
+                      <th class="column-title">User Type </th>
+                      <th class="column-title">Email </th>
+                      <th class="column-title">Phone </th>
+                      <th class="column-title">Property Type </th>
+                      <th class="column-title">Created Date </th>
+                      <th class="column-title">Assign To </th>
+                      <th class="column-title">Status </th>
+                      <th class="column-title">Message </th>
+                      <th class="column-title no-link last"><span class="nobr">View Details</span>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="propertyEstimatorList">
+                    {% if estimator_list %}
+                        {% for estimator in estimator_list %}
+                        <tr class="even pointer">
+                        <td class=" ">{{ forloop.counter0|add:sno }}</td>
+                        <td class=" ">{{ estimator.user_first_name|default:'' }} {{ estimator.user_last_name|default:'' }}</td>
+                        <td class=" ">{{ estimator.user_type|default:'' }}</td>
+                        <td class=" ">{{ estimator.user_email|default:'' }}</td>
+                        <td class=" ">{{ estimator.user_phone_no|phone_split|default:'-' }}</td>
+                        <td class=" ">{{ estimator.property_type|default:'' }}</td>
+                        <td class="convert_to_local_date" data-value="{{ estimator.added_on|default:'' }}">{{ estimator.added_on }}</td>
+                        <td class=" ">
+                            {% if estimator.assign_to_first_name %}
+                                {{ estimator.assign_to_first_name|default:'' }} {{ estimator.assign_to_last_name|default:'' }}
+                            {% else %}
+                              Not Assigned Yet
+                            {% endif %}
+                        </td>
+                        <td class=" ">
+                          <a type="button" class="btn  btn-xs btn-round {% if estimator.complete_status_id == 2 %} btn-danger{% elif estimator.complete_status_id == 4 %} btn-warning{% else %}btn-success{% endif %}" id="statusText{{user.id}}">{{ estimator.complete_status|default:'' }}</a>
+                        </td>
+                        <td>
+                            <a href="javascript:void(0)" onclick="show_message('{{ estimator.review_msg|escape_char|default:'' }}');" class="blue-text" title="View Message">View Message</a>
+                        </td>
+                        <td class="last">
+                          <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                            <a href="/admin/estimator-details/?id={{estimator.id}}" type="button" data-id="{{estimator.id}}"  class="btn btn-xs btn-round btn-primary edit-question"><i class="fa fa-eye"></i> View</a>
+
+                          </div>
+
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>  <td class=" ">No Data available </td></tr>
+                    {% endif %}
+
+                  </tbody>
+                </table>
+                <nav aria-label="Page navigation example" style="float:right;">
+                  <input type="hidden" id="page-estimator-list" value="1"/>
+                  <ul class="pagination justify-content-end" id="propertyEstimatorPagination">
+                      {{pagination_html|safe}}
+                  </ul>
+                </nav>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="viewMsgHistoryModal" class="modal centered-modal personalModalwrap confirmModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Message</h5>
+          <button type="button" class="close" id="msg_close_true" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!--<input type="hidden" name="estimator_id" id="estimator_id" value=""/>
+          <div class="form-group">
+            <label for="agent_comment" class="pb10">Message</label>
+            <textarea name="agent_comment" class="form-control textarea bdr" id="agent_comment" cols="30" rows="4" placeholder="Enter Your Message"></textarea>
+            <p class="error" id="agent_comment_err" style="display:none;"></p>
+          </div>-->
+          <p id="usr_msg"></p>
+          <div class="clearfix center">
+              <button type="button" data-dismiss="modal" class="btn btn-primary-bdr" id="close_msg_pop">Ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  <div class="overlay" style="display:none;">
+                <div class="loader">Loading...</div>
+              </div>
+</div>
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+      // hit add event type modal
+      /*if(window.location.hash && window.location.hash == '#add-event-type' ) {
+          var hash = window.location.hash;
+          window.history.pushState({}, "", window.location.href.split("#")[0]);
+          $('.' + hash.split('#')[1]).modal('show');
+      }*/
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/property-estimator.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/build/js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/vendors/jQuery-Multiple-Select/dist/js/standalone/selectize.js' %}"></script>
+<script>
+    $(function() {
+    $('select[multiple]').selectize(
+        {
+            plugins: ['remove_button'],
+            delimiter: ',',
+            persist: false,
+            create: false,
+        }
+    );
+});
+</script>
+{% endblock %}

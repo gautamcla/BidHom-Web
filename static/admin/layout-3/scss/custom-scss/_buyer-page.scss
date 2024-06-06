@@ -1,0 +1,660 @@
+.investment-wrap {
+    padding: 3% 0;
+    h2 {
+        font-family: 'PT Serif';
+        font-size: 48px;
+        line-height: 46px;
+        font-weight: bold;
+        padding-left: 10px;
+        margin-bottom: 40px;
+        border-left: 2px solid $secondary;
+        display: flex;
+        align-items: center;
+        @include breakpoint(lg) {
+            font-size: 34px;
+            line-height: 40px;
+            margin-bottom: 30px;
+        }
+        @include breakpoint(sm) {
+            font-size: 30px;
+            line-height: 35px;
+            margin-bottom: 20px;
+        }
+        @include breakpoint(xs) {
+            font-size: 28px;
+            line-height: 30px;
+        }
+        .hr-line {
+            margin-left: 15px;
+            width: 75px;
+            height: 1px;
+            background: $secondary;
+            display: inline-block;
+        }
+    }
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+        padding-top: 30px;
+        @include breakpoint(xs) {
+            display: block;
+        }
+        li {
+            width: 33.3%;
+            padding: 0 15px 30px;
+            cursor: pointer;
+            @include breakpoint(md) {
+                width: 50%;
+            }
+            @include breakpoint(xs) {
+                width: 100%;
+            }
+            &:hover {
+                .item {
+                    border-color: $secondary;
+                }
+            }
+            .item {
+                border: 1px solid #666;
+                height: 100%;
+                text-align: center;
+                padding: 40px 30px;
+                @include breakpoint(xs) {
+                    padding: 20px;
+                }
+                h4 {
+                    font-weight: 500;
+                    font-size: 28px;
+                    padding-bottom: 10px;
+                    span {
+                        display: block;
+                    }
+                    @include breakpoint(lg) {
+                        font-size: 20px;
+                    }
+                }
+                p {
+                    margin-bottom: 0;
+                }
+                .icon {
+                    width: 78px;
+                    height: 65px;
+                    margin-bottom: 20px;
+                    display: inline-block;
+                    @include iconBg();
+                    &.icon-1 {
+                        background-position: -9px -630px;
+                    }
+                    &.icon-2 {
+                        background-position: -105px -626px;
+                    }
+                    &.icon-3 {
+                        background-position: -204px -628px;
+                    }
+                    &.icon-4 {
+                        background-position: -314px -630px;
+                    }
+                    &.icon-5 {
+                        background-position: -414px -628px;
+                    }
+                    &.icon-6 {
+                        background-position: -512px -625px;
+                    }
+                    &.icon-7 {
+                        background-position: -614px -625px;
+                    }
+                    &.icon-8 {
+                        background-position: -712px -628px;
+                    }
+                    &.icon-9 {
+                        background-position: -1px -715px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.multiinvest-wrap {
+    padding: 5% 0;
+    background: url(../images/bid-work-bg.jpg) no-repeat 0 0 / cover;
+    h2 {
+        font-family: 'PT Serif';
+        font-size: 48px;
+        line-height: 46px;
+        font-weight: bold;
+        padding-left: 10px;
+        margin-bottom: 40px;
+        border-left: 2px solid $secondary;
+        display: flex;
+        align-items: center;
+        @include breakpoint(lg) {
+            font-size: 34px;
+            line-height: 40px;
+            margin-bottom: 30px;
+        }
+        @include breakpoint(sm) {
+            font-size: 30px;
+            line-height: 35px;
+            margin-bottom: 20px;
+        }
+        @include breakpoint(xs) {
+            font-size: 28px;
+            line-height: 30px;
+        }
+        .hr-line {
+            margin-left: 15px;
+            width: 75px;
+            height: 1px;
+            background: $secondary;
+            display: inline-block;
+        }
+    }
+    .item {
+        display: flex;
+        @include breakpoint(md) {
+            display: block;
+        }
+        .block {
+            width: 58%;
+            position: relative;
+            @include breakpoint(md) {
+                width: 100%;
+                padding-bottom: 30px;
+            }
+            ul {
+                li {
+                    padding: 0 0 35px;
+                    &:last-child {
+                        padding-bottom: 0;
+                    }
+                    h5 {
+                        padding: 0 0 0 35px;
+                        position: relative;
+                        font-weight: 600;
+                        &:before {
+                            content: "";
+                            position: absolute;
+                            top: 3px;
+                            left: 0;
+                            width: 20px;
+                            height: 20px;
+                            background: $iconBg;
+                            background-position: -167px -16px;
+                        }
+                    }
+                    ol {
+                        display: flex;
+                        margin: 0;
+                        padding: 0;
+                        li {
+                            padding: 0 8px;
+                            color: $secondary;
+                            line-height: 16px;
+                            font-size: $fontLarge;
+                            border-right: 1px solid $black;
+                            @include breakpoint(xs) {
+                                padding: 0 5px;
+                                font-size: $font14;
+                            }
+                            @include breakpoint(xxs) {
+                                font-size: $fontMiddle;
+                            }
+                            &:last-child {
+                                padding-right: 0;
+                                border-right: none;
+                            }
+                            &:first-child {
+                                padding-left: 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            &:last-child {
+                padding-left: 40px;
+                width: 42%;
+                @include breakpoint(md) {
+                    width: 100%;
+                    padding-left: 0;
+                }
+            }
+            figure {
+                position: relative;
+                z-index: 1;
+                width: 120%;
+                img {
+                    width: 100%;
+                    max-width: 100%;
+                }
+                .wwwu-inner-border-accent {
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    border-top: 2px solid $white;
+                    border-left: 2px solid $white;
+                    width: calc(100% - 20px);
+                    height: calc(100% - 20px);
+                    pointer-events: none;
+                    z-index: -1;
+                    @include breakpoint(sm) {
+                        left: 10px;
+                    }
+                }
+                .wwwu-outer-border-accent {
+                    position: absolute;
+                    bottom: -20px;
+                    right: -20px;
+                    border: 2px solid $secondary;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: -1;
+                    @include breakpoint(sm) {
+                        right: -10px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.different-wrap {
+    padding: 5% 0;
+    background: url(../images/bid-work-bg.jpg) no-repeat 0 0 / cover;
+    h2 {
+        font-family: 'PT Serif';
+        color: $white;
+        font-size: 48px;
+        line-height: 50px;
+        font-weight: bold;
+        margin-bottom: 0;
+        text-align: center;
+        padding: 20px 0;
+        @include breakpoint(lg) {
+            font-size: 34px;
+        }
+        @include breakpoint(sm) {
+            font-size: 30px;
+        }
+        @include breakpoint(xs) {
+            font-size: 28px;
+        }
+    }
+    .different-box {
+        width: 90%;
+        margin: 0 auto;
+        @include breakpoint(xs) {
+            overflow-x: auto;
+            width: 100%;
+        }
+    }
+
+    .item {
+        display: flex;
+        margin: 0;
+        @include breakpoint(xs) {
+            width: 750px;
+        }
+        .block {
+            &:first-child {
+                width: 33.4%;
+                background: $secondary;
+                text-align: center;
+                padding: 30px 0;
+            }
+            &:last-child {
+                width: 66.6%;
+            }
+            h2 {
+                background: $gray;
+            }
+            .diff-items {
+                display: flex;
+                height: calc(100% - 90px);
+                .item-block {
+                    width: 50%;
+                    padding: 30px 0;
+                    text-align: center;
+                    background: #474747;
+                    border-right: 1px solid #6B6B6B;
+                    &:last-child {
+                        border-right: none;
+                    }
+                    .icon {
+                        width: 56px;
+                        height: 60px;
+                        display: inline-block;
+                        @include iconBg();
+                        &.traditional-icon {
+                            background-position: -101px -717px;
+                        }
+                        &.rewabids-icon {
+                            background-position: -200px -717px;
+                        }
+                    }
+                    h4 {
+                        color: $secondary;
+                        font-weight: 600;
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+    table {
+        width: 100%;
+        margin: 0;
+        border: none;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+        @include breakpoint(xs) {
+            width: 750px;
+        }
+        tr {
+            background: #333;
+            &:nth-child(even){
+                background: #474747;
+            }
+            td {
+                font-size: 20px;
+                line-height: 30px;
+                text-align: center;
+                padding: 15px 0;
+                width: 33.3%;
+                border-right: 1px solid #6B6B6B;
+                @include breakpoint(xs) {
+                    font-size: $font14;
+                }
+                &:first-child {
+                    font-weight: 600;
+                }
+                &:last-child {
+                    border-right: none;
+                }
+            }
+        }
+    }
+}
+
+
+.seller-benifits-wrap {
+    padding: 3% 0;
+    h2 {
+        font-family: 'PT Serif';
+        font-size: 48px;
+        line-height: 46px;
+        font-weight: bold;
+        padding-left: 10px;
+        margin-bottom: 40px;
+        border-left: 2px solid $secondary;
+        display: flex;
+        align-items: center;
+        @include breakpoint(lg) {
+            font-size: 34px;
+            line-height: 40px;
+            margin-bottom: 30px;
+        }
+        @include breakpoint(sm) {
+            font-size: 30px;
+            line-height: 35px;
+            margin-bottom: 20px;
+        }
+        @include breakpoint(xs) {
+            font-size: 28px;
+            line-height: 30px;
+        }
+        .hr-line {
+            margin-left: 15px;
+            width: 75px;
+            height: 1px;
+            background: $secondary;
+            display: inline-block;
+        }
+    }
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+        padding: 0;
+        @include breakpoint(xs) {
+            display: block;
+        }
+        li {
+            width: 33.3%;
+            padding: 0 15px 30px;
+            cursor: pointer;
+            @include breakpoint(md) {
+                width: 50%;
+            }
+            @include breakpoint(xs) {
+                width: 100%;
+            }
+            &:hover {
+                .item {
+                    border-color: $secondary;
+                }
+            }
+            .item {
+                border: 1px solid #666;
+                height: 100%;
+                text-align: center;
+                padding: 60px 40px 40px 40px;
+                @include breakpoint(xs) {
+                    padding: 40px 20px 20px 20px;
+                }
+                h4 {
+                    position: relative;
+                    font-weight: 500;
+                    font-size: 28px;
+                    padding-bottom: 10px;
+                    span {
+                        display: block;
+                    }
+                    @include breakpoint(lg) {
+                        font-size: 20px;
+                    }
+                    &:before {
+                        content: "";
+                        position: absolute;
+                        left: 50%;
+                        top: -20px;
+                        width: 45px;
+                        height: 5px;
+                        background: $secondary;
+                        transform: translateX(-50%);
+                    }
+                }
+                p {
+                    margin-bottom: 0;
+                    font-size: $fontExtraLarge;
+                    line-height: 28px;
+                }
+            }
+        }
+    }
+}
+
+.benifits-wrap {
+    padding: 3% 0;
+    h2 {
+        font-family: 'PT Serif';
+        font-size: 48px;
+        line-height: 46px;
+        font-weight: bold;
+        padding-left: 10px;
+        margin-bottom: 40px;
+        border-left: 2px solid $secondary;
+        display: flex;
+        align-items: center;
+        @include breakpoint(lg) {
+            font-size: 34px;
+            line-height: 40px;
+            margin-bottom: 30px;
+        }
+        @include breakpoint(sm) {
+            font-size: 30px;
+            line-height: 35px;
+            margin-bottom: 20px;
+        }
+        @include breakpoint(xs) {
+            font-size: 28px;
+            line-height: 30px;
+        }
+        .hr-line {
+            margin-left: 15px;
+            width: 75px;
+            height: 1px;
+            background: $secondary;
+            display: inline-block;
+        }
+    }
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+        padding: 30px 50px 0;
+        @include breakpoint(md) {
+            padding: 30px 0 0;
+        }
+        @include breakpoint(xs) {
+            display: block;
+            padding: 0;
+        }
+        li {
+            width: 50%;
+            padding: 0 15px 30px;
+            cursor: pointer;
+            @include breakpoint(xs) {
+                width: 100%;
+            }
+            &:hover {
+                .item {
+                    border-color: $secondary;
+                }
+            }
+            .item {
+                border: 1px solid #666;
+                height: 100%;
+                text-align: center;
+                padding: 60px 40px 40px 40px;
+                @include breakpoint(xs) {
+                    padding: 40px 20px 20px 20px;
+                }
+                h4 {
+                    position: relative;
+                    font-weight: 500;
+                    font-size: 28px;
+                    @include breakpoint(lg) {
+                        font-size: 20px;
+                    }
+                    &:before {
+                        content: "";
+                        position: absolute;
+                        left: 50%;
+                        top: -20px;
+                        width: 45px;
+                        height: 5px;
+                        background: $secondary;
+                        transform: translateX(-50%);
+                    }
+                }
+                p {
+                    margin-bottom: 0;
+                    font-size: $fontExtraLarge;
+                    line-height: 28px;
+                }
+            }
+        }
+    }
+}
+
+
+.testimonial-wrap {
+    position: relative;
+    padding: 5% 0;
+    background: url(../images/bid-work-bg.jpg) no-repeat 0 0 / cover;
+    &:before {
+        content: "";
+        position: absolute;
+        right: -60px;
+        top: 0;
+        width: 324px;
+        height: 278px;
+        opacity: 0.1;
+        background: url(../images/quote-icon.png) no-repeat;
+        @include breakpoint(xs) {
+            right: 0;
+        }
+    }
+    .btnn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 23px;
+        height: 43px;
+        display: inline-block;
+        @include iconBg();
+        @include breakpoint(xs) {
+            display: none;
+        }
+        &.prev {
+            left: 15px;
+            background-position: -99px -235px;
+        }
+        &.next {
+            right: 15px;
+            background-position: -169px -235px;
+        }
+    }
+    .owl-carousel {
+        width: 80%;
+        margin: 0 auto;
+        @include breakpoint(md) {
+            width: 90%;
+        }
+        @include breakpoint(xs) {
+            width: 100%;
+        }
+        .item {
+            text-align: center;
+            display: flex;
+            align-items: center;
+            flex-flow: column;
+            figure {
+                width: 120px;
+                height: 120px;
+                margin-bottom: 45px;
+                img {
+                    width: 100%;
+                    max-width: 100%;
+                    border: 2px solid $white;
+                    @include  border-radius(100%);
+                }
+            }
+            .quote-icon {
+                width: 27px;
+                height: 23px;
+                margin-bottom: 25px;
+            }
+            h5 {
+                line-height: 36px;
+            }
+            h4 {
+                font-weight: 600;
+                line-height: 32px;
+                margin-bottom: 10px;
+            }
+            .designation {
+                color: $secondary;
+                font-size: $fontMedium;
+                text-transform: uppercase;
+            }
+        }
+    }
+}

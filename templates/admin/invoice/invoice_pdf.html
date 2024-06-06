@@ -1,0 +1,304 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load tz %}
+{% load humanize %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;">
+    <meta http-equiv="x-ua-compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
+    <title>Invoice</title>
+    <style type="text/css">
+      @media screen and (max-width: 630px) {
+        .table {
+          width:100% !important;
+          height:auto !important;
+
+        }
+      }
+      table, tr, td {
+          border: none !important;
+      }
+      table, tr, td {
+        border: none;
+    }
+      
+      @media only screen and (max-width: 480px) {
+        .column {
+          width:100% !important;
+          display:block !important;
+        }
+        
+        .hide {
+          display:none !important;
+        }
+        
+        .table .image {
+          width:100% !important;
+          max-width:none !important;
+          max-height:none !important;
+          height:auto !important;
+        }
+        
+        .space {
+          padding-bottom:30px !important;
+        }
+        
+        .center {
+          text-align:center !important;
+        }
+        
+        .width100 {
+          width:100% !important;
+          padding-top:10px;
+        }
+        
+        
+        
+        .p-lr-20 {
+          padding-left:20px !important;
+          padding-right:20px !important;
+        }
+        
+        .font12 {
+          font-size:12px !important;
+        }
+        
+        
+        }
+        
+    </style>
+  </head>
+  <body style="margin: 0; padding: 0;">
+    <center>
+      <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;font-family:'Proxima Nova', '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;font-size:16px;line-height:1;">
+
+          <tr>
+            <td>
+              <table class="table" align="center" width="660" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;width:660px;border:1px solid #ddd;">
+
+                  <tr>
+                    <td>
+                      <table width="100%" cellspacing="0" cellpadding="0" style="width:100%;">
+
+                          <tr>
+                            <td colspan="2" width="55%" style="text-align: left; padding-left: 20px; background-color: #231f21;">
+                              <a href="#" target="_blank"><img src="static/admin/images/bidhom_logo_white.png" width="156" height="46" style="max-width: 156px; max-height: 46px; width: 156px; height: 46px;" alt="RealInsights"></a>
+                            </td>
+                            
+                            <td width="45%" style="background-color:#ec3d3d; padding:0 20px;">
+                              <h2 style="text-align: center; color: #FFF; font-size: 18px; line-height: 25px; padding-top: 10px; margin: 0;">
+                                INVOICE
+                              </h2>
+                              <table width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; margin: 0; padding: 0;">
+                                <tr>
+                                  <td width="40%" style="text-align: left; color: #FFF; font-size: 13px; line-height: 22px; margin: 0;">
+                                    Invoice No:
+                                  </td>
+                                  <td style="text-align: right; color: #FFF; font-size: 13px; line-height: 22px; margin: 0;">
+                                    {{ invoice.invoice|default:'-' }}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style="text-align: left; color: #FFF; font-size: 13px; line-height: 22px; margin: 0;">
+                                    Invoice Date:
+                                  </td>
+                                  <td style="text-align: right; color: #FFF; font-size: 13px; line-height: 22px; margin: 0;">
+                                    {{ invoice.timezone_payment_date|default:'' }}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style="text-align: left; color: #FFF; font-size: 13px; line-height: 22px; margin: 0;">
+                                    Customer ID:
+                                  </td>
+                                  <td style="text-align: right; color: #FFF; font-size: 13px; line-height: 22px; margin: 0;">
+                                    {{ invoice.customer|default:'-' }}
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="2">
+                              
+                            </td>
+                            <td width="40%" style="background-color:#ec3d3d; height: 15px;">
+                              
+                            </td>
+                          </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="height: 30px;">
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 20px;">
+                      <table width="100%" cellspacing="0" cellpadding="0" style="width:100%; text-align: left; padding: 0; margin: 0;">
+                        <tr>
+                          <td width="50%" style="text-align: left;">
+                            <h6 style="text-align: left; color: #ec3d3d; line-height: 20px; font-size: 13px; text-transform: uppercase; font-weight: bold; padding:0; margin: 0;">
+                              Invoice To:
+                            </h6>
+                            <h2 style="text-align: left; color: #231f21; line-height: 18px; font-size: 16px; margin: 0; padding: 5px 0;">
+                              {{ invoice.user_detail.first_name|default:'' }} {{ invoice.user_detail.last_name|default:'' }}
+                            </h2>
+                            <p style="text-align: left; color: #231f21; line-height: 20px; font-size: 13px; padding:0; margin: 0;">
+                              {{ invoice.user_detail.address_first|default:'' }}, {{ invoice.user_detail.city|default:'' }}, {{ invoice.user_detail.state|default:'' }}, {{ invoice.user_detail.postal_code|default:'' }} <br>
+                              Phone: {{ invoice.user_detail.phone_no|format_phone|default:'' }}<br>
+                              Email: {{ invoice.user_detail.email|default:'' }}
+                            </p>
+                          </td>
+                          <td width="50%" style="vertical-align: top;">
+                            <table width="100%" cellspacing="0" cellpadding="0" style="width:100%;">
+                              <tr>
+                                <td colspan="2">
+                                  <h6 style="text-align: left; color: #ec3d3d; font-size: 13px; line-height: 22px; text-transform: uppercase; font-weight: bold; margin: 0;">
+                                    Payment Method:
+                                  </h6>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td width="60%" style="text-align: left; color: #231f21; font-size: 13px; line-height: 22px; margin: 0;">
+                                  Payment Terms:
+                                </td>
+                                <td width="40%" style="text-align: right; color: #231f21; font-size: 13px; line-height: 22px; margin: 0;">
+                                  {{ invoice.payment_detail.payment_terms|default:'' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="text-align: left; color: #231f21; font-size: 13px; line-height: 22px; margin: 0;">
+                                  Visa Card Ending:
+                                </td>
+                                <td style="text-align: right; color: #231f21; font-size: 13px; line-height: 22px; margin: 0;">
+                                  XXXX 1234
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="height: 30px;">
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 20px;">
+                      <table width="100%" cellspacing="0" cellpadding="0" style="width:100%;">
+                        <!--<thead style="background-color: #231f21;">-->
+                          <tr style="background-color: #231f21;">
+                            <td style="text-align: left; color: #FFF; font-size: 13px; padding: 5px 10px;">
+                              Plan Name
+                            </td>
+                            <td style="text-align: left; color: #FFF; font-size: 13px; padding: 5px 10px;">
+                              Theme
+                            </td>
+                            <td style="text-align: left; color: #FFF; font-size: 13px; padding: 5px 10px;">
+                              Price
+                            </td>
+                            <td style="text-align: left; color: #FFF; font-size: 13px; padding: 5px 10px;">
+                              Net Amount
+                            </td>
+                            <td style="text-align: left; color: #FFF; font-size: 13px; padding: 5px 10px;">
+                              Tax
+                            </td>
+                            <td style="text-align: left; color: #FFF; font-size: 13px; padding: 5px 10px;">
+                              Total
+                            </td>
+                          </tr>
+                        <!--</thead>-->
+
+                          <tr>
+                            <td style="text-align: left; color: #231f21; font-size: 13px; padding: 5px 10px; line-height: 18px; background-color: #f6f7fb;">
+                              {{ invoice.member_plan|default:'' }}
+                              <!--<br>
+                              <span style="color:#888; font-size: 11px;">12 Apr 2021 to 23 Oct 2022</span>-->
+                            </td>
+                            <td style="text-align: left; color: #231f21; font-size: 13px; padding: 5px 10px; line-height: 18px; background-color: #f6f7fb;">
+                              {{ invoice.theme_name|default:'' }}
+                            </td>
+                            <td style="text-align: left; color: #231f21; font-size: 13px; padding: 5px 10px; line-height: 18px; background-color: #f6f7fb;">
+                              ${{ invoice.payment_detail.amount|convert_num|default:'' }}
+                            </td>
+                            <td style="text-align: left; color: #231f21; font-size: 13px; padding: 5px 10px; line-height: 18px; background-color: #f6f7fb;">
+                              ${{ invoice.payment_detail.amount|convert_num|default:'' }}
+                            </td>
+                            <td style="text-align: left; color: #231f21; font-size: 13px; padding: 5px 10px; line-height: 18px; background-color: #f6f7fb;">
+                              0
+                            </td>
+                            <td style="text-align: left; color: #231f21; font-size: 13px; padding: 5px 10px; line-height: 18px; background-color: #f6f7fb;">
+                              ${{ invoice.payment_detail.amount|convert_num|default:'' }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="3" style="font-size: 13px; padding: 5px 10px; line-height: 18px;">&nbsp;</td>
+                            <td colspan="2" style="text-align: left; color: #888; font-weight: bold; font-size: 13px; padding: 5px 10px; line-height: 18px;">
+                              Sub Total
+                            </td>
+                            <td style="text-align: left; color: #231f21; font-weight: bold; font-size: 13px; padding: 5px 10px; line-height: 18px;">
+                              ${{ invoice.payment_detail.amount|convert_num|default:'' }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="3" style="font-size: 13px; padding: 5px 10px; line-height: 18px;">&nbsp;</td>
+                            <td colspan="2" style="text-align: left; color: #888; font-weight: bold; font-size: 13px; padding: 5px 10px; line-height: 18px;">
+                              Tax
+                            </td>
+                            <td style="text-align: left; color: #231f21; font-weight: bold; font-size: 13px; padding: 5px 10px; line-height: 18px;">
+                              $0.00
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="3" style="text-align: left; color: #231f21; font-size: 13px; padding: 5px 10px;">&nbsp;</td>
+                            <td colspan="2" style="background-color: #ec3d3d; text-align:left; color: #FFF; font-weight: bold; font-size: 13px; padding: 5px 10px;">
+                              Total Amount
+                            </td>
+                            <td style="background-color: #ec3d3d; color: #FFF; text-align:left; font-weight: bold; font-size: 13px; padding: 5px 10px;">
+                              ${{ invoice.payment_detail.amount|convert_num|default:'' }}
+                            </td>
+                          </tr>
+
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="height: 50px;">
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 20px;">
+                      <h6 style="text-align: left; color: #ec3d3d; font-size: 13px; line-height: 22px; font-weight: bold;">
+                        Thank you for your business with us.
+                      </h6>
+<!--                      <p style="text-align: left; color: #231f21; font-size: 13px; line-height: 22px; margin: 0;">-->
+<!--                        Note: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.-->
+<!--                      </p>-->
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="background-color: #231f21; color: #FFF; font-size: 12px; padding: 5px 20px; text-align: left;">
+                      Contact Support: &nbsp; &nbsp; +1 (646) 421-8637 &nbsp; &nbsp; support@gsa.com
+                    </td>
+                  </tr>
+
+              </table>
+            </td>
+          </tr>
+
+      </table>
+    </center>
+  </body>
+
+</html>

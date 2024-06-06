@@ -1,0 +1,439 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Frequently Asked Questions
+                </h3>
+                <h1>
+                  FAQ
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <div class="tabs-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <ul class="auction-tab">
+              <li>
+                <a href="#buyer">Buyer</a>
+              </li>
+              <li>
+                <a href="#seller">Broker</a>
+              </li>
+              <li>
+                <a href="#agent">Agent</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div><!-- End .tabs-header -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12 col-md-12">
+          <div class="auction-body">
+            <div id="buyer">
+              <div class="customscroll bidder-accordian">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    {% if buyer_faq %}
+                    {% for faq in buyer_faq %}
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="heading-{{ forloop.counter }}">
+                          <h5 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse-{{ forloop.counter }}" class="collapsed">
+                                {% if faq.question %}
+                                  {% autoescape off %}
+                                    {{ faq.question }}
+                                    {% endautoescape %}
+
+                                  {% else %}
+                                  Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                                  {% endif %}
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="collapse-{{ forloop.counter }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-{{ forloop.counter }}">
+                          <div class="panel-body">
+                              {% if faq.answer %}
+                              {% autoescape off %}
+                                    {{ faq.answer }}
+                                    {% endautoescape %}
+                                  {% else %}
+                                   Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from section.
+                                  {% endif %}
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+                    {% endfor %}
+                    {% else %}
+
+                  <div class="panel panel-default">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" alt="No Data Found" role="img" class=" center mb0" />
+                  </div>
+                  {% comment %}
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingOne">
+                          <h5 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                          <div class="panel-body">
+                            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from section.
+                          </div>
+                      </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingTwo">
+                            <h5 class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" class="collapsed">
+                                  It is a long established fact that a reader will be distracted by the readable content of a page.
+                                  <!-- <span class="icon"></span> -->
+                                </a>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                            <div class="panel-body">
+                              2
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingThree">
+                          <h5 class="panel-title">
+                              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree" class="collapsed">
+                                There are many variations of passages of Lorem Ipsum available, but the majority have suffered.
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                          <div class="panel-body">
+                            3
+                          </div>
+                      </div>
+                    </div>
+                  {% endcomment %}
+                  {% endif %}
+
+              </div><!-- panel-group -->
+              </div><!-- End .customscroll -->
+            </div><!-- End .buyer -->
+
+            <div id="seller">
+                <div class="customscroll bidder-accordian">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    {% if seller_faq %}
+                    {% for sfaq in seller_faq %}
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="sellerHeading-{{ forloop.counter }}">
+                          <h5 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#sellerCollapse-{{ forloop.counter }}" aria-expanded="true" aria-controls="sellerCollapse-{{ forloop.counter }}" class="collapsed">
+                                {% if sfaq.question %}
+                                  {% autoescape off %}
+                                    {{ sfaq.question }}
+                                    {% endautoescape %}
+
+                                  {% else %}
+                                  Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                                  {% endif %}
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="sellerCollapse-{{ forloop.counter }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="sellerHeading-{{ forloop.counter }}">
+                          <div class="panel-body">
+                              {% if sfaq.answer %}
+                              {% autoescape off %}
+                                    {{ sfaq.answer }}
+                                    {% endautoescape %}
+                                  {% else %}
+                                   Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from section.
+                                  {% endif %}
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+                    {% endfor %}
+                    {% else %}
+                    <div class="panel panel-default">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" alt="No Data Found" role="img" class=" center mb0" />
+                    </div>
+                    {% comment %}
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="sellerHeadingOne">
+                          <h5 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#sellerCollapseOne" aria-expanded="true" aria-controls="sellerCollapseOne" class="collapsed">
+                                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="sellerCollapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="sellerHeadingOne">
+                          <div class="panel-body">
+                            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from section.
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="sellerHeadingTwo">
+                          <h5 class="panel-title">
+                              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#sellerCollapseTwo" aria-expanded="false" aria-controls="sellerCollapseTwo" class="collapsed">
+                                It is a long established fact that a reader will be distracted by the readable content of a page.
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="sellerCollapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="sellerHeadingTwo">
+                          <div class="panel-body">
+                            2
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="sellerHeadingThree">
+                        <h5 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#sellerCollapseThree" aria-expanded="false" aria-controls="sellerCollapseThree" class="collapsed">
+                              There are many variations of passages of Lorem Ipsum available, but the majority have suffered.
+                              <!-- <span class="icon"></span> -->
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="sellerCollapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="sellerHeadingThree">
+                        <div class="panel-body">
+                          3
+                        </div>
+                    </div>
+                  </div><!-- End .panel -->
+                  {% endcomment %}
+                    {% endif %}
+
+              </div><!-- panel-group -->
+              </div><!-- End .customscroll -->
+                {% comment %}
+              <h2>
+                Direct Offer 
+              </h2>
+
+              <div class="item">
+                <div class="block">
+                  <p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                  <p>
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                </div>
+                <div class="block">
+                  <a href="#" data-toggle="modal" data-target="#videoModal">
+                    <img src="{% static 'theme-4/images/video-img.jpg' %}" alt="real estate sales">
+                    <span class="play-icon"></span>
+                  </a>
+                </div>
+              </div>
+
+              <p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+              </p>
+              <p>
+                It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
+              </p>
+                {% endcomment %}
+            </div><!-- End .seller -->
+
+            <div id="agent">
+                <div class="customscroll bidder-accordian">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    {% if agent_faq %}
+                    {% for afaq in agent_faq %}
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="agentHeading-{{ forloop.counter }}">
+                          <h5 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#agentCollapse-{{ forloop.counter }}" aria-expanded="true" aria-controls="agentCollapse-{{ forloop.counter }}" class="collapsed">
+                                {% if afaq.question %}
+                                  {% autoescape off %}
+                                    {{ afaq.question }}
+                                    {% endautoescape %}
+
+                                  {% else %}
+                                  Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                                  {% endif %}
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="agentCollapse-{{ forloop.counter }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="agentHeading-{{ forloop.counter }}">
+                          <div class="panel-body">
+                              {% if afaq.answer %}
+                              {% autoescape off %}
+                                    {{ afaq.answer }}
+                                    {% endautoescape %}
+
+                                  {% else %}
+                                   Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from section.
+                                  {% endif %}
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+                    {% endfor %}
+                    {% else %}
+                     <div class="panel panel-default">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" alt="No Data Found" role="img" class=" center mb0" />
+                  </div>
+                    {% comment %}
+
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="agentHeadingOne">
+                          <h5 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#agentCollapseOne" aria-expanded="true" aria-controls="agentCollapseOne" class="collapsed">
+                                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="agentCollapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="agentHeadingOne">
+                          <div class="panel-body">
+                            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from section.
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="agentHeadingTwo">
+                          <h5 class="panel-title">
+                              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#agentCollapseTwo" aria-expanded="false" aria-controls="agentCollapseTwo" class="collapsed">
+                                It is a long established fact that a reader will be distracted by the readable content of a page.
+                                <!-- <span class="icon"></span> -->
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="agentCollapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="agentHeadingTwo">
+                          <div class="panel-body">
+                            2
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="agentHeadingThree">
+                        <h5 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#agentCollapseThree" aria-expanded="false" aria-controls="agentCollapseThree" class="collapsed">
+                              There are many variations of passages of Lorem Ipsum available, but the majority have suffered.
+                              <!-- <span class="icon"></span> -->
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="agentCollapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="agentHeadingThree">
+                        <div class="panel-body">
+                          3
+                        </div>
+                    </div>
+                  </div><!-- End .panel -->
+                    {% endcomment %}
+                    {% endif %}
+
+              </div><!-- panel-group -->
+              </div><!-- End .customscroll -->
+                {% comment %}
+              <h2>
+                Hybrid Auction 
+              </h2>
+
+              <div class="item">
+                <div class="block">
+                  <p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                  <p>
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                  </p>
+                </div>
+                <div class="block">
+                  <a href="#" data-toggle="modal" data-target="#videoModal">
+                    <img src="images/video-img.jpg" role="img" alt="real estate sales">
+                    <span class="play-icon"></span>
+                  </a>
+                </div>
+              </div>
+
+              <p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+              </p>
+              <p>
+                It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
+              </p>
+                {% endcomment %}
+            </div><!-- End .agent -->
+
+          </div>
+        </div>
+      </div>
+    </div><!-- End .container-fluid -->
+    {% if not request.session.user_id %}
+    <div class="register-today">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="register-today-wrap">
+              <h3>
+                Why wait? Register today!
+              </h3>
+              <form action="">
+                <input type="text" class="form-control" placeholder="Your email address" role="textbox" aria-label="Email Address">
+                <button role="button" class="btn btn-primary" aria-label="Signup">Signup</button>
+              </form>
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .register-today -->
+    {% endif %}
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+
+<script>
+  $('.auction-tab li:first').addClass('active');
+  $('.auction-body > div').hide();
+  $('.auction-body > div:first').show();
+  $('.auction-tab a').click(function() {
+      $('.auction-tab li').removeClass('active');
+      $(this).parent().addClass('active');
+      var activeTab = $(this).attr('href');
+      $('.auction-body > div:visible').hide();
+      $(activeTab).show();
+      return false;
+  });
+</script>
+{% endblock %}

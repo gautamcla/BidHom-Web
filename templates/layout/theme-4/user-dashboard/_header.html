@@ -1,0 +1,176 @@
+{% load static %}
+
+<!--<div class="dashboard-header">
+        <div class="dashboard-heading">
+
+          <h5>
+            User Dashboard
+          </h5>
+        </div>
+        <div class="dashoard-user">
+          <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+            <span class="user-icon"></span><span class="name">Welcome {% if request.session.first_name %}{{request.session.first_name}}{% else %} William{% endif %}</span><span class="arrow-icon"></span>
+          </a>
+          <ul role="menu" class="dropdown-header-top author-log dropdown-menu">
+            {% if request.session.is_admin %}
+            <li>
+              <a href="{% if request.session.is_broker %}/admin/{% else %}/admin/business-info/{% endif %}"><span class="icon dashboard-icon"></span> Admin Dashboard</a>
+            </li>
+            {% endif %}
+              <li><a href="/" target="_blank"><span class="icon website-icon"></span> My Website</a>
+            </li>
+            <li><a href="#"><span class="icon personal-icon"></span> Personal Info</a>
+            </li>
+            <li><a href="#"><span class="icon security-icon"></span> Security</a>
+            </li>
+            <li><a href="/logout/"><span class="icon logout-icon"></span> Log Out</a>
+            </li>
+          </ul>
+        </div>
+    </div>--><!-- End .dashboard-header -->
+<header id="header" class="header homepage-header fixed-header">
+    <div class="header-ani">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table">
+              <div class="table-cell">
+                <a href="/" role="button" tabindex="0">
+                  <img class="logo" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-4/images/default_img.svg' %}{% endif %}" alt="real estate sales">
+                  <img class="logo-icon" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-4/images/default_img.svg' %}{% endif %}" alt="real estate sales">
+                </a>
+              </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <a href="javascript:void(0)" role="button" class="nav-button">Menu</a>
+                <a href="javascript:void(0)" role="button" class="nav-close">Close Menu</a>
+                <nav class="nav">
+                  <ul>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="1">Search</a>
+                      <ul>
+                        <li><a href="/our-listing" role="button" >Our Listings</a></li>
+                        <!-- <li><a href="">Sold Listings</a></li>
+                        <li><a href="">Nationwide Listings</a></li> -->
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="2">Buy & Sell</a>
+                      <ul>
+                        <li>
+                          <a href="/buyers/" role="button">Buyers Guide</a>
+                        </li>
+                        <li>
+                          <a href="/sellers/" role="button">Sellers Guide</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="3">Company</a>
+                      <ul>
+                        <li><a href="/about-us" role="button">About Us</a></li>
+                        <li><a href="/our-agents" role="button">Our Team</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="4">Learn</a>
+                      <ul>
+                        <li><a href="/bid-online/" role="button" >How To Bid</a></li>
+                        <li><a href="/auction-type/" role="button" >Our Auction Types</a></li>
+                        <li><a href="/video-tutorials/" role="button" >Auction Video Tutorials</a></li>
+                        <li><a href="/faq/" role="button">FAQs</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="5">Resources</a>
+                      <ul>
+                        {% if request.session.user_id %}
+                        <li><a href="/property-value-estimator/" role="button" >Property Value Estimator</a></li>
+                        {% endif %}
+                        <li><a href="/blogs" role="button" >Our Blog</a></li>
+                        <li><a href="/terms/" role="button" >Terms & Conditions</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="/contact-us" role="button" tabindex="6">Contact</a>
+                    </li>
+                  </ul>
+                </nav>
+                <!-- <a href="#menu" class="menu-link active"><i class="fas fa-bars fa-2x"></i></a>
+                <nav id="menu" class="menu">
+                  <ul>
+                    <li>
+                      <a href="/"><span class="home-icon"></span></a>
+                    </li>
+                    <li>
+                      <a href="/our-listing/">Buying</a>
+                    </li>
+                    <li>
+                      <a href="#">Selling</a>
+                    </li>
+                    <li>
+                      <a href="/about-us/">About Us</a>
+                    </li>
+                    <li>
+                      <a href="/contact-us/">Contact Us</a>
+                    </li>
+                    <li>
+                      <a href="#">Resources</a>
+                    </li>
+                    <li>
+                      <a href="#">Help</a>
+                    </li>
+                  </ul>
+                </nav> -->
+              </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <ul class="user-links">
+                  <li>
+                    <div class="dashoard-user">
+                      <a href="javascript:void(0)" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" tabindex="1">
+                        <span class="user-icon"></span><span class="name"> {% if request.session.first_name %}{{request.session.first_name}}{% else %} William{% endif %}</span><span class="arrow-icon"></span>
+                      </a>
+                      <ul role="menu" class="dropdown-header-top author-log dropdown-menu">
+                        {% if request.session.is_admin %}
+                          {% comment %}
+                          <li>
+                            <a role="button" href="{% if request.session.is_broker %}/admin/{% else %}/admin/business-info/{% endif %}" tabindex="16"><span class="icon dashboard-icon" role="presentation"></span> Admin Dashboard</a>
+                          </li>
+                          {% endcomment %}
+                          <li>
+                            {% if is_free_plan %}
+                              <a role="button" href="{% if request.session.is_broker %}/admin/{% else %}/admin/business-info/{% endif %}" role="presentation" tabindex="17"><span class="icon dashboard-icon"></span> Admin Dashboard</a>
+                            {% else %}
+                              <a role="button" href="/admin/dashboard/" tabindex="17"><span class="icon dashboard-icon" role="presentation"></span> Admin Dashboard</a>
+                            {% endif %}
+                            </li>
+                        {% endif %}
+                          {% comment %}<li><a href="/" target="_blank" tabindex="18"><span class="icon website-icon" role="presentation"></span> My Website</a>{% endcomment %}
+                        </li>
+                        {% if request.session.is_broker %}
+                        <li><a role="button" href="/admin/payment-settings/" tabindex="19"><span class="icon payment-icon" role="presentation"></span> Payment Settings</a>
+                        </li>
+                        {% endif %}
+                        <li><a role="button" href="/edit-profile/" tabindex="20"><span class="icon personal-icon" role="presentation"></span> Personal Info</a>
+                        </li>
+                        <li><a role="button" href="/edit-profile/?tab=change_password" tabindex="21"><span class="icon security-icon" role="presentation"></span> Security</a>
+                        </li>
+                        {% comment %}
+                        <li>
+                          <a role="button" href="/logout/" tabindex="22"><span class="icon logout-icon" role="presentation"></span> Log Out</a>
+                        </li>
+                        {% endcomment %}
+                        <li>
+                          <a role="button" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal" tabindex="23"><span class="icon logout-icon" role="presentation"></span> Log Out</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+                </ul>
+              </div><!-- End .table-cell -->
+
+            </div><!-- End .table -->
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .header-ani -->
+  </header><!-- End .header -->

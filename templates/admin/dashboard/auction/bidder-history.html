@@ -1,0 +1,44 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if bidder_history %}
+{% for bidder in bidder_history %}
+<div class="block-item">
+    <div class="item">
+        {{ forloop.counter|add:start_index }}
+    </div>
+    <div class="item">
+        {{bidder.bidder_detail.first_name}}&nbsp;{{bidder.bidder_detail.last_name}}
+    </div>
+    <div class="item">
+        {{bidder.company_name}}
+    </div>
+    <div class="item">
+        {{bidder.bidder_detail.email}}
+    </div>
+    <div class="item">
+        {{bidder.bidder_detail.phone_no|default:''|format_phone}}
+    </div>
+    <div class="item">
+        ${{bidder.bid_limit|convert_num|intcomma|default:'0'}}
+    </div>
+    <div class="item">
+        <span class="badge {% if bidder.approval_status|lower == 'pending' %}badge-warning{% elif bidder.approval_status|lower == 'approved' %}badge-success{% elif bidder.approval_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+            {{ bidder.approval_status|default:'' }}
+        </span>
+    </div>
+    <div class="item">
+        {{bidder.ca_signed}}
+    </div>
+    <div class="item convert_to_local_date_time" data-value="{{ bidder.approval_date|default:'' }}">
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="block-item">
+  <div class="item fullwidth"><img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" /></div>
+</div>
+{% endif %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+{% endblock %}

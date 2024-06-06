@@ -1,0 +1,200 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Estimator Category List {% endblock title %}
+
+{% block style %}
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>Estimator Category List</h3>
+        </div>
+        <div class="title_right">
+            <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+            <div class="input-group">
+                <input type="text" id="category_search" class="form-control" placeholder="Search for..." value="{{search|default:''}}">
+                <span class="input-group-btn">
+                <button class="btn btn-secondary searchBtn"  type="button" onclick="ajax_estimate_category_list()">Go!</button>
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="listing-filter">
+          <div class="block right">
+            <i class="fa fa-filter"></i> Filters
+          </div>
+          <div class="block" style="min-width: 130px;">
+            <select class="form-control" name="category_status" id="category_status" onchange="ajax_estimate_category_list()">
+              <option value="">Select</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="block">
+            <button type="button" class="btn btn-primary" style="float:right;" id="addEstimatorCategory"><i class="fa fa-plus-circle"></i> Add Category</button>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+      <div class="row">
+
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_content">
+
+              {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+              <div class="table-responsive">
+                <table class="table table-striped bulk_action">
+                  <thead>
+                    <tr class="headings">
+                      <th class="column-title">ID </th>
+                      <th class="column-title">Category Name </th>
+                      <th class="column-title">Status </th>
+                      <th class="column-title no-link last"><span class="nobr">Action</span>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="estimatorCategoryList">
+                    {% if estimator_category_list %}
+                        {% for category in estimator_category_list %}
+                        <tr class="even pointer">
+                        <td class=" ">{{ forloop.counter0|add:sno }}</td>
+                        <td class=" ">{{category.name}}</td>
+                        <td class=" ">
+                          {% if category.status_name|lower == 'active' %}
+                          <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{category.id}}">Active</button>
+                          {% else %}
+                          <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{category.id}}">Inactive</button>
+                           {% endif %}
+                        </td>
+                        <td class="last">
+                          <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                            <button type="button" data-id="{{category.id}}" data-name="{{category.name}}" data-status="{% if category.status_name|lower == 'active' %}1{% else %}0{% endif %}" data-slug="{{ category.slug|default:'' }}" class="btn btn-xs btn-round btn-primary edit-category"><i class="fa fa-edit"></i> Edit</button>
+                              {% comment %}
+                              <input type="hidden" name="event_id" value="{{category.id}}">
+                              <input type="hidden" class="status-change" name="status" value="{% if category.status_name|lower == 'active' %}0{% else %}1{% endif %}">
+                              {% if category.status_name|lower == 'active' %}
+                                <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                              {% else %}
+                                <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                              {% endif %}
+                              {% endcomment %}
+                          </div>
+
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>  <td class=" ">No Category available </td></tr>
+                    {% endif %}
+
+                  </tbody>
+                </table>
+                <nav aria-label="Page navigation example" style="float:right;">
+                  <input type="hidden" id="page-category-list" value="1"/>
+                  <ul class="pagination justify-content-end" id="estimatorCategoryPagination">
+                      {{pagination_html|safe}}
+                  </ul>
+                </nav>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Add Event type modal -->
+  <div class="modal fade add-estimator-category" id="estimatorCategoryModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Add Estimator Category</h4>
+        </div>
+
+        <div class="modal-body">
+
+          <form method="post" data-parsley-validate class="form-horizontal form-label-left" id="add_estimator_category_frm">
+            {% csrf_token %}
+            <div class="alert alert-dismissible message_box" role="alert" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                </button>{{ message }}
+            </div>
+            <input type="hidden" name="estimator_category_id" id="estimator_category_id" value=""/>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="category_name">Category Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="category_name" name="category_name" required="required" class="form-control col-md-7 col-xs-12" maxlength="40">
+
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" id="is_active" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="2">Inactive</option>
+              </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" id="submitCategory" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+</div>
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+      // hit add event type modal
+      /*if(window.location.hash && window.location.hash == '#add-event-type' ) {
+          var hash = window.location.hash;
+          window.history.pushState({}, "", window.location.href.split("#")[0]);
+          $('.' + hash.split('#')[1]).modal('show');
+      }*/
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/estimator-category.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+
+{% endblock %}

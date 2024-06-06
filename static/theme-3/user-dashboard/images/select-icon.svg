@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <g id="select" transform="translate(-1377 -192)">
+    <g id="Ellipse_282" data-name="Ellipse 282" transform="translate(1377 192)" fill="none" stroke="#6fc152" stroke-width="2">
+      <circle cx="10.5" cy="10.5" r="10.5" stroke="none"/>
+      <circle cx="10.5" cy="10.5" r="9.5" fill="none"/>
+    </g>
+    <path id="spellcheck" d="M20.534,14.973l1.083,1.083-7.291,7.327-3.934-3.934,1.083-1.083,2.852,2.852Z" transform="translate(1371.383 183.154)" fill="#6fc152"/>
+  </g>
+</svg>

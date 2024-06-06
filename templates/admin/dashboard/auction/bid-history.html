@@ -1,0 +1,57 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %} 
+{% if bid_history %} 
+{% for bids in bid_history %}
+<tr>
+    <td>
+    {% if bids.bidder_detail %}
+        <a href="javascript:void(0);" data-id="{{bids.user}}" class="blue-text show-bidder-info"><strong>{{bids.bidder_detail.first_name}}&nbsp;{{bids.bidder_detail.last_name}}&nbsp;<i {% if forloop.counter0 == 0  %}class="fas fa-chevron-up" {% else %}class="fas fa-chevron-down"{% endif %} id="arrowPositionBidder{{bids.user}}"></i></strong></a><br>
+        <p id="showBidderinfoBidder{{bids.user}}" {% if forloop.counter0 != 0  %}style="display:none"{% endif %}>
+            {% if bids.bidder_detail.address_first %}
+            <span class="blue-text">
+            {{bids.bidder_detail.address_first}},
+            </span><br>
+            {% endif %}
+            <span class="blue-text">
+            {% if bids.bidder_detail.city %}
+            {{bids.bidder_detail.city}},
+            {% endif %}
+            {% if bids.bidder_detail.state %}
+            {{bids.bidder_detail.state}},
+            {% endif %}
+            {% if bids.bidder_detail.postal_code %}
+            {{bids.bidder_detail.postal_code}}
+            {% endif %}
+            </span><br>
+            <span class="blue-text">{{bids.bidder_detail.phone_no|default:''|format_phone}}</span><br>
+            <span class="blue-text">{{bids.bidder_detail.email}}</span><br>
+            {{bids.bidder_detail.ip_address|default:''}}
+        </p>
+    {% else %}
+    -
+    {% endif%}
+    </td>
+    <td>${{bids.start_bid|convert_num|intcomma|default:'0'}}</td>
+    <td>${{bids.max_bid|convert_num|intcomma|default:'0'}}</td>
+    <td>{{bids.bids}}</td>
+    <td class="convert_to_local_date_time" data-value="{{ bids.bid_time|default:'' }}">
+
+    </td>
+<!--    <td>-->
+<!--        <span class="badge badge-success">Approved</span>-->
+<!--    </td>-->
+</tr>
+
+{% endfor %} 
+{% else %}
+<div class="block-item">
+  <div class="item fullwidth"><img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" /></div>
+</div>
+{% endif %}
+{% block js_content %}
+    <script
+        type="text/javascript"
+        src="{% static 'admin/js/custom_js.js' %}?v=4.7"
+    ></script>
+{% endblock %}

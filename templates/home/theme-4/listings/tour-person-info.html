@@ -1,0 +1,11 @@
+{% load static %}
+{% load dashboard_extra %}
+<li>
+<i class="far fa-user"></i> {{ first_name|default:'' }} {{ last_name|default:'' }}
+</li>
+<li>
+<i class="fas fa-phone-alt"></i> {{ phone_no|format_phone|default:'' }}
+</li>
+<li>
+<i class="far fa-envelope"></i> {{ email|default:'' }}
+</li>

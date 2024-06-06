@@ -1,0 +1,324 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% load tz %}
+{% block content %}
+{% load humanize %}
+<div class="dashboard-body">
+  <div class="row">
+    <div class="col-md-12 col-sm-12">
+
+      <div class="listing-top">
+        <div class="block">
+          <h6>
+            <strong id="startTourBtn">Agents</strong>
+          </h6>
+        </div>
+        
+        <div class="block filters">
+          <ul>
+            <li>
+              <form action="" class="search-field last">
+                <div class="search-icon"><i class="fas fa-search"></i></div>
+                <input type="text" name="agent_search" id="agent_search" placeholder="Search" class="form-control input-sm sugesstion_input" value="{{ request.GET.search|default:'' }}"><button type="button" id="searchAgentBtn" class="btn btn-primary btn-sm pl20" onclick="agentListingSearch(1);">Search</button>
+              </form>
+            </li>
+            <li>
+              <span class="text">
+                <i class="fas fa-filter"></i> Filters
+              </span>
+            </li>
+            <li>
+              <select name="agent_filter_status" id="agent_filter_status" class="select form-control" onchange="agentListingSearch(1);">
+                <option value="">All Status</option>
+                <option value="active" selected >Active</option>
+                <option value="inactive" {% if request.GET.status and request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+              </select>
+            </li>
+            <li>
+              <select name="agent_num_record" id="agent_num_record" class="select form-control" onchange="agentListingSearch(1);">
+                <option value="">Record Per Page</option>
+                <option value="10" {% if request.GET.perpage and request.GET.perpage == 10 %}selected{% endif %}>10 Agent</option>
+                <option value="20" {% if request.GET.perpage and request.GET.perpage == 20 %}selected{% endif %}>20 Agent</option>
+                <option value="30" {% if request.GET.perpage and request.GET.perpage == 30 %}selected{% endif %}>30 Agent</option>
+                <option value="40" {% if request.GET.perpage and request.GET.perpage == 40 %}selected{% endif %}>40 Agent</option>
+                <option value="50" {% if request.GET.perpage and request.GET.perpage == 50 %}selected{% endif %}>50 Agent</option>
+              </select>
+            </li>
+            <li id="add_broker_agent">
+              {% if request.session.is_broker %}<a href="/admin/add-agent/" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Agent</a>{% endif %}
+            </li>
+          </ul>
+        </div>
+      </div><!-- End .listing-top -->
+
+        <div id="agent_list" class="listing-table">
+          {% if agent_list %}
+            {% if agent_list|length > 3 %}
+              {% define_var agent_list|length|add:'-1' as first_row %}
+              {% define_var agent_list|length as second_row %}
+            {% else %}
+              {% define_var 0 as first_row %}
+              {% define_var 0 as second_row %}
+            {% endif %}
+            {% for agent in agent_list %}
+              <div id="row_{{ agent.id }}" class="new-listing_blocks {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}">
+                <ul class="bottom">
+                  <li>
+                    License No: {{ agent.licence_no|default:'' }}
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-envelope"></i>  {{ agent.email|default:'' }}
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-phone"></i> {{ agent.phone_no|default:''|format_phone }}
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-calendar-days"></i> Create Date | <span class="convert_to_local_date_time" data-value="{{ agent.added_on|default:'' }}">
+                      {{ agent.added_on }}
+                    </span>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-calendar-days"></i> Last Login  | <span class="date-block {% if agent.last_login == None %}  {% else %} convert_to_local_date_time {% endif%}" data-value="{{ agent.last_login|default:'' }}">
+                      {% if agent.last_login == None %}  {% else %} {{ agent.last_login }} {% endif %}
+                    </span>
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li>
+                    <figure>
+                      <img class="slide-fixed" src="{% static 'admin/images/transparent.png' %}" alt="">
+                      <img class="slide-img" src="{% if agent.profile_image.doc_file_name %}{{ aws_url }}{{ agent.profile_image.bucket_name }}/{{ agent.profile_image.doc_file_name }}{% else %}{% static 'admin/images/no-image.jpg' %}{% endif %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <h6>
+                        <span>
+                          {{ agent.first_name|default:'' }} {{ agent.last_name|default:'' }}
+                          {% if agent.is_upgrade %}
+                          <a href="#" data-toggle="tooltip" data-placement="bottom" title="User upgraded to Agent"><img src="{% static 'admin/images/up-arrow.svg' %}" alt=""></a>
+                          {% endif %}
+                        </span>
+                      </h6>
+                      <p class="location">
+                        <i class="fas fa-map-marker-alt"></i> {{ agent.address_first|default:'' }}, {{ agent.state|default:'' }}, {{ agent.postal_code|default:'' }}
+                      </p>
+                      <h6 class="mb0 pt10">
+                        <strong>{{ agent.company_name|default:'' }}</strong>
+                      </h6>
+                    </figcaption>
+                  </li>
+                  <li>
+                    <div class="action-icon">
+                      <span class="view-list">
+                        <i class="fa-solid fa-ellipsis"></i>
+                        <ul>
+                          <li>
+                            <a href="/admin/add-agent/?id={{ agent.id }}"><i class="fas fa-edit"></i> Edit Agent</a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" onclick="agent_delete_confirmation({{ agent.id }})"><i class="fas fa-trash"></i> Delete Agent</a>
+                          </li>
+                        </ul>
+                      </span>
+                    </div>
+
+                    <ol class="circle-high">
+                      <li>
+                        <div class="icon"><i class="fa-solid fa-user-large fa-2x"></i></div>
+                        <span class="badge {% if agent.status|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                          {{ agent.status|default:'' }}
+                        </span>
+                        <h6 class="pt10">
+                          Agent Status
+                        </h6>
+                      </li>
+                      <li>
+                        <div class="icon"><i class="fa-solid fa-user-tie fa-2x"></i></div>
+                        <span class="badge {% if agent.user_status|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                          {{ agent.user_status|default:'' }}
+                        </span>
+                        <h6 class="pt10">
+                          User Status
+                        </h6>
+                      </li>
+                      <li>
+                        <div class="icon"><i class="fa-solid fa-building fa-2x"></i></div>
+                        <h5 class="blue-text">
+                          {{ agent.property_cnt|default:'NA' }}
+                        </h5>
+                        <h6 class="pt10">
+                          No. Property
+                        </h6>
+                      </li>
+                    </ol>
+                    
+                    <!-- <div class="block-status">
+                      <div class="item">
+                        <strong><label for="">Agent Status</label></strong><br>
+                        <span class="badge {% if agent.status|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                          {{ agent.status|default:'' }}
+                        </span>
+                      </div>
+                      <div class="item">
+                        <strong><label for="">User Status </label></strong><br>
+                        <span class="badge {% if agent.user_status|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                          {{ agent.user_status|default:'' }}
+                        </span>
+                      </div>
+                    </div>
+                     <div class="block-status pb0">
+                      <div class="item">
+                        <strong><label for="">Email</label></strong><br>
+                        <span class="blue-text">{{ agent.email|default:'' }}</span>
+                      </div>
+                      <div class="item">
+                        <strong><label for="">Phone</label></strong><br>
+                        {{ agent.phone_no|default:''|format_phone }}
+                      </div>
+                    </div> -->
+                  </li>
+                  <!-- <li>
+                    <div class="action-icon">
+                      <span class="view-list">
+                        <i class="fa-solid fa-ellipsis"></i>
+                        <ul>
+                          <li>
+                            <a href="/admin/add-agent/?id={{ agent.id }}"><i class="fas fa-edit"></i> Edit Agent</a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" onclick="agent_delete_confirmation({{ agent.id }})"><i class="fas fa-trash"></i> Delete Agent</a>
+                          </li>
+                        </ul>
+                      </span>
+                    </div>
+                    <div class="block-status pt10">
+                      <div class="item">
+                        <strong><label for="">No. Property</label></strong><br>
+                        {{ agent.property_cnt|default:'NA' }}
+                      </div>
+                      <div class="item">
+                        <strong><label for="">License No.</label></strong><br>
+                        {{ agent.licence_no|default:'' }}
+                      </div>
+                    </div>
+                    <div class="block-status pb0">
+                      <div class="item">
+                        <strong><label for="">Created Date</label></strong><br>
+                        <span class="convert_to_local_date_time" data-value="{{ agent.added_on|default:'' }}">
+                          {{ agent.added_on }}
+                        </span>
+                      </div>
+                      <div class="item">
+                        <strong><label for="">Last Login</label></strong><br>
+                        <span class="date-block {% if agent.last_login == None %}  {% else %} convert_to_local_date_time {% endif%}" data-value="{{ agent.last_login|default:'' }}">
+                          {% if agent.last_login == None %}  {% else %} {{ agent.last_login }} {% endif %}
+                        </span>
+                      </div>
+                    </div>
+                  </li> -->
+                </ul>    
+              </div><!-- End .block-item -->
+              
+            {% endfor %}
+            {% else %}
+            <div class="listing-table">
+              <div class="new-listing_blocks ">
+                <ul class="bottom">
+                  <li>
+                    No data Available
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li class="fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" />
+                  </li>
+                </ul>
+                
+              </div><!-- End .block-item -->
+            </div><!-- End .create-table -->
+            
+            {% endif %}
+          </div><!-- End .create-table -->
+
+          <div class="pagination">
+            <ul id="agent_listing_pagination_list">
+              {{ pagination_html }}
+            </ul>
+          </div><!-- End .pagination -->
+
+    </div><!-- End .col-md-12 -->
+  </div><!-- End .row -->
+</div><!-- End .dashboard-body -->
+
+
+  <div id="confirmAgentDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button class="btn btn-primary-bdr del_agent_btn" id="del_agent_false">No</button> <button class="btn btn-primary del_agent_btn" id="del_agent_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=1.9"></script>
+    <script type="text/javascript" src="{% static 'admin/js/pagination.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.2"></script>
+    <script type="text/javascript" src="{% static 'admin/js/agent.js' %}?v=5.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+  <script type="text/javascript" src="{% static 'admin/js/agent_tour.js' %}?v=3.1"></script>
+
+
+    <script>
+      var is_first_login = {{request.session.is_first_admin_login}};
+      var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      //getresult('agent_listing', 1, '', '', '');
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }
+
+      $('[data-toggle="tooltip"]').tooltip();
+
+
+      $('.select').chosen();
+
+    </script>
+{% endblock %}

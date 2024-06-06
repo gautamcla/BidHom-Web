@@ -1,0 +1,649 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Get in 
+                </h3>
+                <h1>
+                  Touch
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+    
+    <div class="contact-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+              <div class="contact-addbar">
+                <div class="contact-form">
+                  <h3>
+                    We would love to hear from you!
+                  </h3>
+                  <h5>
+                    Send us a message and we'll get right  back in touch.
+                  </h5>
+                  
+                  <div class="row">
+                    <form id="save-contact" name="save-contact" method="post" autocomplete="off">
+                      <div id="dispRep" class="alert alert-success" role="alert" style="display: none;">
+                        <span id="dispMsg"></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">X</span>
+                        </button>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group focused">
+                          <label for="first_name">Name</label>
+                          <input type="text" class="form-control alphaAccpt" id="first_name" name="first_name" placeholder="" aria-required="true" role="textbox" aria-label="Name">
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group focused">
+                          <label for="email">Email</label>
+                          <input type="text" class="form-control" id="email" name="email" placeholder="" role="textbox" aria-required="true" aria-label="Email">
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group focused">
+                          <label for="Phone">Phone</label>
+                          <input type="text" class="form-control" id="phone_no" name="phone_no" onmouseover="return add_focus(this);" placeholder="" data-inputmask="'mask': '(999) 999-9999'" data-inputmask-clearincomplete="true" aria-required="true" role="textbox" aria-label="Phone">
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group focused">
+                          <label for="phone_no">Select Type</label>
+                          <select aria-label="Select Type" name="user_type" id="user_type" class="select form-control">
+                            <option value="Seller">Seller</option>
+                            <option value="Buyer">Buyer</option>
+                            <option value="Agent">Agent</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="form-group focused">
+                          <label for="message">Your Message</label>
+                          <textarea name="message" cols="30" rows="3" id="message" class="form-controlT" aria-required="true" role="textbox" aria-label="Message"></textarea>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <button role="button" type="submit" id="btn_save" class="btn btn-secondary">Send</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div class="address">
+                  <h4>
+                    Get in Touch
+                  </h4>
+                  <ul class="address-list">
+                    <li>
+                      <div class="icon msg-icon"><i class="fa-solid fa-envelope" role="presentation"></i></div>
+                      <h6>
+                        Mail
+                      </h6>
+                      <a href="mailto:{{ data.profile.email|default:'' }}" role="button" tabindex="0">{{ data.profile.email|default:'' }}</a>
+                    </li>
+                    <li>
+                      <div class="icon phone-icon"><i class="fa-solid fa-phone" role="presentation"></i></div>
+                      <h6>
+                        Phone
+                      </h6>
+                      <span class='phone-no'>{{ data.profile.phone_no|default:'' }}</span>
+                    </li>
+                    <li>
+                      <div class="icon home-icon"><i class="fa-sharp fa-regular fa-location-dot" role="presentation"></i></div>
+                      <h6>
+                        Address
+                      </h6>
+                      {% if data.profile.address|length > 0 %}
+                      <ol>
+                        {% for address in data.profile.address %}
+                        <li>
+                          <span><i class="fas fa-map-marker-alt" role="presentation"></i></span> {{ address.address_first|default:'' }}, {{ address.state|default:'' }}, {{ address.postal_code|default:'' }}
+                        </li>
+                        {% endfor %}
+                      </ol>
+                      {% endif %}
+                    </li>
+                  </ul>
+
+                  <div class="follow">
+                    <h5>
+                      Join Our Followers
+                    </h5>
+                    <ul class="social-links">
+                      {% if data.social_account|length > 0  %}
+                        {% for social in data.social_account %}
+                        <li class="{{social.name}}">
+                          <a href="{{social.url}}" role="button" tabindex="1">
+                            {% if social.account_type == 1 %}
+                              <i class="fab fa-facebook-f" role="img" aria-label="facebook"></i>
+                            {% elif social.account_type == 2 %}
+                              <i class="fab fa-twitter" role="img" aria-label="twitter"></i>
+                            {% elif social.account_type == 3 %}
+                              <i class="fab fa-youtube" role="img" aria-label="youtube"></i>
+                            {% elif social.account_type == 4 %}
+                              <i class="fab fa-linkedin-in" role="img" aria-label="linkedin"></i>
+                            {% elif social.account_type == 5 %}
+                              <i class="fab fa-instagram" role="img" aria-label="instagram"></i>
+                            {% endif %}
+                          </a>
+                        </li>
+                        {% endfor %}
+                      {% endif %}
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+
+          </div><!-- End .col-lg-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .contact-address -->
+
+    <div class="property-map" style="margin-top: 0;">
+      <div class="maps-direction">
+        <button type="button" class="d-btn fullscreen-control-icon fullscreen-control" id="maximize_map" title="Toggle Fullscreen"><span class="icon rotate-btn"></span></button>
+        <button class="d-btn zoom-control-in" title="Zoom In" id="zoom_in"><span class="icon plus-btn"></span></button>
+        <button class="d-btn zoom-control-out" title="Zoom Out" id="zoom_out"><span class="icon minus-btn"></span></button>
+      </div>
+      <!-- <div class="maps-direction">
+        <button class="d-btn"><span class="icon direction-btn"></span></button>
+        <button class="d-btn"><span class="icon rotate-btn"></span></button>
+        <button class="d-btn"><span class="icon plus-btn"></span></button>
+        <button class="d-btn"><span class="icon minus-btn"></span></button>
+      </div> -->
+      <!-- <img src="{% static 'theme-4/images/map.jpg' %}" alt="real estate sales"> -->
+      <div id="map" style = "margin: 0; width: 100%;height:550px;"></div>
+    </div><!-- End .contact-banner -->
+    {% if sess_user_id %}
+    {% else %}
+    <div class="register-today">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="register-today-wrap">
+              <h3>
+                Why wait? Register today!
+              </h3>
+              <form action="">
+                <input type="text" class="form-control" placeholder="Your email address" role="textbox" aria-label="Email Address">
+                <button role="button" class="btn btn-primary" aria-label="Signup">Signup</button>
+              </form>
+              <!-- <div class="button">
+                <a href="{% if sess_user_id %}javascript:void(0);{% else %}{% url 'register' %}{% endif %}" class="btn btn-primary line">Signup now</a>
+              </div> -->
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .register-today -->
+    {% endif %}
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+ {% endblock %}
+ {% block js_content %}
+ <script type="text/javascript" src="{% static '/theme-common/js/mask_input.js' %}"></script>
+ <script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<!-- <script-->
+<!--    async defer-->
+<!--  ></script>-->
+ <script
+    src="https://maps.googleapis.com/maps/api/js?v=3&key={{site_detail.google_map_key}}&callback=initmap&libraries=&v=weekly"
+    async defer
+  ></script>
+<script type="text/javascript" src="{% static 'admin/js/chosen.js' %}?v=2.4"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+
+ <script>
+
+    $(".numVal").on("keypress keyup blur",function (event) {
+        $(this).val($(this).val().replace(/[^0-9\.]/g,''));
+            if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                event.preventDefault();
+            }
+    });
+
+    $('.alphaAccpt').on('keypress', function(event) {
+        var key = event.keyCode;
+        return ((key >= 65 && key <= 90) || (key == 8) || (key >= 97 && key <= 122) || (key == 32));
+    });
+
+    $(document).ready(function(){
+      $("#phone_no").inputmask('(999) 999-9999');
+      $('.phone-no').each(function(){
+        try{
+          var phone = $(this).html();
+          var cleaned = ('' + phone).replace(/\D/g, '');
+          var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+          if (match) {
+            $(this).html('(' + match[1] + ') ' + match[2] + '-' + match[3]);
+          }
+        }catch(ex){
+          console.log(ex);
+        }
+      });
+
+      $('#save-contact').validate({
+          errorElement: 'p',
+          rules: {
+                first_name:{
+                    required: true
+                },
+                email:{
+                    required: true,
+                    email: true
+                },
+                phone_no:{
+                    required: true,
+                },
+                user_type:{
+                    required: true,
+                },
+                message:{
+                    required: true,
+                },
+
+            },
+            messages: {
+                first_name:{
+                    required: "Name is required."
+                },
+                email:{
+                    required: "Email is required."
+                },
+                phone_no:{
+                    required: "Phone number is required."
+                },
+                type:{
+                    required: "User type is required.",
+                },
+                message:{
+                    required: "Message is required.",
+                },
+            },
+            submitHandler:function(){
+               $.ajax({
+                    url: '/contact-us/',
+                    type: 'post',
+                    dateType: 'json',
+                    cache: false,
+                    data: $('#save-contact').serialize(),
+                    beforeSend: function(){
+                      $('.overlay').show();
+                      $('#btn_save').prop('disabled',true);
+                    },
+                    success: function(response){
+                        $('.overlay').hide();
+                        if(response.error == 0){
+                          $.growl.notice({title: "Enquiry", message: response.msg, size: 'large'});
+                          window.setTimeout(function () {
+                            $("#save-contact")[0].reset();
+                          }, 2000);
+                          $('#btn_save').prop('disabled',false);
+                        }else{
+                          window.setTimeout(function () {
+                              $.growl.error({title: "Enquiry", message: response.msg, size: 'large'});
+                          }, 2000);
+                          $('#btn_save').prop('disabled',false);
+                        }
+                    }
+                });
+            }
+        });
+
+    });
+
+    //Map Set
+    var geocoder; //To use later
+    var map; //Your map
+    var latitude = 0;
+    var longitude = 0;
+    var markerClusterer = null;
+    var map= null;
+    var lookup_markers = [];
+  function initmap(){
+    var location = [];
+    geocoder = new google.maps.Geocoder();
+    try{
+      var address_list = "{{ address_list }}";
+      address_list = address_list.replace(/&quot;/g,'"');
+      //address_list = address_list.replace(/None/g,'""');
+      var address_data = JSON.parse(address_list);
+    }catch(ex){
+      console.log(ex);
+      var address_data = [];
+    }
+
+    var myLatlng = new google.maps.LatLng(37.090240, -95.712891);
+    var myOptions={
+      zoom:4,
+      center:myLatlng,
+      mapTypeId:"roadmap",
+      streetViewControl:false,
+      rotateControl:false,
+      disableDefaultUI:true,
+//       styles:[
+//   {
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#f5f5f5"
+//       }
+//     ]
+//   },
+//   {
+//     "elementType": "labels.icon",
+//     "stylers": [
+//       {
+//         "visibility": "off"
+//       }
+//     ]
+//   },
+//   {
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#616161"
+//       }
+//     ]
+//   },
+//   {
+//     "elementType": "labels.text.stroke",
+//     "stylers": [
+//       {
+//         "color": "#f5f5f5"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "administrative.land_parcel",
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#bdbdbd"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "poi",
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#eeeeee"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "poi",
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#757575"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "poi.park",
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#e5e5e5"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "poi.park",
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#9e9e9e"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "road",
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#ffffff"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "road.arterial",
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#757575"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "road.highway",
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#dadada"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "road.highway",
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#616161"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "road.local",
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#9e9e9e"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "transit.line",
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#e5e5e5"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "transit.station",
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#eeeeee"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "water",
+//     "elementType": "geometry",
+//     "stylers": [
+//       {
+//         "color": "#c9c9c9"
+//       }
+//     ]
+//   },
+//   {
+//     "featureType": "water",
+//     "elementType": "labels.text.fill",
+//     "stylers": [
+//       {
+//         "color": "#9e9e9e"
+//       }
+//     ]
+//   }
+// ],
+     // styles:[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#757575"}]},{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"administrative.land_parcel","stylers":[{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#181818"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"poi.park","elementType":"labels.text.stroke","stylers":[{"color":"#1b1b1b"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry","stylers":[{"color":"#4e4e4e"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#3d3d3d"}]}]
+    };
+    map = new google.maps.Map(document.getElementById("map"),myOptions);
+
+    initZoomControl(map);
+    initFullscreenControl(map);
+    var marker, i;
+    var address = '';
+    $.each(address_data, function(i, item) {
+        //var infowindow = new google.maps.InfoWindow({content:item.name});
+
+        var address = item.address_first+',' +item.state+', '+item.postal_code;
+
+        /*var geocode_values = geocoder.geocode( { 'address': address}, function(results, status) {
+
+          if (status == google.maps.GeocoderStatus.OK) {
+           latitude = results[0].geometry.location.lat();
+           longitude = results[0].geometry.location.lng();
+
+          }
+        });*/
+        address_list
+        if(item.latitude){
+          latitude = item.latitude;
+        }
+        if(item.longitude){
+          longitude = item.longitude;
+        }
+        //var infowindow = new google.maps.InfoWindow({content:address});
+           var image="/static/theme-4/images/pin-icon.png";
+           var latLng = new google.maps.LatLng(latitude,longitude);
+
+          //var markerImage = new google.maps.MarkerImage(image, new google.maps.Size(30, 40));
+          marker = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            icon: {
+              url: image,
+              scaledSize: new google.maps.Size(30, 45), // scaled size
+              origin: new google.maps.Point(0,0), // origin
+              anchor: new google.maps.Point(0, 0) // anchor
+            },
+            title: item.name,
+          });
+          lookup_markers.push(marker);
+          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+
+            return function() {
+              InfoWindow.setContent(address);
+              InfoWindow.open(map, marker);
+            }
+          })(marker, i));
+
+    });
+  }
+
+    // $('.select').chosen();
+
+    /* map control button */
+    function initZoomControl(map) {
+      document.querySelector(".zoom-control-in").onclick = function () {
+        map.setZoom(map.getZoom() + 1);
+      };
+      document.querySelector(".zoom-control-out").onclick = function () {
+        map.setZoom(map.getZoom() - 1);
+      };
+      map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(
+        document.querySelector(".maps-direction")
+      );
+    }
+
+    function initFullscreenControl(map) {
+      const elementToSendFullscreen = map.getDiv().firstChild;
+      const fullscreenControl = document.querySelector(".fullscreen-control");
+      //map.controls[google.maps.ControlPosition.RIGHT_TOP].push(fullscreenControl);
+
+      fullscreenControl.onclick = function () {
+        if (isFullscreen(elementToSendFullscreen)) {
+          exitFullscreen();
+        } else {
+          requestFullscreen(elementToSendFullscreen);
+        }
+      };
+
+      document.onwebkitfullscreenchange =
+        document.onmsfullscreenchange =
+        document.onmozfullscreenchange =
+        document.onfullscreenchange =
+          function () {
+            if (isFullscreen(elementToSendFullscreen)) {
+              fullscreenControl.classList.add("is-fullscreen");
+            } else {
+              fullscreenControl.classList.remove("is-fullscreen");
+            }
+          };
+    }
+
+    function isFullscreen(element) {
+      return (
+        (document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement) == element
+      );
+    }
+
+    function requestFullscreen(element) {
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.webkitRequestFullScreen) {
+        element.webkitRequestFullScreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.msRequestFullScreen) {
+        element.msRequestFullScreen();
+      }
+    }
+
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+    function add_focus(el){
+      $(el).parents('.form-group').addClass('focused');
+
+    }
+    function remove_focus(el){
+      $(el).parents('.form-group').removeClass('focused');
+
+    }
+
+ </script>
+  
+  {% endblock %} 
+  
+  

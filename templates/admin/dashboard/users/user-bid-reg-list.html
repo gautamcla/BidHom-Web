@@ -1,0 +1,65 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+<table width="100%">
+    <thead>
+      <tr>
+        <th>
+          &nbsp;
+        </th>
+        <th>
+          Property Name
+        </th>
+        <th>
+          Registration Status
+        </th>
+        <th>
+          Bid Limit
+        </th>
+        <th>
+          Bid Count
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+        {% if list_data|length > 0 %}
+            {% for bidlist in list_data %}
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                    <h6 class="blue-text">
+                        {{ bidlist.property_address_one|default:'' }}
+                        <span>{{ bidlist.property_city|default:'' }}, {{ bidlist.property_state|default:'' }} {{ bidlist.property_postal_code|default:'' }}</span>
+                    </h6>
+                    </td>
+                    <td>
+                    <span class="badge {% if bidlist.is_approved_name|lower == 'pending' %}badge-warning{% elif bidlist.is_approved_name|lower == 'approved' %}badge-success{% elif bidlist.is_approved_name|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">{{ bidlist.is_approved_name|default:'' }}</span>
+                    </td>
+                    <td>
+                      {% if bidlist.bid_limit|length > 0 %}
+                        ${{ bidlist.bid_limit|default:'-' }}
+                      {% else %}
+                        -
+                      {% endif %}  
+                    </td>
+                    <td>
+                    <div class="tooltipp"><span class="blue-text">{{ bidlist.bid_count|default:'' }}</span>
+                        <span class="tooltipp__content right">
+                        <ul>
+                            <li>
+                            <span>First Bid:</span> $42000
+                            </li>
+                            <li>
+                            <span>Second Bid:</span> $42100
+                            </li>
+                        </ul>
+                        </span>
+                    </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+                <tr><td colspan="5" style="text-align: center;">No data available</td></tr>
+        {% endif %}
+    </tbody>
+</table>

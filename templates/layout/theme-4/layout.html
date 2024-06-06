@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <title>{{ site_detail.website_title|default:'Marketplace - Home Page' }}</title>
+  <!-- Meta Tags -->
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="format-decetion" content="telephone=no" />
+  {% block extra_head %}{% endblock %}
+  <!-- links -->
+  <link rel="icon" href="{% if site_detail.favicon.image_name %}{{ aws_url}}{{ site_detail.favicon.bucket_name }}/{{ site_detail.favicon.image_name }}{% else %}{% static 'theme-4/images/Bidhom_favicon.ico' %}{% endif %}" type="image/png" sizes="16x16">
+
+  <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.1.1/css/all.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link href="{% static 'theme-4/css/style.css' %}?v=5.0" type="text/css" rel="stylesheet" />
+  <link href="{% static 'theme-4/css/all.css' %}?v=4.0" type="text/css" rel="stylesheet" />
+  <link href="{% static 'theme-common/css/custom_style.css' %}?v=3.0" type="text/css" rel="stylesheet" />
+  <link href="{% static 'theme-common/css/jquery.growl.css' %}?v=3.0" type="text/css" rel="stylesheet" />
+  <link href="{% static 'theme-common/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+  
+{% block styles %}
+  {% endblock %}
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--about-us.html-->
+
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  <!--[if lte IE 7]> <html class="ie7"> <![endif]-->
+  <!--[if IE 8]>     <html class="ie8"> <![endif]-->
+  <!--[if IE 9]>     <html class="ie9"> <![endif]-->
+  <!--[if !IE]><!-->
+<script>
+    var aws_url = '{{ aws_url }}';
+    var base_url = '{{ SITE_URL }}';
+  </script>
+</head>
+
+<body class="{% if is_home_page %}homepage{% endif %}">
+
+    {% if not hide_header %}
+    {% include "layout/theme-4/_header.html"%}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+
+    {% if not hide_footer %}
+    {% include "layout/theme-4/_footer.html"%}
+    {% endif %}
+
+    {% if request.session.first_name %}
+      {% include "layout/theme-4/_personal_info_popup.html"%}
+    {% endif %}
+
+  <script type="text/javascript" src="{% static 'theme-4/js/all.js' %}?v=1.1"></script>
+  <script type="text/javascript" src="{% static 'theme-4/js/homepage.js' %}?v=1.1"></script>
+  <script type="text/javascript" src="{% static 'theme-4/js/toggle-nav.js' %}?v=1.1"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+  <script>
+    $('.nav').nav();
+    $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+    var google_map_key = "{{site_detail.google_map_key}}";
+  </script>
+  <script type="text/javascript" src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+{% block js_content %}
+{% endblock %}
+
+</body>
+</html>

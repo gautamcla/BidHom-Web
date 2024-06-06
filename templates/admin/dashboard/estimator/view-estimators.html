@@ -1,0 +1,378 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% load tz %}
+{% block content %}
+{% load humanize %}
+<div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Estimator List</strong>
+                </h6>
+              </div>
+              <div class="block filters">
+                <ul>
+                  <li>
+                    <span class="text">
+                      <i class="fas fa-filter"></i> Filters
+                    </span>
+                  </li>
+                  <li>
+                    <select class="select form-control" name="" id="filter_type">
+                      <option value="" selected>All</option>
+                      <option value="">Residential</option>
+                    </select>
+                  </li>
+                  <li>
+                    <select name="estimator_num_record" id="estimator_num_record" class="select form-control" onchange="estimatorListingSearch(1);">
+                      <option value="10" {% if request.GET.perpage and request.GET.perpage == 10 %}selected{% endif %}>10</option>
+                      <option value="20" {% if request.GET.perpage and request.GET.perpage == 20 %}selected{% endif %}>20</option>
+                      <option value="30" {% if request.GET.perpage and request.GET.perpage == 30 %}selected{% endif %}>30</option>
+                      <option value="40" {% if request.GET.perpage and request.GET.perpage == 40 %}selected{% endif %}>40</option>
+                      <option value="50" {% if request.GET.perpage and request.GET.perpage == 50 %}selected{% endif %}>50</option>
+                    </select>
+                  </li>
+                  <li>
+                    <form action="" class="search-field last">
+                      <div class="search-icon"><i class="fas fa-search"></i></div>
+                      <input type="text" name="estimator_search" id="estimator_search" placeholder="Search" class="form-control input-sm sugesstion_input" value="{{ request.GET.search|default:'' }}"><button type="button" id="searchEstimatorBtn" class="btn btn-primary btn-sm pl20" onclick="estimatorListingSearch(1);">Search</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .listing-top -->
+
+            <div id="estimator_list" class="listing-table">
+              {% if estimator_list %}
+                  {% if estimator_list|length > 3 %}
+                    {% define_var estimator_list|length|add:'-1' as first_row %}
+                    {% define_var estimator_list|length as second_row %}
+                  {% else %}
+                    {% define_var 0 as first_row %}
+                    {% define_var 0 as second_row %}
+                  {% endif %}
+                {% for estimator in estimator_list %}
+              <div id="row_{{ estimator.id }}" class="listing_blocks {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}">
+                <ul class="bottom">
+                  <li>
+                    User Type: {{ estimator.user_type|default:'' }}
+                  </li>
+                  <li class="item convert_to_local_date_time date-block" data-value="{{ estimator.added_on|default:'' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Created Date | {{ estimator.added_on }}
+                  </li>
+                </ul>
+                <ul class="top estimator-top">
+                  <li class="review-status">
+                    <div class="display_status" id="display_status_{{ estimator.id }}">
+                      <span class="badge {% if estimator.complete_status_id == 2 %} badge-danger{% elif estimator.complete_status_id == 4 %} badge-warning{% else %}badge-success{% endif %}" style="cursor:pointer;">
+                        {{ estimator.complete_status|default:'' }}
+                      </span>
+                    </div>
+                    <div class="change_status" id="change_status_{{ estimator.id }}" style="display:none;">
+                      <select class="select form-control change_status" name="change_status" id="change_status_{{ estimator.id }}" onchange="change_estimator_status({{ estimator.id }},this)">
+                        <option value="">Select Status</option>
+                        {% if status_list %}
+                        {% for item in status_list %}
+                          <option value="{{ item.id }}" {% if item.id == estimator.complete_status_id %}selected{% endif %}>{{ item.status_name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                      </select>
+                    </div>
+                      
+                    <h6 class="name">
+                      {{ estimator.user_first_name|default:'' }} {{ estimator.user_last_name|default:'' }}
+                    </h6>
+                  </li>
+                  {% if is_broker == 1 %}
+                  <li>
+                    <h5 class="buyer-name">
+                      <i class="fa-solid fa-user-large"></i>
+                      <div class="display_agent" id="display_agent_{{ estimator.id }}">
+                        {% if estimator.assign_to_first_name %}
+                        {{ estimator.assign_to_first_name|default:'' }} {{ estimator.assign_to_last_name|default:'' }}
+                        {% else %}
+                          Not Assigned Yet
+                        {% endif %}
+                      </div>
+                      <div class="change_agent" id="change_agent_{{ estimator.id }}" style="display:none;">
+                        <select class="select form-control estimator_change_agent" name="estimator_change_agent" id="estimator_change_agent_{{ estimator.id }}" onchange="change_estimator_agent({{ estimator.id }},this)">
+                          <option value="">Select Agent</option>
+                          {% if agent_list %}
+                          {% for item in agent_list %}
+                            <option value="{{ item.id }}" {% if item.id == estimator.assign_to %}selected{% endif %}>{{ item.first_name }} {{ item.last_name }}</option>
+                          {% endfor %}
+                          {% endif %}
+                        </select>
+                      </div>
+                      <span>
+                        Assign To
+                      </span>
+                    </h5>
+                  </li>
+                  {% endif %}
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-envelope"></i> {{ estimator.user_email|default:'' }}
+                    </div>
+                    <div class="email-text">
+                      <i class="fa-solid fa-phone"></i> {{ estimator.user_phone_no|default:''|format_phone }}
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <a href="javascript:void(0)" onclick="show_message('{{ estimator.id }}', '{{ estimator.review_msg|escape_char|default:'' }}');" class="blue-text" title="View Message"><i class="fa-solid fa-comment-dots"></i> View Message</a>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <a href="/admin/property-estimator-details/?id={{ estimator.id }}"><i class="fa-solid fa-eye"></i> View</a>
+                    </div>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth"><img src="{% static 'admin/images/no-data-image.png' %}"/></div>
+                </div>
+                {% endif %}
+            </div><!-- End .bidder-table -->
+
+
+            <!-- <div class="default-table estimator-table">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Name
+                </div>
+                <div class="item">
+                  User Type
+                </div>
+                <div class="item">
+                  Email
+                </div>
+                <div class="item">
+                  Phone
+                </div>
+                <div class="item">
+                  Created Date
+                </div>
+                {% if is_broker == 1 %}
+                <div class="item">
+                  Assign To
+                </div>
+                {% endif %}
+                <div class="item">
+                  Status
+                </div>
+                <div class="item">
+                  Message
+                </div>
+                <div class="item">
+                  View Details
+                </div>
+              </div>
+              <div class="block sscroll" id="estimator_list">
+                {% if estimator_list %}
+                  {% if estimator_list|length > 3 %}
+                    {% define_var estimator_list|length|add:'-1' as first_row %}
+                    {% define_var estimator_list|length as second_row %}
+                  {% else %}
+                    {% define_var 0 as first_row %}
+                    {% define_var 0 as second_row %}
+                  {% endif %}
+                {% for estimator in estimator_list %}
+                <div id="row_{{ estimator.id }}" class="block-item {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}">
+                  <div class="item">
+                  {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    {{ estimator.user_first_name|default:'' }} {{ estimator.user_last_name|default:'' }}
+                  </div>
+                  <div class="item">
+                    {{ estimator.user_type|default:'' }}
+                  </div>
+                  <div class="item">
+                    {{ estimator.user_email|default:'' }}
+                  </div>
+                  <div class="item">
+                    {{ estimator.user_phone_no|default:''|format_phone }}
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ estimator.added_on|default:'' }}">
+                    {{ estimator.added_on }}
+                  </div>
+                  {% if is_broker == 1 %}
+                  <div class="item">
+                    <div class="display_agent" id="display_agent_{{ estimator.id }}">
+                      <span class="badge" style="cursor:pointer;">
+                        {% if estimator.assign_to_first_name %}
+                        {{ estimator.assign_to_first_name|default:'' }} {{ estimator.assign_to_last_name|default:'' }}
+                        {% else %}
+                          Not Assigned Yet
+                        {% endif %}
+                      </span>
+                    </div>
+                    <div class="change_agent" id="change_agent_{{ estimator.id }}" style="display:none;">
+                      <select class="select form-control estimator_change_agent" name="estimator_change_agent" id="estimator_change_agent_{{ estimator.id }}" onchange="change_estimator_agent({{ estimator.id }},this)">
+                        <option value="">Select Agent</option>
+                        {% if agent_list %}
+                        {% for item in agent_list %}
+                          <option value="{{ item.id }}" {% if item.id == estimator.assign_to %}selected{% endif %}>{{ item.first_name }} {{ item.last_name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                      </select>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  <div class="item">
+                    <div class="display_status" id="display_status_{{ estimator.id }}">
+                      <span class="badge {% if estimator.complete_status_id == 2 %} badge-danger{% elif estimator.complete_status_id == 4 %} badge-warning{% else %}badge-success{% endif %}" style="cursor:pointer;">
+                        {{ estimator.complete_status|default:'' }}
+                      </span>
+                    </div>
+                    <div class="change_status" id="change_status_{{ estimator.id }}" style="display:none;">
+                      <select class="select form-control change_status" name="change_status" id="change_status_{{ estimator.id }}" onchange="change_estimator_status({{ estimator.id }},this)">
+                        <option value="">Select Status</option>
+                        {% if status_list %}
+                        {% for item in status_list %}
+                          <option value="{{ item.id }}" {% if item.id == estimator.complete_status_id %}selected{% endif %}>{{ item.status_name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                      </select>
+                    </div>
+
+                  </div>
+
+                  <div class="item">
+                    <a href="javascript:void(0)" onclick="show_message('{{ estimator.id }}', '{{ estimator.review_msg|escape_char|default:'' }}');" class="blue-text" title="View Message">View Message</a>
+                  </div>
+
+                  <div class="item center">
+                      <div class="action_dropdown {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}dropup{% endif %}{% endif %}">
+                        <a href="/admin/property-estimator-details/?id={{ estimator.id }}"><i class="fas fa-eye"></i> View</a>
+                      </div>
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                  </div>
+                </div>
+                {% endif %}
+
+              </div>
+            </div> -->
+
+            <div class="pagination">
+              <ul id="estimator_listing_pagination_list">
+                {{ pagination_html }}
+              </ul>
+            </div><!-- End .pagination -->
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+  <div id="confirmAgentDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button class="btn btn-primary del_agent_btn" id="del_agent_false">No</button> <button class="btn btn-secondary del_agent_btn" id="del_agent_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+<div id="viewMsgHistoryModal" class="modal centered-modal personalModalwrap confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Message</h5>
+        <button type="button" class="close" id="msg_close_true" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="estimator_id" id="estimator_id" value=""/>
+        <div class="form-group">
+          <label for="agent_comment">Message</label>
+          <textarea name="agent_comment" class="form-control textarea bdr" id="agent_comment" cols="30" rows="4" placeholder="Enter Your Message"></textarea>
+          <p class="error" id="agent_comment_err" style="display:none;"></p>
+        </div>
+        <p id="usr_msg"></p>
+        <div class="clearfix center">
+            <button type="button" class="btn btn-secondary confirm_bid_btn" id="send_msg" onclick="send_review_msg()">Send</button><button type="button" data-dismiss="modal" class="btn btn-primary" id="close_msg_pop">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=1.9"></script>
+    <script type="text/javascript" src="{% static 'admin/js/pagination.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.2"></script>
+    <script type="text/javascript" src="{% static 'admin/js/property-estimator.js' %}?v=6.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/estimator_tour.js' %}?v=3.1"></script>
+
+
+    <script>
+      var is_first_login = {{request.session.is_first_admin_login}};
+      var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      //getresult('agent_listing', 1, '', '', '');
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }
+
+      $('[data-toggle="tooltip"]').tooltip();
+
+
+      $('.select').chosen();
+
+    </script>
+{% endblock %}

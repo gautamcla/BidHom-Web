@@ -1,0 +1,72 @@
+{% load static %}
+{% load dashboard_extra %}
+{% if bidder_list %}
+  {% if bidder_list|length > 3 %}
+    {% define_var bidder_list|length|add:'-1' as first_row %}
+    {% define_var bidder_list|length as second_row %}
+  {% else %}
+    {% define_var 0 as first_row %}
+    {% define_var 0 as second_row %}
+  {% endif %}
+{% for bidder in bidder_list %}
+<div class="block-item {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}" id="row_{{ bidder.id }}" id="row_{{ bidder.id }}"  data-auction="{{ bidder.auction_id }}" data-property="{{ bidder.property }}" data-user="{{ bidder.user_id }}">
+  <div class="item">
+    {{ forloop.counter0|add:sno }}
+  </div>
+  <div class="item">
+    <a href="/asset-details/?property_id={{ bidder.property }}" target="_blank" class="blue-text">{{ bidder.property_address_one|default:'' }}, {{ bidder.property_city|default:'' }}, {{ bidder.property_state|default:'' }} {{ bidder.property_postal_code|default:'' }}</a>
+  </div>
+  <div class="item">
+    {{ bidder.registrant|default:'' }}
+  </div>
+  <div class="item">
+    {{ bidder.user_type|default:'' }}
+  </div>
+  {% comment %} <div class="item">
+    {{ bidder.company|default:'' }}
+  </div> {% endcomment %}
+  <div class="item">
+    {{ bidder.email|default:'' }}
+  </div>
+  <div class="item">
+    {{ bidder.phone_no|default:''|format_phone }}
+  </div>
+  <div class="item">
+    <span class="badge {% if bidder.is_reviewed|lower == 'reviewed' %}badge-success{% elif bidder.is_reviewed|lower == 'not reviewed' %}badge-info{% else %}badge-warning{% endif %}">{{ bidder.is_reviewed|default:'' }}</span>
+  </div>
+  <div class="item">
+    <span class="badge {% if bidder.is_approved|lower == 'pending' %}badge-warning{% elif bidder.is_approved|lower == 'approved' %}badge-success{% elif bidder.is_approved|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">{{ bidder.is_approved|default:'' }}</span>
+  </div>
+<!--  <div class="item">-->
+<!--    <span class="badge {% if bidder.status == 1 %}badge-success{% else %}badge-danger{% endif %}">{{ bidder.status_name|default:'' }}</span>-->
+<!--  </div>-->
+  <div class="item">
+    {{ bidder.ip_address|default:'' }}
+  </div>
+  <div class="item convert_to_local_date_time date-block" data-value="{{ bidder.added_on|default:'' }}">
+    {{ bidder.added_on|default:'' }}
+  </div>
+  <div class="item convert_to_local_date_time date-block" data-value="{{ bidder.updated_on|default:'' }}">
+    {{ bidder.updated_on|default:'' }}
+  </div>
+  <div class="item center">
+    <div class="action_dropdown {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}dropup{% endif %}{% endif %}">
+      <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+        <i class="fas fa-ellipsis-v"></i>
+      </a>
+      <ul role="menu" class="dropdown-header-top author-log dropdown-menu right">
+          <li><a href="/admin/bidder-registration-details/?id={{ bidder.id }}"><i class="fas fa-edit"></i> Edit</a>
+          </li>
+          <li><a href="javascript:void(0)" onclick="bidder_delete_confirmation({{ bidder.id }}, {{ bidder.auction_id }}, {{ bidder.property }}, {{ bidder.user_id }},'{{ bidder.bid_count|default:'0' }}')"><i class="fas fa-trash-alt"></i> Delete</a>
+          </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="block-item">
+  <div class="item fullwidth"><img src="{% static 'admin/images/no-data-image.png' %}"/></div>
+</div>
+{% endif %}
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}"></script>

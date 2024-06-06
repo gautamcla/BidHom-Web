@@ -1,0 +1,66 @@
+{% load static %}
+<div class="dashboard-header">
+        <div class="dashboard-heading">
+          <h5>
+            Management Dashboard
+
+            {% if site_detail.email_verified is None or site_detail.email_verified == "" %}
+          <div class="email-verification">
+            Please check your email and follow the instructions to verify your account. <a href="javascript:void(0)" id="email_verification">Resend</a>
+          </div>
+          {% endif %}
+          </h5>
+          
+        </div>
+        <div class="dashoard-user">
+          <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+            <span class="user-icon"></span><span class="name"> {% if request.session.first_name %}{{request.session.first_name}}{% else %} William{% endif %}</span><span class="arrow-icon"></span>
+          </a>
+          <ul role="menu" class="dropdown-header-top author-log dropdown-menu">
+            <li><a href="{{ SITE_URL }}" target="_blank"><span class="icon website-icon"></span> My Website</a>
+            </li>
+
+            {% if request.session.is_broker %}
+              <li><a href="/admin/payment-settings/"><span class="icon payment-icon"></span> Payment Settings</a>
+              </li>
+            {% endif %}
+
+            {% if request.session.user_id %}
+            {% comment %} <li>
+              <a href="/my-bids/"><span class="icon bid-icon"></span> My Bids</a>
+            </li>
+            <li>
+              <a href="/favourite-listings/"><span class="icon favorite-icon"></span> Favorite Listings</a>
+            </li> {% endcomment %}
+            <li>
+              <a href="/my-bids/"><span class="icon personal-icon"></span> User Dashboard</a>
+            </li>
+            {% endif %}
+            {% comment %} <li><a href="javascript:void(0)" data-toggle="modal" data-target="#personalModal" onclick="show_hide_popup('personalModal')"><span class="icon personal-icon"></span> Personal Info</a>
+            </li>
+            <li><a href="javascript:void(0)" data-toggle="modal" data-target="#securityModal" onclick="show_hide_popup('securityModal')"><span class="icon security-icon"></span> Security</a>
+            </li> {% endcomment %}
+            <li><a href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal"><span class="icon logout-icon"></span> Log Out</a>
+            </li>
+          </ul>
+        </div>
+      </div><!-- End .dashboard-header -->
+
+<!-- Modal -->
+<div class="modal fade centered-modal" id="email_verification_msg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header center">
+        <h5 class="modal-title" id="exampleModalLabel">Success</h5>
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> -->
+      </div>
+      <div class="modal-body center">
+        <p class="model_content"></p>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+      
+    </div>
+  </div>
+</div>

@@ -1,0 +1,423 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% load humanize %}
+{% block content %}
+<div class="dashboard-body">
+  <div class="row">
+    <div class="col-md-12 col-sm-12">
+      <div class="back-btn">
+        <a href="/admin/users/"><i class="fas fa-chevron-left"></i> Back to list</a>
+      </div><!-- End .back-btn -->
+      <input type="hidden" name="user_id" id="user_id" value="{{ user_id|default:'' }}">
+      <div class="box">
+        <div class="user-profile">
+          <div class="block">
+            <figure>
+              <img src="{% if user_detail.profile_image.doc_file_name %}{{ aws_url }}{{ user_detail.profile_image.bucket_name }}/{{ user_detail.profile_image.doc_file_name }}{% else %}{% static 'admin/images/no-image.jpg' %}{% endif %}" alt="">
+            </figure>
+          </div>
+          <div class="block">
+            <h5>
+              {{ user_detail.first_name|default:'' }} {{ user_detail.last_name|default:'' }}
+            </h5>
+            <h6>
+              {% if user_detail.address_first or user_detail.address_second or user_detail.city or user_detail.state_name or  user_detail.postal_code %}
+              <i class="fas fa-map-marker-alt"></i> 
+              {% endif %}
+              {% if user_detail.address_first %}
+              {{ user_detail.address_first|default:'' }},
+              {% endif %}
+              {% if user_detail.address_second %}
+              {{ user_detail.address_second|default:'' }},
+              {% endif %}
+              {% if user_detail.city %}
+              {{user_detail.city|default:''}},
+              {% endif %}
+              {% if user_detail.state_name %}
+              {{user_detail.state_name|default:''}},
+              {% endif %}
+              {% if user_detail.postal_code %}
+              {{user_detail.postal_code|default:''}}
+              {% endif %}
+            </h6>
+          </div>
+          <div class="block">
+            <ul>
+              
+              <li>
+                <i class="fas fa-envelope"></i> {{ user_detail.email|default:'' }}
+              </li>
+              <li>
+                <i class="fas fa-phone-alt"></i> {{ user_detail.phone_no|default:''|format_phone }}
+              </li>
+            </ul>
+          </div>
+        </div><!-- End .user-profile -->
+
+        <div class="default-table userprofile-table">
+          <div class="block">
+            <div class="item">
+              No.
+            </div>
+            <div class="item">
+              Property Name
+            </div>
+            <div class="item">
+              Auction Type
+            </div>
+            <div class="item">
+              Property Status
+            </div>
+            <div class="item">
+              Current Bid
+            </div>
+            <div class="item">
+              Bid Count
+            </div>
+            <div class="item">
+              Start Date
+            </div>
+            <div class="item">
+              End Date
+            </div>
+            <div class="item">
+              Approval Status
+            </div>
+          </div><!-- End .block -->
+          <div class="block sscroll" id="bid_listing">
+            {% if bid_list %}
+              {% for bid in bid_list %}
+                <div class="block-item">
+                  <div class="item">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    <div class="user-pics">
+                      <span class="user-pic"><img src="{% if bid.property_image.image %}{{ aws_url }}{{ bid.property_image.bucket_name }}/{{ bid.property_image.image }}{% else %}{% static 'theme-1/images/property-default-img.png' %}{% endif %}" alt=""></span> 
+                      <h6>
+                        <a href="/asset-details/?property_id={{ bid.property_id }}" target="_blank"><span class="blue-text">{{ bid.property_address_one|default:'' }}</span></a>
+                        <i class="fas fa-map-marker-alt"></i> {{ bid.property_city|default:'' }}, {{ bid.property_state|default:'' }} {{ bid.property_postal_code|default:'' }}
+                      </h6>
+                    </div>
+                  </div>
+                  <div class="item">
+                    {{ bid.sale_type|default:'' }}
+                  </div>
+                  <div class="item">
+                    <span class="badge {% if bid.stage|lower == 'pending' %}badge-warning{% elif bid.stage|lower == 'active' %}badge-success{% elif bid.stage|lower == 'inactive' %}badge-danger{% else %}badge-info{% endif %}">{{ bid.stage|default:'' }}</span>
+                  </div>
+                  <div class="item">
+                    {% if bid.current_bid != "" %}
+                      ${{ bid.current_bid|default:'' }}
+                    {% else %}
+                      {{ bid.current_bid|default:'-' }}
+                    {% endif %}
+                    
+                  </div>
+                  <div class="item">
+                    <button class="blue-text"  onclick="propertyBidHistorySearch({{ bid.property_id }},1)">{{ bid.bid_count|default:'0' }}</button>
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ bid.auction_start|default:'' }}">
+                    {{ bid.auction_start|default:'' }}
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ bid.auction_end|default:'' }}">
+                    {{ bid.auction_end|default:'' }}
+                  </div>
+                  <div class="item">
+                    <span class="badge {% if bid.is_approved_name|lower == 'pending' %}badge-warning{% elif bid.is_approved_name|lower == 'approved' %}badge-success{% elif bid.is_approved_name|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">{{ bid.is_approved_name|default:'' }}</span>
+                  </div>
+                </div><!-- End .block-item -->
+              {% endfor %}
+            {% else %}
+              <div class="block-item">
+                <div class="item fullwidth">
+                  <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+
+                </div>
+              </div>
+            {% endif %}   
+          </div><!-- End .block -->
+        </div><!-- End .create-table -->
+        <div class="pagination" id="user_bid_listing_pagination">
+          <ul id="user_bid_listing_pagination_list">
+            {{ pagination_html }}
+          </ul>
+        </div><!-- End .pagination -->
+        <!-- <div class="customscroll dashboard-detail">
+          <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            My Auctions
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                      <table id="report" class="table">
+                        <tr>
+                            <th width="4%"></th>
+                            <th>Address</th>
+                            <th>Sale Type</th>
+                            <th>Stage</th>
+                            <th>End Date</th>
+                            <th>Current Bid</th>
+                            <th>Bidder's Bid</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr class="sub-container">
+                            <td>
+                              <button type="button" class="exploder">
+                                <span class="icon icon-plus"></span>
+                              </button>
+                            </td>
+                            <td>
+                              <div class="user-pro">
+                              <span><img src="images/pexels-photo-209296.jpg" alt=""></span> <a href="#">West Jameshaven, <br>
+                                California, 34333</a>
+                              </div>
+                            </td>
+                            <td>English</td>
+                            <td>Active</td>
+                            <td>2021-03-30<br>16:00</td>
+                            <td>$12,000</td>
+                            <td><span class="red-text">$12,000</span></td>
+                            <td>2021-03-30<br>16:00</td>
+                            <td><span class="red-text">Pending</span></td>
+                        </tr>
+                        <tr class="explode hide">
+                            <td>&nbsp;</td>
+                            <td colspan="8">
+                              <table class="table inner-table width50">
+                                <tr>
+                                  <th>
+                                    Bidder's Bids
+                                  </th>
+                                  <th>
+                                    Bid submission date
+                                  </th>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    <span class="red-text">$12,000</span>
+                                  </td>
+                                  <td>
+                                    2021-03-10
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                        </tr>
+                        <tr class="sub-container">
+                          <td>
+                            <button type="button" class="exploder">
+                              <span class="icon icon-plus"></span>
+                            </button>
+                          </td>
+                          <td>
+                            <div class="user-pro">
+                            <span><img src="images/pexels-photo-209296.jpg" alt=""></span> <a href="#">West Jameshaven, <br>
+                              California, 34333</a>
+                            </div>
+                          </td>
+                          <td>English</td>
+                          <td>Active</td>
+                          <td>2021-03-30<br>16:00</td>
+                          <td>$12,000</td>
+                          <td><span class="red-text">$12,000</span></td>
+                          <td>2021-03-30<br>16:00</td>
+                          <td><span class="red-text">Pending</span></td>
+                      </tr>
+                      <tr class="explode hide">
+                        <td>&nbsp;</td>
+                        <td colspan="8">
+                          <table class="table inner-table width50">
+                            <tr>
+                              <th>
+                                Bidder's Bids
+                              </th>
+                              <th>
+                                Bid submission date
+                              </th>
+                            </tr>
+                            <tr>
+                              <td>
+                                <span class="red-text">$12,000</span>
+                              </td>
+                              <td>
+                                2021-03-10
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingTwo">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Auctions of Others
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                    <div class="panel-body">
+                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div> -->
+    </div><!-- End .box -->
+      
+    </div><!-- End .col-md-10 -->
+  </div><!-- End .row -->
+</div><!-- End .dashboard-body -->
+  <div id="bidderrecordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+    <input type="hidden" name="bidHistoryPropertyId" id="bidHistoryPropertyId" value=""/>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidding Records
+          </h5>
+          <div class="bidderrecord-top">
+            <figure>
+              <img src="{% static 'theme-2/images/default-img.png' %}" alt="" id="bidHistoryPropertyImage">
+            </figure>
+            <figcaption>
+              <h6 id="bidHistoryPropertyName">
+                Loading...
+              </h6>
+              <ul>
+                <li>
+                  <span>Auction Type:</span> <label id="bidHistoryAuctiontype" style="margin-bottom: 0; font-weight: normal;">-</label> 
+                </li>
+                <li>
+                  <span>Bid Increment:</span> <label id="bidHistoryBidIncrement" style="margin-bottom: 0; font-weight: normal;">-</label>
+                </li>
+              </ul>
+            </figcaption>
+            <div class="listing-bottom">
+              <div class="block" id="bidderHistoryBtnSection">
+                <button type="button" class="btn btn-primary btn-sm pl20"><i class="fas fa-file-export"></i> Export</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="table-responsive">
+            <table width="100%" class="table table-scroll bidderrecordTable">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  <th>
+                    Bidder Name
+                  </th>
+                  <th>
+                    Email
+                  </th>
+                  <th>
+                    Phone
+                  </th>
+                  <th>
+                    Bid Amount
+                  </th>
+                  <th>
+                  IP Address
+                  </th>
+                  <th>
+                    Bidding Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="bidHistoryList">
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination" id="bidHistoryPagination">
+              <ul id="bidHistoryPaginationList">
+                {{ pagination_html }}
+              </ul>
+          </div><!-- End .pagination -->
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderrecordModal -->
+{% comment %} <div id="bidcountModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Bid Count</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-scroll">
+          <thead>
+            <tr>
+              <th>Bid Limit</th>
+              <th>
+                Bid Date
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                $42000
+              </td>
+              <td>
+                11-10-2021 12:07 pm
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    </div>
+  </div>
+</div><!-- End .logoutModal --> {% endcomment %}
+{% endblock %}
+
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/tableHeadFixer.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/user_details.js' %}?v=3.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=2.5"></script>
+  <script>
+        $(".exploder").click(function(){
+          $(this).toggleClass("exploder");
+          $(this).closest("tr").toggleClass("table-expand");
+          //$(".sub-container").toggleClass("table-expand");
+          $(this).children(".icon").toggleClass("icon-plus icon-minus");
+          $(this).closest("tr").next("tr").toggleClass("hide");
+          if($(this).closest("tr").next("tr").hasClass("hide")){
+            $(this).closest("tr").next("tr").children("td").slideUp();
+          }
+          else{
+            $(this).closest("tr").next("tr").children("td").slideDown(350);
+          }
+        });
+  </script>
+{% endblock %}

@@ -1,0 +1,283 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+{% endblock %}
+{% load tz %}
+{% block content %}
+{% load humanize %}
+<div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Email Template</strong>
+                </h6>
+              </div>
+              <div class="block rgt">
+                <form action="" class="search-field">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" name="template_search" id="template_search" placeholder="Search" class="form-control input-sm sugesstion_input" value="{{ request.GET.search|default:'' }}">
+                  <button type="button" id="searchTemplateBtn" class="btn btn-primary btn-sm" onclick="templateListingSearch(1);">Search</button> <!--<a href="/admin/add-template/" class="btn btn-secondary"><i class="fas fa-plus"></i> New Template</a>-->
+                </form>
+              </div>
+              <div class="block filters">
+                <ul>
+                  <li>
+                    <span class="text"><i class="fas fa-filter"></i> Filters</span>
+                  </li>
+                  <li>
+                    <select name="template_filter_status" id="template_filter_status" class="select form-control" onchange="templateListingSearch(1);">
+                      <option value="">All</option>
+                      <option value="active" {% if request.GET.status and request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                      <option value="inactive" {% if request.GET.status and request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                  </li>
+                  <li>
+                    <select name="template_num_record" id="template_num_record" class="select form-control" onchange="templateListingSearch(1);">
+                      <option value="10" {% if request.GET.perpage and request.GET.perpage == 10 %}selected{% endif %}>10</option>
+                      <option value="20" {% if request.GET.perpage and request.GET.perpage == 20 %}selected{% endif %}>20</option>
+                      <option value="30" {% if request.GET.perpage and request.GET.perpage == 30 %}selected{% endif %}>30</option>
+                      <option value="40" {% if request.GET.perpage and request.GET.perpage == 40 %}selected{% endif %}>40</option>
+                      <option value="50" {% if request.GET.perpage and request.GET.perpage == 50 %}selected{% endif %}>50</option>
+                    </select>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .listing-top -->
+
+            <div class="listing-table" id="template_list">
+              {% if template_list %}
+              {% if template_list|length > 3 %}
+                  {% define_var template_list|length|add:'-1' as first_row %}
+                  {% define_var template_list|length as second_row %}
+                {% else %}
+                  {% define_var 0 as first_row %}
+                  {% define_var 0 as second_row %}
+                {% endif %}
+              {% for template in template_list %}
+              <div id="row_{{ agent.id }}" class="parcel_blocks {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}" >
+                <ul class="bottom">
+                  <li>
+                    No : {{ forloop.counter0|add:sno }}
+                  </li>
+                  <li>
+                    Created Date | 
+                    <span class=" convert_to_local_date_time date-block" data-value="{{ template.added_on|default:'' }}">
+                      {{ template.added_on }}
+                    </span>       
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li>
+                    <span class="badge {% if template.status_name|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                      {{ template.status_name|default:'' }}
+                    </span>
+                    <h6 class="name">
+                      {{ template.email_subject|default:'' }}
+                      <span>
+                        Subject
+                      </span>
+                    </h6>
+                  </li>
+                  <li>
+                    <div class="buyer-name last">
+                      <h6>
+                        {{ template.event_name|default:'' }}
+                        <span>
+                          Event Name
+                        </span>
+                      </h6>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="buyer-name last">
+                      <h6>
+                        {{ template.event_slug|default:'' }}
+                        <span>
+                          Slug
+                        </span>
+                      </h6>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="email-text">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                      <a href="/admin/add-template/?id={{ template.id }}">Edit Template</a>
+                    </div>
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endfor %}
+              {% else %}
+              <div class="parcel_blocks ">
+                <ul class="bottom">
+                  <li>
+                    No data Available
+                  </li>
+                </ul>
+                <ul class="top">
+                  <li class="fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                  </li>
+                </ul>
+              </div><!-- End .block-item -->
+              {% endif %}
+            </div><!-- End .listing-table -->
+            
+            <!-- <div class="default-table email-table">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Subject
+                </div>
+                <div class="item">
+                  Slug
+                </div>
+                <div class="item">
+                  Event Name
+                </div>
+                <div class="item">
+                  Created Date
+                </div>
+                <div class="item">
+                  Status
+                </div>
+                <div class="item">
+                  Action
+                </div>
+              </div>
+              <div class="block sscroll" id="template_list">
+                {% if template_list %}
+                    {% if template_list|length > 3 %}
+                        {% define_var template_list|length|add:'-1' as first_row %}
+                        {% define_var template_list|length as second_row %}
+                      {% else %}
+                        {% define_var 0 as first_row %}
+                        {% define_var 0 as second_row %}
+                      {% endif %}
+                    {% for template in template_list %}
+                    <div id="row_{{ agent.id }}" class="block-item {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}">
+                      <div class="item">
+                      {{ forloop.counter0|add:sno }}
+                      </div>
+
+                      <div class="item">
+                        {{ template.email_subject|default:'' }}
+                      </div>
+                      <div class="item">
+                        {{ template.event_slug|default:'' }}
+                      </div>
+                      <div class="item">
+                        {{ template.event_name|default:'' }}
+                      </div>
+                      <div class="item convert_to_local_date_time date-block" data-value="{{ template.added_on|default:'' }}">
+                        {{ template.added_on }}
+                      </div>
+                      <div class="item">
+                        <span class="badge {% if template.status_name|lower == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                          {{ template.status_name|default:'' }}
+                        </span>
+                      </div>
+                      <div class="item center">
+                          <div class="action_dropdown {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}dropup{% endif %}{% endif %}">
+                        <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                          <i class="fas fa-ellipsis-v"></i>
+                        </a>
+                        <ul role="menu" class="dropdown-header-top author-log dropdown-menu right">
+                          <li>
+                            <a href="/admin/add-template/?id={{ template.id }}"><i class="fas fa-edit"></i> Edit Template</a>
+                          </li>
+                        </ul>
+                      </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="block-item">
+                      <div class="item fullwidth">
+                        <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                      </div>
+                    </div>
+                    {% endif %}
+
+              </div>
+            </div> -->
+
+            <div class="pagination">
+              <ul id="template_pagination_list">
+                {{ pagination_html }}
+              </ul>
+            </div><!-- End .pagination -->
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+  <div id="confirmTemplateDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button class="btn btn-primary-bdr del_agent_btn" id="del_agent_false">No</button> <button class="btn btn-primary del_agent_btn" id="del_agent_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=1.9"></script>
+    <script type="text/javascript" src="{% static 'admin/js/pagination.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.2"></script>
+    <script type="text/javascript" src="{% static 'admin/js/email_template.js' %}?v=5.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+
+    <script>
+      var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      //getresult('agent_listing', 1, '', '', '');
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }
+
+      $('[data-toggle="tooltip"]').tooltip();
+
+
+      $('.select').chosen();
+
+    </script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Lookup Object Status {% endblock title %}
+
+{% block styles %}
+  {{ block.super }}
+  <link href="{% static 'admin/vendors/jQuery-Multiple-Select/dist/css/selectize.bootstrap3.css' %}" type="text/css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+    <div class="row">
+      <div class="col-md-9">
+        <div class="form-group">
+          <label class=" " for="lookup_object">Choose Lookup Object To View/Manage </label>
+          <select class="select form-control" name="lookup_object" id="lookup_object" required="required">
+                <option value="" disabled selected>select</option>
+                {% for item in object_list %}
+                {% if item.is_active %}
+                <option value="{{item.id}}">{{item.object_name}}</option>
+                {% endif %}
+                {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label style="visibility:hidden">.</label>
+            <a href="{% url 'admin-lookup-objects' %}#add-object" target="_blank" type="button" class="btn btn-primary form-control"><i class="fa fa-external-link"></i> Add Object</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="ln_solid"></div>
+    <input type="hidden" name="page-lookup-object-status" id="page-lookup-object-status" value="1" />						
+
+    <div id="lookup-object-status-list">
+    </div>
+  
+</div>
+
+
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/lookup-object-status.js' %}?v=1.0"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/jquery-ui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/jQuery-Multiple-Select/dist/js/standalone/selectize.js' %}"></script>
+
+{% endblock %}

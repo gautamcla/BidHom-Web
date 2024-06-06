@@ -1,0 +1,33 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if total_property_view %}
+{% for view_data in total_property_view %}
+    <tr>
+        <td>
+        {{ forloop.counter|add:start_index }}
+        </td>
+        <td>
+        {% if view_data.first_name %}
+        {{view_data.first_name}} {{view_data.last_name}}
+        {% endif %}
+        </td>
+         <td>
+        {% if view_data.email %}
+             <a href="mailto:{{view_data.email}}">{{view_data.email}}</a>
+        {% endif %}
+        </td>
+        <td>
+        {% if view_data.phone_no %}
+        {{view_data.phone_no|default:''|format_phone}}
+        {% endif %}
+        </td>
+        <td class="convert_to_local_date_time" data-value="{{ view_data.added_on|default:'' }}">
+        </td>
+    </tr>
+{% endfor %}
+{% endif %}
+
+{% block js_content %}
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+{% endblock %}

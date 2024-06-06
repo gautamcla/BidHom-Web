@@ -1,0 +1,162 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Edit CMS {% endblock title %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>Edit CMS</h3>
+        </div>
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            
+            <div class="x_content">
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+              <form method="post" id="addCms" action="{% url 'admin-ajax-add-cms' %}" class="form-horizontal form-label-left" data-parsley-validate>
+                {% csrf_token %}
+
+                <input type="hidden" name="cms_id" value="{{data.id}}">
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="site">Choose Domain
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+
+                    <select class="form-control" id="site" name="site" >
+                        <option value="" >Choose Available Domain</option>
+                        {% for obj in domain_list %}
+                            {% if obj.is_active %}
+                                <option value="{{obj.id}}" {% if obj.id == data.site_id %} selected="selected" {% endif %} >{{obj.domain_name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    </div>
+                    
+
+                </div>
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="site">Status <span class="required">*</span>
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+
+                    <select class="form-control" id="status" name="status" required="required" >
+                        <option value="" >Choose Status</option>
+                        {% for obj in status_list %}
+                            {% if obj.is_active %}
+                                <option value="{{obj.id}}" {% if obj.id == data.status %} selected="selected" {% endif %} >{{obj.status_name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    </div>
+                    <a href="{% url 'admin-lookup-status' %}#add-status" target="_blank" type="button" class="btn btn-primary btn-round"> Add more <i class="fa fa-external-link"></i></a>
+
+                </div>
+
+
+                <span class="section">Meta Info</span>
+                
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="meta_key_word">Meta Keywords <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input id="meta_key_word" class="form-control col-md-7 col-xs-12" value="{{data.meta_key_word}}" data-parsley-trigger="keyup" name="meta_key_word" placeholder="Enter meta keyword" required="required" type="text">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="meta_title">Meta Title <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input id="meta_title" class="form-control col-md-7 col-xs-12" value="{{data.meta_title}}" data-parsley-trigger="keyup" name="meta_title" placeholder="Enter meta title" required="required" type="text">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="meta_description">Meta Description <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="meta_description" name="meta_description" value="{{data.meta_description}}" data-parsley-trigger="keyup" required="required" class="form-control col-md-7 col-xs-12" placeholder="Enter meta description">
+                  </div>
+                </div>
+
+                <div class="row" >
+                    <span class="section">Page Info</span>
+
+                    <div class="item form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="page_title">Page Title <span class="required">*</span>
+                    </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input id="page_title" class="form-control col-md-7 col-xs-12" value="{{data.page_title}}"  data-parsley-trigger="keyup" name="page_title" placeholder="Enter page title" required="required" type="text">
+                    </div>
+                    </div>
+
+
+                    <div class="item form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="slug">Slug <span class="required">*</span>
+                    </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input id="slug" readonly class="form-control col-md-7 col-xs-12" value="{{data.slug}}" data-parsley-trigger="keyup" name="slug" placeholder="Will be genertaed automatically based on page title" required="required" type="text">
+                    </div>
+                    </div>
+
+
+                    <div class="item form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="page_content">Page Content <span class="required">*</span>
+                    </label>
+                    <div class="col-md-8 col-sm-8 col-xs-12">
+                        <textarea class="form-control description" id="page_content" name="page_content" required="required" rows="3" placeholder="Enter page content..." style="height: 120px;" spellcheck="true">{{data.page_content}}</textarea>
+
+                    </div>
+                    </div>
+
+                </div>
+                
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-md-offset-3">
+                    <button id="submitAddCms" type="submit" class="btn btn-success">Save Changes</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/edit-cms.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/tinymce/tinymce.min.js' %}"></script>
+{% endblock %}

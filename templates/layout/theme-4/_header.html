@@ -1,0 +1,158 @@
+{% load static %}
+<header id="header" class="header {% if is_home_page %}homepage-header{% else %}fixed-header{% endif %}{% if request.session.user_id %} post_loggedin_header{% endif %}">
+  <a role="button" href="#main-link" class="skip" tabindex="34">Skip to main content</a>  
+  <div class="header-ani">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table">
+              <div class="table-cell">
+                <a href="/" role="button" tabindex="0">
+                  <img class="logo" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-4/images/default_img.svg' %}{% endif %}" alt="real estate sales">
+                  <img class="logo-icon" src="{% if site_detail.website_logo.image_name %}{{ aws_url}}{{ site_detail.website_logo.bucket_name }}/{{ site_detail.website_logo.image_name }}{% else %}{% static 'theme-4/images/default_img.svg' %}{% endif %}" alt="real estate sales">
+                </a>
+              </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <a href="javascript:void(0)" role="button" class="nav-button">Menu</a>
+                <a href="javascript:void(0)" role="button" class="nav-close">Close Menu</a>
+                <nav class="nav">
+                  <ul>
+                    <li class="nav-submenu" id="our_listings">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="1">Search</a>
+                      <ul>
+                        <li><a href="/our-listing" role="button" >Our Listings</a></li>
+                        <!--  <li><a href="">Sold Listings</a></li>-->
+                        <!-- <li><a href="">Nationwide Listings</a></li>-->
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="2">Buy & Sell</a>
+                      <ul>
+                        <li>
+                          <a href="/buyers/" role="button">Buyers Guide</a>
+                        </li>
+                        <li>
+                          <a href="/sellers/" role="button">Sellers Guide</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="3">Company</a>
+                      <ul>
+                        <li><a href="/about-us" role="button">About Us</a></li>
+                        <li><a href="/our-agents" role="button">Our Team</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="4">Learn</a>
+                      <ul>
+                        <li><a href="/bid-online/" role="button" >How To Bid</a></li>
+                        <li><a href="/auction-type/" role="button" >Our Auction Types</a></li>
+                        <li><a href="/video-tutorials/" role="button" >Auction Video Tutorials</a></li>
+                        <li><a href="/faq/" role="button">FAQs</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="5">Resources</a>
+                      <ul>
+                        {% if request.session.user_id %}
+                        <li><a href="/property-value-estimator/" role="button" >Property Value Estimator</a></li>
+                        {% endif %}
+                        <li><a href="/blogs" role="button" >Our Blog</a></li>
+                        <li><a href="/terms/" role="button" >Terms & Conditions</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="/contact-us" role="button" tabindex="6">Contact</a>
+                    </li>
+                  </ul>
+                </nav>
+                </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <ul class="user-links">
+                  <!-- <li class="search-btn">
+                    <div class="search-container">
+                      <form action="/search" method="get">
+                        <input class="search expandright" id="searchright" type="search" name="q" placeholder="Search">
+                        <label class="button searchbutton" for="searchright"><span class="mglass"><i class="fas fa-search"></i></span></label>
+                      </form>
+                    </div>
+                  </li> -->
+                  {% if request.session.user_id %}
+                  
+                  <li class="user-icons">
+                    <a role="button" href="{% if request.session.is_admin %}/admin/chat/{% else %}/chat/{% endif %}" tabindex="7" aria-label="Message"><i class="fas fa-envelope"></i></a>
+                  </li>
+                  <li class="user-icons">
+                    <div class="user-notification">
+                      <a role="button" aria-label="Message" href="javascript:void(0);" {% if request.session.user_id %}onclick="get_notification_details();"{% endif %} data-toggle="dropdown" role="button" aria-expanded="false" tabindex="0" class="nav-link dropdown-toggle">
+                        <i class="fas fa-bell" role="presentation"></i><span class="circle" id="notification_count" style="display:none;"></span>
+                      </a>
+                      <div role="menu" class="dropdown-header-top author-log dropdown-menu">
+                        <div class="noti-top">
+                            <h6>Notification</h6>
+                            <a role="button" href="/notifications/" tabindex="15">View All</a>
+                        </div>
+                        <ul id="notification_list">
+                          
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="dashoard-user">
+                      <a href="javascript:void(0)" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" tabindex="1">
+                        <span class="user-icon"></span><span class="name"> {% if request.session.first_name %}{{request.session.first_name}} {% else %} William{% endif %}</span><span class="arrow-icon"></span>
+                      </a>
+                      <ul role="menu" class="dropdown-header-top author-log dropdown-menu">
+                        {% if request.session.is_admin %}
+                          <li>
+                          {% if is_free_plan %}
+                            <a role="button" href="{% if request.session.is_broker %}/admin/{% else %}/admin/business-info/{% endif %}" tabindex="16"><span class="icon dashboard-icon" role="presentation"></span> Admin Dashboard</a>
+                          {% else %}
+                            <a role="button" href="/admin/dashboard/" tabindex="17"><span class="icon dashboard-icon" role="presentation"></span> Admin Dashboard</a>
+                          {% endif %}
+                          </li>
+                        {% endif %}
+                        {% if request.session.is_broker %}
+                        <li>
+                          <a role="button" href="/admin/payment-settings/" tabindex="18"><span class="icon payment-icon" role="presentation"></span> Payment Settings</a>
+                        </li>
+                        {% endif %}
+                        {% comment %} 
+                        <li>
+                          <a role="button" href="/my-bids/" tabindex="19"><span class="icon bid-icon" role="presentation"></span> My Bids</a>
+                        </li>
+                        <li>
+                          <a role="button" href="/favourite-listings/" tabindex="20"><span class="icon favorite-icon" role="presentation"></span> Favorite Listings</a>
+                        </li> {% endcomment %}
+                        <li>
+                          <a role="button" href="/my-bids/" tabindex="21"><span class="icon personal-icon" role="presentation"></span> Buyer Dashboard</a>
+                        </li>
+                        {% comment %}
+                        <li>
+                          <a role="button" href="/logout/" tabindex="22"><span class="icon logout-icon" role="presentation"></span> Log Out</a>
+                        </li>
+                        {% endcomment %}
+                        <li><a role="button" href="javascript:void(0)" data-toggle="modal" data-target="#logoutModal"><span class="icon logout-icon" role="presentation"></span> Log Out</a>
+                      </ul>
+                    </div>
+                  </li>
+                  {% else %}
+                  <li class="register-btn">
+                    <a role="button" href="{% url 'register' %}" class="btn btn-primary btn-sm" tabindex="8"><i class="fa-regular fa-user" role="presentation"></i> Create Free Account</a>
+                  </li>
+                  <li>
+                    <a role="button" href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn btn-secondary btn-sm" tabindex="9"><i class="fa-sharp fa-regular fa-arrow-right-to-arc" role="presentation"></i> Login</a>
+                  </li>
+                  
+                  {% endif %}
+                </ul>
+              </div><!-- End .table-cell -->
+
+            </div><!-- End .table -->
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .header-ani -->
+  </header><!-- End .header -->

@@ -1,0 +1,136 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Email Templates {% endblock title %}
+
+{% block styles %}
+  <link href="{% static 'admin/vendors/jQuery-Multiple-Select/dist/css/selectize.bootstrap3.css' %}" type="text/css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  
+      <div class="listing-top">
+        <div class="block">
+          <h6>Email Templates : <b id="totalCount">Loading...</b></h6>
+        </div>
+
+        <div class="block">
+          <form action="" class="search-field last top_search">
+            <div class="search-icon"><i class="fas fa-search"></i></div>
+            <input type="text" id="search" class="form-control input-sm" placeholder="Search for...">
+            <button class="btn btn-primary btn-sm pl20 searchBtn"  type="submit">Go!</button>
+          </form>
+        </div>
+      </div>
+
+      
+
+      <div class="listing-bottom">
+            <div class="block right">
+              <i class="fa fa-filter"></i> Filters
+            </div>
+            <div class="block">
+              <select class="select form-control" id="site" name="site_id" multiple>
+                  <option value="" selected disabled>Filter Domain</option>
+                  {% for obj in domain_list %}
+                      {% if obj.is_active %}
+                          <option value="{{obj.id}}">{{obj.domain_name}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+            </div>
+            <div class="block">
+              <select class="form-control" name="prop_filter_status" id="prop_filter_status" multiple>
+                <option value="" selected disabled>Filter Status</option>
+                {% for obj in status_list %}
+                      <option value="{{obj.id}}">{{obj.status_name}}</option>
+                  {% endfor %}
+              </select>
+            </div>
+
+            <div class="block" style="min-width: 130px;">
+              <select class="form-control" name="per_page_record" id="per_page_record">
+                <option value="10">10 Records</option>
+                <option value="20" selected>20 Records</option>
+                <option value="30">30 Records</option>
+                <option value="40">40 Records</option>
+                <option value="50">50 Records</option>
+              </select>
+            </div>
+
+            <div class="block">
+                <a type="button" class="btn btn-primary" style="float:right;" href="{% url 'admin-add-email-template' %}"><i class="fa fa-plus-circle"></i> Add Template</a>
+            </div>
+
+          </div>
+
+
+      <div class="row">
+        
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_content">
+
+              {% if messages %}
+              {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+              <input type="hidden" name="page-email-template-list" id="page-email-template-list" value="1">						
+
+
+              <span id="span-ajax-email-template-list">
+               <div class="table-responsive">
+                <table class="table table-striped jambo_table bulk_action">
+                  <thead>
+                      <tr class="headings">
+                        <th class="column-title">ID </th>
+                        <th class="column-title" style="width:10%">Domain Name </th>
+                        <th class="column-title">Event Name </th>
+                        <th class="column-title">Subject </th>
+                        <th class="column-title" style="width:10%">Added on </th>
+                        <th class="column-title">Status </th>
+                        <th class="column-title no-link last" style="width:14%"><span class="nobr">Action</span>
+                        </th>
+                      </tr>
+                    </thead>
+                      
+                    <tbody>							  			  
+                    </tbody>
+                  </table>
+                </div>
+              </span> 
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/status-active-inactive.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/email-template-list.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/jQuery-Multiple-Select/dist/js/standalone/selectize.js' %}"></script>
+
+
+
+{% endblock %}

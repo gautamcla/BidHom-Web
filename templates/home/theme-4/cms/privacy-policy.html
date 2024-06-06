@@ -1,0 +1,118 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+  
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  Privacy
+                </h3>
+                <h1>
+                  Policy
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <section class="tutorial-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+
+            <div class="tutorial-detail-wrap">
+              <div class="tutorial-wrap">
+                <h2>{% if privacy.page_title %}{% autoescape off %}{{ privacy.page_title }}{% endautoescape %}{% else %}Our Contract (E-SIGN){% endif %}<span class="hr-line"></span></h2>
+                {% if privacy.page_content %}
+                {% autoescape off %}
+                {{ privacy.page_content }}
+                {% endautoescape %}
+                {% else %}
+                <p>
+                  You are entering a binding contract with https://rogsolitude.com, the Realtors® or lenders who use it and their parents, subsidiaries and affiliates, and Commissions Inc. (“us”). By (1) using this website "https://rogsolitude.com", and (2) by submitting your information to “Continue My Search” and create a user profile, you agree that you are giving your express written consent to the all the terms below, as well as our Privacy Policy, both of which contain an Arbitration Agreement and Class Action Waiver. You agree that your doing so constitutes your electronic signature, and is equivalent to a written signature. You may choose to receive this contract on paper by calling us at (855) 259-7277 or emailing us at postmaster@cincpro.com. You may withdraw this consent by using the opt-out procedures described in the “Our Communications With You” section below.
+                </p>
+                <p>
+                  By accessing https://rogsolitude.com, you are consenting to the information collection and use practices described in this Privacy Policy located here
+                </p>
+                <p>
+                  Our Communications With you <br>
+                  (TCPA Consent for United States Residents)
+                </p>
+                <p>
+                  EXPRESS WRITTEN CONSENT. BY SUBMITTING YOUR CONTACT INFORMATION, YOU ARE PROVIDING YOUR EXPRESS WRITTEN CONSENT TO RECEIVE COMMUNICATIONS FROM US AT THE EMAIL ADDRESS AND TELEPHONE NUMBERS YOU ENTERED INTO OUR CONTACT FORM, OR THAT YOU LATER PROVIDE TO US OR ENTER INTO YOUR CONTACT PAGE.
+                </p>
+                <p>
+                  E-MAILS, CALLS, AND TEXTS. THESE COMMUNICATIONS MAY INCLUDE TELEMARKETING MESSAGES, THROUGH THE USE OF EMAIL, LANDLINE PHONE, FAX, CELLULAR PHONE, AND TEXT MESSAGES (INCLUDING SMS AND MMS).
+                </p>
+                <p>
+                  AUTODIALING. WE MAY USE AN AUTOMATIC TELEPHONE DIALING SYSTEM (OR “AUTO-DIALER”), WHICH MAY EMPLOY AN ARTIFICIAL OR PRE-RECORDED VOICE OR “ROBOTEXTS.” YOUR CARRIER’S STANDARD RATES AND CHARGES MAY APPLY.
+                </p>
+                <p>
+                  NO PURCHASE NECESSARY. AGREEING TO THESE COMMUNICATIONS IS NOT A CONDITION OF PURCHASING ANY PROPERTY, GOODS, OR SERVICES FROM US.
+                </p>
+                <p>
+                  OPTING OUT. YOU MAY REVOKE YOUR CONSENT TO RECEIVE COMMUNICATIONS AT ANY TIME BY REPLYING “STOP” TO ANY OF OUR TEXTS, OR BY ANY OTHER REASONABLE MEANS. WE WILL MAKE A COMMERCIALLY REASONABLE EFFORT TO COMPLY WITH ANY COMMUNICATIONS FROM YOU OPTING OUT, BUT REPLY “STOP” WILL AUTOMATICALLY UNSUBSCRIBE YOU, AND WE RECOMMEND THAT METHOD. WE MAY TAKE UP TO 30 DAYS TO STOP COMMUNICATIONS IF YOU USE A METHOD OTHER THAN THE AUTOMATIC REPLY “STOP.” YOU CONSENT TO RECEIVE A FINAL TEXT MESSAGE CONFIRMING YOUR OPT-OUT.
+                </p>
+                <p>
+                  COMMUNICATION FREQUENCY. HOW OFTEN WE SEND YOU COMMUNICATIONS WILL VARY, BECAUSE THE INDIVIDUAL SALESPERSON OR REALTOR WHO COMMUNICATES WITH YOU WILL DETERMINE IT.
+                </p>
+                <p>
+                  Your consent here also serves as your express written consent to your past receipt of electronic communications from us.
+                </p>
+                <h6>
+                  You represent and warrant that:
+                </h6>
+                <ul class="list-item">
+                  <li>
+                    You are at least 18 years old
+                  </li>
+                  <li>
+                    You live in the United States (or Canada, in which case the Canadian consents below apply)
+                  </li>
+                  <li>
+                    You have not registered on a national or statewide Do Not Call list
+                  </li>
+                  <li>
+                    You are the account holder for the email addresses and phone numbers you provided, or you have authorization from the account holder to give this consent
+                  </li>
+                  <li>
+                    The email addresses and phone numbers you provided are accurate, and you will let us know if you release them to another person or individual
+                  </li>
+                  <li>
+                    Our mobile service is available only in certain states. Certain mobile features may be incompatible with your carrier or mobile device. Contact your carrier with questions regarding these issues. Read More...
+                  </li>
+                </ul>
+                {% endif %}
+
+
+              </div><!-- End .blog-wrap -->
+
+            </div><!-- End .blog-detail-wrap -->
+
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </section> <!-- End .blog-wrapper -->
+
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+
+{% endblock %}

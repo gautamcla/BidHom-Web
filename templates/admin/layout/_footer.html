@@ -1,0 +1,31 @@
+{% load static %}
+<div id="confirmImageDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="popup_article_id" id="popup_article_id" value=""/>
+                <input type="hidden" name="popup_section" id="popup_section" value=""/>
+                <input type="hidden" name="popup_image_id" id="popup_image_id" value=""/>
+                <input type="hidden" name="popup_image_name" id="popup_image_name" value=""/>
+                <input type="hidden" name="popup_count" id="popup_count" value=""/>
+                <input type="hidden" name="popup_agent_id" id="popup_agent_id" value=""/>
+                <input type="hidden" name="popup_user_id" id="popup_user_id" value=""/>
+                <input type="hidden" name="loggedin_user_id" id="loggedin_user_id" value=""/>
+                <input type="hidden" name="request_from" id="request_from" value=""/>
+                <input type="hidden" name="delete_for" id="delete_for" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button" class="btn btn-primary-bdr del_user_btn" id="del_image_false">No</button> <button type="button" class="btn btn-primary del_user_btn" id="del_image_true">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->

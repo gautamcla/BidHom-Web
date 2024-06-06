@@ -1,0 +1,1384 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block content %}
+{% load humanize %}
+<div class="dashboard-body">
+        <div class="row">
+          {% if response.msg != ''%}
+          <span class="col-md-10 col-sm-12">
+          </span>
+          {% endif %}
+          <form name="website_setting_form" id="website_setting_form" method="post" autocomplete="off">
+            {% csrf_token %}
+            <input type="hidden" name="total_section" id="total_section" value="{% if website_details.articles %}{{ website_details.articles|length }}{% else %}1{% endif %}"/>
+            <input type="hidden" name="total_website_auction" id="total_website_auction" value="{% if website_details.home_auction %}{{ website_details.home_auction|length }}{% else %}1{% endif %}"/>
+            <input type="hidden" name="total_area_expertise" id="total_area_expertise" value="{% if website_details.area_expertise %}{{ website_details.area_expertise|length }}{% else %}1{% endif %}"/>
+            <div class="col-md-12 col-sm-12">
+
+              <h5>
+                <strong id="startTourBtn">
+                  Manage Website
+                </strong>
+              </h5>
+
+              <div class="customscroll bidder-accordian">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingOne">
+                          <h4 class="panel-title">
+                              <a id="first_step_open" class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne" >
+                                Home Page
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                          <div class="panel-body">
+                            <h6>
+                              Home Page
+                              <a href="javascript:void(0);" class="tool-box">
+                                <i class="fas fa-question-circle"></i>
+                                <div class="tool-pic">
+                                  <img src="{% static 'admin/images/tooltip/home.jpg' %}" alt="">
+                                </div>
+                              </a>
+                            </h6>
+
+                            <div class="chose-doamin">
+                              <div class="item">
+                                <label for="primary_domain">
+                                  Choose Primary Domain <span class="text-danger">*</span>
+                                </label>
+                                <!--<select name="country" id="domain">
+                                  <option value="">https://rogsolitude.staging.rebabids.com/</option>
+                                </select>-->
+                                <input type="text" class="form-control" name="primary_domain" id="primary_domain" value="{% if website_details.domain_url %}{{ website_details.domain_url }}{% else%}{{ request.META.HTTP_HOST }}{% endif %}" readonly/>
+                              </div>
+                              <div class="item">
+                                <label for="manageDomainBtn">
+                                  &nbsp;
+                                </label>
+                                <button type="button" class="btn btn-primary" id="manageDomainBtn" data-toggle="modal" data-target="#domainModal">Manage</button>
+                              </div>
+                            </div>
+                            <h6>
+                              Favicons <span class="text-danger">*</span> 
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img">
+                                  Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px <br><img src="{% static 'admin/images/tooltip/fevicon.jpg' %}" alt=""></span>
+                              </div>
+                            </h6>
+                            <div class="upload-fav">
+                              <div class="item">
+                                <!--<form action="/upload-target" class="dropzone" id="favicon_img" name="favicon_img"></form>-->
+                                <div class="dropzone" id="faviconImgFrm">
+                                  <input type="hidden" id="favicon_img_id" name="favicon_img_id" value="{{ website_details.custom_site_settings.favicon.upload_id|default:'' }}"/>
+                                  <input type="hidden" name="favicon_img_name" id="favicon_img_name" value="{{ website_details.custom_site_settings.favicon.image_name|default:'' }}"/>
+                                  <div class="dz-default dz-message" data-dz-message="">
+                                    <!--<input name="file" type="file" id="favicon_img" name="favicon_img" />
+                                    <button><i class="fas fa-upload"></i> Upload favicon</button>-->
+
+                                    <div class="block">
+                                      <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload favicon</button>
+                                    </div>
+                                    <div class="block">
+                                      or
+                                    </div>
+                                    <div class="block">
+                                      <h6>
+                                        Drag & Drop Docs
+                                        <span>Supported Files:  png, jpg, jpeg, ico</span>
+                                      </h6>
+                                    </div>
+                                  </div>
+
+                                </div>
+                              </div>
+                              <div class="item" id="favIconImgDiv">
+                                <div class="fav-icon">
+                                  <figure>
+                                    <img src="{{ aws_url }}{{ website_details.custom_site_settings.favicon.bucket_name }}/{{ website_details.custom_site_settings.favicon.image_name }}" id="favIconImg" alt="" style="{% if website_details.custom_site_settings.favicon.image_name %}{% else %}display:none;{% endif %}">
+                                  </figure>
+                                  
+                                  <a href="javascript:void(0)" class="confirm_image_delete" data-image-id="{{ website_details.custom_site_settings.favicon.upload_id|default:'' }}" data-image-name="{{ website_details.custom_site_settings.favicon.image_name|default:'' }}" data-image-section="{{ website_details.custom_site_settings.favicon.bucket_name }}" data-count="" id="faviconDelBtn" style="{% if website_details.custom_site_settings.favicon.image_name %}{% else %}display:none;{% endif %}"><i class="fas fa-trash-alt"></i></a>
+                                </div>
+                                
+                              </div>
+
+                            </div><!-- End .uplaod-fav -->
+                            <p id="custom_favicon_error"  class="custom_image_error" style="display:none;">Favicons is required.</p>
+                            <div class="form-group website-title">
+                              <label for="website_title">
+                                Website Title <span class="text-danger">*</span> 
+                                <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                  <span class="tooltipp__content right banner-img">This name will be used throughout the website and will appear in web search result <br><img src="{% static 'admin/images/tooltip/Website-Title.jpg' %}" alt=""></span>
+                                </div>
+                              </label>
+                              <input type="text" name="website_title" id="website_title" class="form-control" placeholder="Gsa" value="{{ website_details.custom_site_settings.website_title|default:'Marketplace-Home Page' }}">
+                              
+                            </div>
+
+                            <h6>
+                              Website Logo <span class="text-danger">*</span> 
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img">Preferred logo size is 226 x 76px. Raster (GIF, PNG, BMP, TIFF, JPEG 2000) and vector file formats (EPS, WMF, SVG) are recommended, as they support transparency<br><img src="{% static 'admin/images/tooltip/Website-Logo.jpg' %}" alt=""></span>
+                              </div>
+                            </h6>
+                            <div class="upload-fav">
+                              <div class="item">
+                                <div class="dropzone" id="websiteLogoFrm">
+                                  <input type="hidden" id="website_logo_id" name="website_logo_id" value="{{ website_details.custom_site_settings.website_logo.upload_id|default:'' }}"/>
+                                  <input type="hidden" name="website_logo_name" id="website_logo_name" value="{{ website_details.custom_site_settings.website_logo.image_name|default:'' }}"/>
+                                  <div class="dz-default dz-message" data-dz-message="">
+                                    <!-- <input name="file" type="file" id="website_logo" name="website_logo" />
+                                    <button><i class="fas fa-upload"></i> Upload Logo</button> -->
+                                    <div class="block">
+                                      <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Company Logo</button>
+                                    </div>
+                                    <div class="block">
+                                      or
+                                    </div>
+                                    <div class="block">
+                                      <h6>
+                                        Drag & Drop Docs
+                                        <span>Supported Files: jpg, jpeg, png</span>
+                                      </h6>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="item" id="websiteLogoImgDiv" >
+                                <div class="logo-icon website-logo">
+                                  <figure>
+                                    <img src="{{ aws_url }}{{ website_details.custom_site_settings.website_logo.bucket_name }}/{{ website_details.custom_site_settings.website_logo.image_name }}" id="websiteLogoImg" alt="" style="{% if website_details.custom_site_settings.website_logo.image_name %}{% else %}display:none;{% endif %}">
+                                  </figure>
+                                  <a href="javascript:void(0)" class="confirm_image_delete" data-image-id="{{ website_details.custom_site_settings.website_logo.upload_id|default:'' }}" data-image-name="{{ website_details.custom_site_settings.website_logo.image_name }}" data-image-section="{{ website_details.custom_site_settings.website_logo.bucket_name }}" data-count="" id="websiteLogoDelBtn" style="{% if website_details.custom_site_settings.website_logo.image_name %}{% else %}display:none;{% endif %}"><i class="fas fa-trash-alt"></i></a>
+                                </div>
+                                
+                              </div>
+                            </div><!-- End .uplaod-fav -->
+                            <p id="custom_logo_error"  class="custom_image_error" style="display:none;">Logo is required.</p>
+                            <!--<p class="red-text font13 mb10 regular">
+                              Main Banner ------
+                            </p>-->
+                            <h6>
+                              Banner Images
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img">Banner Image is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 800 x 600 px. Allowed file type are png, jpg, jpeg. You can upload maximum 4 files at a time. <br><img src="{% static 'admin/images/tooltip/Banner-Image.jpg' %}" alt=""></span>
+                              </div>
+                            </h6>
+                            <div class="upload-fav">
+                              <!--<input type="hidden" name="banner_image_name" id="banner_image_name" value=""/>-->
+                              <div class="item">
+                                <div class="dropzone {% if website_details.banner_images|length > 3 %}dz-max-files-reached{% endif %}" id="BannerImgFrm">
+                                  <input type="hidden" id="banner_image_id" name="banner_image_id" value="{{ website_details.banner_image_ids|default:'' }}"/>
+                                  <input type="hidden" name="banner_image_name" id="banner_image_name" value="{{ website_details.banner_image_name|default:'' }}"/>
+                                  <div class="dz-default dz-message" data-dz-message="">
+                                    <!-- <input name="file" type="file" id="banner_image" name="banner_image" multiple/>
+                                    <button><i class="fas fa-upload"></i> Upload Banner</button> -->
+                                    <div class="block">
+                                      <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Photos</button>
+                                    </div>
+                                    <div class="block">
+                                      or
+                                    </div>
+                                    <div class="block">
+                                      <h6>
+                                        Drag & Drop Docs
+                                        <span>Supported Files: Png, Jpg, Jpeg</span>
+                                        <span>Max Files upload: 4</span>
+                                      </h6>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="item">
+                                <!-- <div class="tooltipp rgt"><i class="fas fa-question-circle"></i>
+                                  <span class="tooltipp__content banner-tool">Prefered logo size is 226x76px. Raster (GIF, PNG, BMP, TIFF, JPEG 2000) and vector file formats (EPS, WMF, SVG) are recommended, as
+                                    they support transparency. <br><img src="{% static 'admin/images/tooltip/banner.png' %}" alt=""></span>
+                                </div> -->
+                              </div>
+                            </div><!-- End .uplaod-fav -->
+                            <p id="custom_banner_error"  class="custom_image_error" style="display:none;">Banner is required.</p>
+                            <p>
+                              Uploaded Banners
+                            </p>
+
+                            <div class="image-show-list" id="bannerImgDiv" style="{% if website_details.banner_images %}{% else%}display:none;{% endif %}">
+                              <ul id="bannerImgList">
+                                  {% if website_details.banner_images %}
+                                    {% for banner in  website_details.banner_images %}
+                                      <li rel_id="{{ banner.upload_id }}" rel_position="{{ forloop.counter }}">
+                                        <a href="javascript:void(0)" data-image-id="{{ banner.upload_id }}" data-image-name="{{ banner.doc_file_name }}" data-image-section="{{ banner.bucket_name }}"  class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+                                        <img src="{{ aws_url}}{{ banner.bucket_name }}/{{ banner.doc_file_name }}" alt="">
+                                        <figcaption>
+                                          <h6>
+                                            {{ banner.doc_file_name|default:'' }}
+                                          </h6>
+                                          <p class="size_date_sec" data-file-size="{{ banner.file_size }}" data-added-date="{{ banner.added_date }}">
+                                            File Size: {{ banner.file_size|default:'2 MB' }} <br>
+                                            Uploaded: {{ banner.added_date|parse_iso|date:'M j, Y h:i:sa' }}
+                                          </p>
+                                          <div class="move">
+                                            <i class="fas fa-expand-arrows-alt"></i> Move
+                                          </div>
+                                        </figcaption>
+                                      </li>
+
+                                    {% endfor %}
+                                  {% endif %}
+                              </ul>
+                            </div>
+
+                            <div class="form-group">
+                              <label for="banner_headline">
+                                Banner Headline <span class="text-danger">*</span>
+                                <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                  <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/Banner-Headline.jpg' %}" alt=""></span>
+                                </div>
+                              </label>
+                              <input type="text" name="banner_headline" id="banner_headline" class="form-control" value="{{ website_details.custom_site_settings.banner_headline|default:'Selling To The Highest Bidder' }}">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="website_name">
+                                Website Company Name <span class="text-danger">*</span>
+                                <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                  <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/Website-name.jpg' %}" alt=""></span>
+                                </div>
+                              </label>
+                              <input type="text" name="website_name" id="website_name" class="form-control" value="{{ website_details.custom_site_settings.website_name|default:'Gsa group' }}">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="call_action">
+                                Call To Action <span class="text-danger">*</span>
+                                <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                  <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/Call-To-Action.jpg' %}" alt=""></span>
+                                </div>
+                              </label>
+                              <input type="text" name="call_action" id="call_action" class="form-control" value="{{ website_details.custom_site_settings.call_to_action|default:'START BIDDING NOW' }}">
+                            </div>
+
+                            {% comment %}
+                            <div class="form-group">
+                              <input type="checkbox" name="enable_search" id="enable_search" class="css-checkbox" value="1" {% if website_details.custom_site_settings.is_search_icon == '1' %}checked{% endif %}>
+                              <label for="enable_search" class="check-label">Enable to search icon</label>
+                            </div>
+                            {% endcomment %}
+
+
+                            <!--<div class="form-group">
+
+                              <label for="headline" class="pb10">
+                                Head Line <span class="text-danger">*</span>
+                                <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                  <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/auction-type-Head-Line.jpg' %}" alt=""></span>
+                                </div>
+                              </label>
+                              <textarea class="ckeditor form-control" name="headline" id="headline">{% if website_details.custom_site_settings.headline %}{{ website_details.custom_site_settings.headline }}{% else %}<h1>Rethink</h1><h6><span></span>Real Estate Auctions</h6>{% endif %}</textarea>
+                            </div>-->
+
+                            <div class="form-group">
+                              <div class="clearfix">
+                                <h6 for="extend_description" class="black-text pb10">
+                                  Extended Description <span class="text-danger">*</span>
+                                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                    <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/Auction-Type-detail.jpg' %}" alt=""></span>
+                                  </div>
+                                </h6>
+                              </div>
+                              <textarea class="ckeditor form-control" name="extend_description" id="extend_description">{% if website_details.custom_site_settings.extended_description %}{{ website_details.custom_site_settings.extended_description }}{% else %}Is revolutionizing the way real estate is sold.&nbsp; We took the best features from real estate auctions and traditional real estate and created an innovative multi auction platform that works better than any other selling methods in any market condition{% endif %}</textarea>
+                            </div>
+
+                          <div class="form-group mb0">
+                            <label for="auctionTypeAll" class="black-text pb10">
+                              Select Auction Type
+                              
+                            </label> &nbsp; &nbsp;
+                            <input type="checkbox" class="css-checkbox" id="auctionTypeAll">
+                              <label for="auctionTypeAll" class="check-label">Select All</label>
+                              &nbsp; &nbsp;
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img">Auction Image is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 400 x 300 px <br><img src="{% static 'admin/images/tooltip/Select-Auction-Type.jpg' %}" alt=""></span>
+                              </div>
+                          </div>
+                          <div class="auction-type">
+
+                            {% for type_name in pre_auction_type_list %}
+
+                            {% get_list_value website_details.auctions forloop.counter0 'id' as auction_id %}
+                            {% get_list_value website_details.auctions forloop.counter0 'auction_name' as auction_name %}
+                            {% get_list_value website_details.auctions forloop.counter0 'upload_id' as upload_id %}
+                            {% get_list_value website_details.auctions forloop.counter0 'status' as status %}
+                            {% get_list_value website_details.auctions forloop.counter0 'doc_file_name' as doc_file_name %}
+                            {% get_list_value website_details.auctions forloop.counter0 'bucket_name' as bucket_name %}
+                            {% get_list_value website_details.auctions forloop.counter0 'file_size' as file_size %}
+                            {% get_list_value website_details.auctions forloop.counter0 'added_on' as date_added %}
+
+                            <div class="auction-list">
+                              
+                                <div class="block">
+                                  <input type="checkbox" class="css-checkbox check_auction_type" id="check_auction_type_{{ forloop.counter0 }}" value="{{ forloop.counter0 }}" {% if status == 1 %}checked{% endif %} {% if website_details.auctions|length == 0 %}checked{% endif %}>
+                                  <label for="check_auction_type_{{ forloop.counter0 }}" class="check-label"></label>
+                                  <input type="hidden" class="selected_auction_type" name="selected_auction_type_{{ forloop.counter0 }}" id="selected_auction_type_{{ forloop.counter0 }}" value="{% if status %}{{ status }}{% else %}2{% endif %}">
+                                </div>
+                                <div class="block">
+                                  <input type="text" class="form-control auction_type" name="auction_type_{{ forloop.counter0 }}" id="auction_type_{{ forloop.counter0 }}" placeholder="Enter Auction Type" value="{% if auction_name %}{{ auction_name }}{% else %}{{ type_name }}{% endif %}" readonly>
+
+                                </div>
+                                <!--<div class="upload-btn-wrapper">
+                                  <div class="upload-fav">
+                                    <div class="singleitem">
+                                      <div class="dropzone auctionTypeImgFrm" id="auctionTypeImgFrm{{ forloop.counter0 }}">
+                                        <input type="hidden" class="auction_image_id" id="auction_image_id_{{ forloop.counter0 }}" name="auction_image_id_{{ forloop.counter0 }}" value="{% if upload_id %}{{ upload_id }}{% endif %}"/>
+                                        <input type="hidden" class="auction_image_name" name="auction_image_name_{{ forloop.counter0 }}" id="auction_image_name_{{ forloop.counter0 }}" value="{% if doc_file_name %}{{ doc_file_name }}{% endif %}"/>
+                                        <div class="fallback">
+                                          <input name="file" class="auction_image_field" type="file" id="auction_image_field_{{ forloop.counter0 }}" name="auction_image_field_{{ forloop.counter0 }}"/>
+                                          <button type="button"><i class="fas fa-upload"></i> Upload Photos</button>
+                                        </div>
+                                      </div>
+                                      <p id="custom_auction_image_error_{{ forloop.counter0 }}"  class="custom_image_error" style="display:none;">Image is required.</p>
+                                    </div>
+                                    
+                                  </div>
+
+                                  <div class="image-show-list" id="auctionTypeImgDiv{{ forloop.counter0 }}" style="{% if doc_file_name %}{% else %}display:none;{% endif %}">
+                                    <ul id="auctionTypeImgList{{ forloop.counter0 }}">
+                                          <li rel_id="{% if upload_id %}{{ upload_id }}{% endif %}">
+                                            <a href="javascript:void(0)" data-image-id="{% if upload_id %}{{ upload_id }}{% endif %}" data-image-name="{% if doc_file_name %}{{ doc_file_name }}{% endif %}" data-image-section="{% if bucket_name %}{{ bucket_name }}{% endif %}" data-count="{{ forloop.counter0 }}" class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+                                            <img src="{% if doc_file_name %}{{ aws_url }}{{ bucket_name }}/{{ doc_file_name }}{% else %}https://realtyonegroup.s3.us-west-1.amazonaws.com/banner_img/1617196229.4964526_banner-1.jpg{% endif %}" alt="">
+
+                                          </li>
+                                    </ul>
+                                  </div>
+
+                                </div>-->
+                              
+                            </div><!-- End .col-md-4 -->
+
+
+                            {% endfor %}
+
+                          </div>
+
+
+
+                          <div class="form-group mb0">
+                            <h6>
+                              Select Experties &nbsp; &nbsp;
+                              <input type="checkbox" class="css-checkbox" id="expertiseTypeAll">
+                              <label for="expertiseTypeAll" class="check-label">Select All</label> &nbsp; &nbsp;
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img">Experties is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 400 x 300 px <br><img src="{% static 'admin/images/tooltip/Area-of-Experties.jpg' %}" alt=""></span>
+                              </div>
+                            </h6>
+                            <!-- <label for="expertiseTypeAll" class="black-text pb10">
+                              Select Experties
+                              
+                            </label> &nbsp; &nbsp;
+                            <input type="checkbox" class="css-checkbox" id="expertiseTypeAll">
+                            <label for="expertiseTypeAll" class="check-label">Select All</label>
+                            &nbsp; &nbsp;
+                            <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                              <span class="tooltipp__content right banner-img">Experties is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 400 x 300 px <br><img src="{% static 'admin/images/tooltip/Area-of-Experties.jpg' %}" alt=""></span>
+                            </div> -->
+                          </div>
+                          <div class="auction-type">
+                            {% for type_name in pre_expertise_list %}
+                              {% get_list_value website_details.expertise forloop.counter0 'id' as expertise_id %}
+                              {% get_list_value website_details.expertise forloop.counter0 'expertise_name' as expertise_name %}
+                              {% get_list_value website_details.expertise forloop.counter0 'upload_id' as expertise_upload_id %}
+                              {% get_list_value website_details.expertise forloop.counter0 'status' as expertise_status %}
+                              {% get_list_value website_details.expertise forloop.counter0 'doc_file_name' as expertise_doc_file_name %}
+                              {% get_list_value website_details.expertise forloop.counter0 'bucket_name' as expertise_bucket_name %}
+                              {% get_list_value website_details.expertise forloop.counter0 'file_size' as expertise_file_size %}
+                              {% get_list_value website_details.expertise forloop.counter0 'added_on' as expertise_date_added %}
+                              {% get_list_value website_details.expertise forloop.counter0 'expertise_icon' as expertise_icon_name %}
+                              {% get_list_value website_details.expertise forloop.counter0 'expertise_icon_type_id' as expertise_icon_type_id %}
+                              {% get_list_value website_details.expertise forloop.counter0 'icon_list' as icon_list %}
+                              {% get_list_value website_details.expertise forloop.counter0 'counter' as list_count %}
+                              {% get_list_value website_details.expertise forloop.counter0 'expertise_icon_name' as expertise_icon_name %}
+                              {% get_list_value website_details.expertise forloop.counter0 'expertise_icon_id' as expertise_icon_id %}
+
+                              <div class="auction-list">
+                                <div class="block">
+                                  <input type="checkbox" class="css-checkbox check_expertise" id="check_expertise_{{ forloop.counter0 }}" value="{{ forloop.counter0 }}" {% if expertise_status == 1 %}checked{% endif %} {% if website_details.expertise|length == 0 %}checked{% endif %}>
+                                  <label for="check_expertise_{{ forloop.counter0 }}" class="check-label"></label>
+                                  <input type="hidden" class="selected_expertise" name="selected_expertise_{{ forloop.counter0 }}" id="selected_expertise_{{ forloop.counter0 }}" value="{% if expertise_status %}{{ expertise_status }}{% else %}2{% endif %}">
+                                </div>
+                                <div class="block">
+                                  <input type="text" class="form-control expertise_type" name="expertise_type_{{ forloop.counter0 }}" id="expertise_type_{{ forloop.counter0 }}" placeholder="Enter Auction Type" value="{% if expertise_name %}{{ expertise_name }}{% else %}{{ type_name }}{% endif %}">
+                                  <input type="hidden" name="expertise_icon_{{ forloop.counter0 }}" rel_pos="{{ forloop.counter0 }}" id="expertise_icon_{{ forloop.counter0 }}" class="expertise_icon" value="{{ expertise_icon_id|default:'' }}"/>
+                                </div>
+                                <!--<div class="">
+                                  <div class="col-md-5 col-sm-5">
+                                    <div class="form-group">
+                                      <select name="expertise_icon_type_{{ forloop.counter0 }}" rel_pos="{{ forloop.counter0 }}" id="expertise_icon_type_{{ forloop.counter0 }}" class="select expertise_icon_type">
+                                        <option value="">Select Icon Type</option>
+                                        <option value="1" {% if expertise_icon_type == '1' %}selected{% endif %}> Residencial</option>
+                                        <option value="2" {% if expertise_icon_type == '2' %}selected{% endif %}> Land</option>
+                                        <option value="3" {% if expertise_icon_type == '3' %}selected{% endif %}> Commercial</option>
+                                        <option value="4" {% if expertise_icon_type == '4' %}selected{% endif %}> Auction</option>
+
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-5 col-sm-5">
+                                    <div class="form-group">
+                                      <select name="expertise_icon_{{ forloop.counter0 }}" rel_pos="{{ forloop.counter0 }}" id="expertise_icon_{{ forloop.counter0 }}" class="select expertise_icon icon-select">
+                                        <option value="">Select Icon</option>
+                                        {% for icon in icon_list %}
+                                          <option value="{{ icon.icon_name }}"{% if expertise_icon_name == icon.icon_name %}selected{% endif %} >{{ icon.icon_name }}</option>
+                                        {% endfor %}
+
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>-->
+                                <!--<div class="upload-btn-wrapper">
+
+                                  <div class="upload-fav">
+                                    <div class="singleitem">
+                                      <div class="dropzone expertiseTypeImgFrm" id="expertiseTypeImgFrm{{ forloop.counter0 }}">
+                                        <input type="hidden" class="expertise_image_id" id="expertise_image_id_{{ forloop.counter0 }}" name="expertise_image_id_{{ forloop.counter0 }}" value="{{ expertise_upload_id|default:'' }}"/>
+                                        <input type="hidden" class="expertise_image_name" name="expertise_image_name_{{ forloop.counter0 }}" id="expertise_image_name_{{ forloop.counter0 }}" value="{{ expertise_doc_file_name|default:'' }}"/>
+                                        <div class="fallback">
+                                          <input name="file" class="expertise_image_field" type="file" id="expertise_image_field_{{ forloop.counter0 }}" name="expertise_image_field_{{ forloop.counter0 }}"/>
+                                          <button type="button"><i class="fas fa-upload"></i> Upload Photos</button>
+                                        </div>
+                                      </div>
+                                      <p id="custom_expertise_image_error_{{ forloop.counter0 }}"  class="custom_image_error" style="display:none;">Image is required.</p>
+                                    </div>
+                                    
+                                  </div>
+
+                                  <div class="image-show-list" id="expertiseImgDiv{{ forloop.counter0 }}" style="{% if expertise_doc_file_name %}{% else %}display:none;{% endif %}">
+                                    <ul id="expertiseImgList{{ forloop.counter0 }}">
+                                          <li rel_id="{{ banner.upload_id }}">
+                                            <a href="javascript:void(0)" data-image-id="{% if expertise_upload_id %}{{ expertise_upload_id }}{% endif %}" data-image-name="{% if expertise_doc_file_name %}{{ expertise_doc_file_name }}{% endif %}" data-image-section="{% if expertise_bucket_name %}{{ expertise_bucket_name }}{% endif %}" data-count="{{ forloop.counter0 }}"  class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+                                            <img src="{% if expertise_doc_file_name %}{{ aws_url }}{{ expertise_bucket_name }}/{{ expertise_doc_file_name }}{% else %}https://realtyonegroup.s3.us-west-1.amazonaws.com/banner_img/1617196229.4964526_banner-1.jpg{% endif %}" alt="">
+                                          </li>
+                                    </ul>
+                                  </div>
+
+                                </div>-->
+                                <div class="experties-dropdown">
+                                  <div class="item">
+                                    <select name="expertise_icon_type_{{ forloop.counter0 }}" rel_pos="{{ forloop.counter0 }}" id="expertise_icon_type_{{ forloop.counter0 }}" class="select form-control expertise_icon_type">
+                                      <option value="">Select Icon Type</option>
+                                      <option value="1" {% if expertise_icon_type_id == 1 %}selected{% endif %}> Residential</option>
+                                      <option value="2" {% if expertise_icon_type_id == 2 %}selected{% endif %}> Land</option>
+                                      <option value="3" {% if expertise_icon_type_id == 3 %}selected{% endif %}> Commercial</option>
+                                      <option value="4" {% if expertise_icon_type_id == 4 %}selected{% endif %}> Auction</option>
+
+                                    </select>
+
+                                  </div>
+                                  <div class="item">
+                                    <div class="experties-icon">
+                                      <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                                        <!--<span class="name" id="expertise_icon_selected_{{ forloop.counter0 }}">{% if expertise_icon_name %}{{ expertise_icon_name }}{% else %}Select Icon{% endif %}</span><span class="arrow-icon"></span>-->
+                                        <span class="name" id="expertise_icon_selected_{{ forloop.counter0 }}">{% if expertise_icon_id %}Icon Selected{% else %}Select Icon{% endif %}</span><span class="arrow-icon"></span>
+                                      </a>
+                                      <ul role="menu" class="dropdown-header-top author-log dropdown-menu dropdown-experties expertise_icon_dropdown" rel_pos="{{ forloop.counter0 }}" id="expertise_icon_dropdown_{{ forloop.counter0 }}">
+                                        {% if icon_list %}
+                                        {% for icon in icon_list %}
+                                        <li class="icon_dropdown_li {% if icon.id == expertise_icon_id %}active{% endif %}" rel_id="{{ icon.id }}" rel_name="{{ icon.icon_name }}" position="{{ list_count }}">
+                                          <a href="javascript:void(0)">
+                                            <span class="{{ icon.icon_name }}"></span>
+                                          </a>
+                                        </li>
+                                        {% endfor %}
+                                        {% endif %}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            
+                            {% endfor %}
+                          </div>
+
+
+
+                          <div class="form-group">
+                            <h6 for="extend_description" class="black-text">
+                              Our Number <span class="text-danger">*</span>
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/Our-Number.jpg' %}" alt=""></span>
+                              </div>
+                            </h6>
+                            
+                              
+                            </div>
+                          <div class="row">
+                            {% for item in pre_number_list %}
+                              {% get_list_value website_details.dashboard_numbers forloop.counter0 'id' as number_id %}
+                              {% get_list_value website_details.dashboard_numbers forloop.counter0 'title' as number_title %}
+                              {% get_list_value website_details.dashboard_numbers forloop.counter0 'value' as number_value %}
+                              {% get_list_value website_details.dashboard_numbers forloop.counter0 'status' as number_status %}
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <input type="text" class="form-control input-bg number_title" name="number_title_{{ forloop.counter }}" id="number_title_{{ forloop.counter }}" value="{% if number_title %}{{ number_title }}{% else %}{{ item.title }}{% endif %}">
+                                </div>
+                              </div>
+                              <div class="col-md-2">
+                                <div class="form-group">
+                                  <input type="text" class="form-control input-bg number_value" name="number_value_{{ forloop.counter }}" id="number_value_{{ forloop.counter }}" value="{% if number_value %}{{ number_value }}{% else %}{{ item.value }}{% endif %}">
+                                </div>
+                              </div>
+
+                            {% endfor %}
+
+                          </div>
+
+
+                            <!-- <h6>
+                              Footer Company Partner Logo <span class="text-danger">*</span>
+                            </h6> -->
+
+                            <h6>
+                              Company Affiliation Logo's
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img">Company Affiliation Logo is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 200 x 100 px<img src="{% static 'admin/images/tooltip/footer-img.jpg' %}" alt=""></span>
+                              </div>
+                            </h6>
+                            <div class="upload-fav">
+                              <!--<input type="hidden" name="banner_image_name" id="banner_image_name" value=""/>-->
+                              <div class="item">
+                                <div class="dropzone" id="footerCompanyImgFrm">
+                                  <input type="hidden" id="footer_company_parter_logo_id" name="footer_company_parter_logo_id" value="{{ website_details.footer_image_ids|default:'' }}"/>
+                                  <input type="hidden" name="footer_company_parter_logo_name" id="footer_company_parter_logo_name" value="{{ website_details.footer_image_name|default:'' }}"/>
+                                  <div class="dz-default dz-message" data-dz-message="">
+                                    <!-- <input name="file" type="file" id="banner_image" name="banner_image" multiple/>
+                                    <button><i class="fas fa-upload"></i> Upload Banner</button> -->
+                                    <div class="block">
+                                      <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Company Logo's</button>
+                                    </div>
+                                    <div class="block">
+                                      or
+                                    </div>
+                                    <div class="block">
+                                      <h6>
+                                        Drag & Drop Docs
+                                        <span>Supported Files: Png, Jpg, Jpeg</span>
+                                        <!--<span>Max Files upload: 4</span>-->
+                                      </h6>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="item">
+                              </div>
+                            </div>
+                            <!--<div class="upload-fav">
+                              <div class="item">
+                                <div class="dropzone" id="footerCompanyImgFrm">
+                                  <input type="hidden" id="footer_company_parter_logo_id" name="footer_company_parter_logo_id" value="{{ website_details.footer_image_ids|default:'' }}"/>
+                                  <input type="hidden" name="footer_company_parter_logo_name" id="footer_company_parter_logo_name" value="{{ website_details.footer_image_name|default:'' }}"/>
+                                  <div class="fallback">
+                                    <input name="file" type="file" id="footer_company_parter_logo" name="footer_company_parter_logo" multiple/>
+                                    <button type="button"><i class="fas fa-upload"></i> Upload Footer Company Logo</button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="item">
+                                
+                              </div>
+                            </div>-->
+                            <p id="custom_partner_error"  class="custom_image_error" style="display:none;">Compant Partner Image is required.</p>
+                            <div class="image-show-list footer-logo"  id="footerCompanyImgDiv" style="{% if website_details.footer_images %}{% else %}display:none;{% endif %}">
+                              <ul id="footerCompanyImgList">
+                                {% if website_details.footer_images %}
+                                    {% for footerimg in  website_details.footer_images %}
+                                      <li rel_id="{{ footerimg.upload_id }}">
+                                        <div class="bdr-logo">
+                                          <a href="javascript:void(0)" data-image-id="{{ footerimg.upload_id }}" data-image-name="{{ footerimg.doc_file_name }}" data-image-section="{{ footerimg.bucket_name }}"  class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+                                          <img src="{{ aws_url }}{{ footerimg.bucket_name }}/{{ footerimg.doc_file_name }}" alt="">
+                                        </div>
+                                      </li>
+
+                                    {% endfor %}
+                                  {% endif %}
+                              </ul>
+                            </div>
+
+                            <!--<p class="red-text font13 mb10">
+                              Social Media Icons ------
+                            </p>-->
+
+
+
+                            <h6>
+                              Social Media Icons
+                            </h6>
+                          <div class="form-group">
+                            <label for="" class="black-text pb10">
+                              Links
+                              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                <span class="tooltipp__content right banner-img">Social Media Icons is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 30 x 30 px<img src="{% static 'admin/images/tooltip/Social-Media.jpg' %}" alt=""></span>
+                              </div>
+                            </label>
+                            <ul class="social-drags">
+                              {% for item in pre_social_account_list %}
+                              <li class="{{ item.li_class_name }}" rel_position="{{ forloop.counter }}">
+                                <a href="javascript:void(0)" class="social_account" id="{{ item.li_a_id }}">
+                                  <i class="{{ item.li_icon }}"></i>
+                                </a>
+                              </li>
+                              {% endfor %}
+                              <!--<li class="twitter">
+                                <a href="javascript:void(0)" class="social_account" id="twitter_account">
+                                  <i class="fab fa-twitter"></i>
+                                </a>
+                              </li>
+                              <li class="youtube">
+                                <a href="javascript:void(0)" class="social_account" id="youtube_account">
+                                  <i class="fab fa-youtube"></i>
+                                </a>
+                              </li>
+                              <li class="linkedin">
+                                <a href="javascript:void(0)" class="social_account" id="linkedin_account">
+                                  <i class="fab fa-linkedin-in"></i>
+                                </a>
+                              </li>
+                              <li class="instagram">
+                                <a href="javascript:void(0)" class="social_account" id="instagram_account">
+                                  <i class="fab fa-instagram"></i>
+                                </a>
+                              </li>-->
+                              <li class="font13">
+                                (Drag and drop to reorder)
+                              </li>
+                            </ul>
+                          </div>
+
+                          {% for item in pre_social_account_list %}
+                            <div class="form-group" style="{% if forloop.counter == 1 %}{% else %}display:none;{% endif %}">
+                              <label for="{{ item.input_url_id }}">
+                                Website URL
+                              </label>
+                              <input type="text" class="form-control social_url" name="{{ item.input_url_id }}" id="{{ item.input_url_id }}" placeholder="Enter your website url" value="{{ item.default_url }}">
+                              <input type="hidden" class="social_position" id="{{ item.input_position_id }}" name="{{ item.input_position_id }}" value="{{ item.default_position }}"/>
+                              <input type="hidden" class="account_type" id="account_type_{{ forloop.counter }}" name="account_type_{{ forloop.counter }}" value="{{ item.account_type }}"/>
+                            </div>
+                          {% endfor %}
+                          <!--<div class="form-group" style="display:none;">
+                            <label for="twitter_url">
+                              Website URL
+                            </label>
+                            <input type="text" class="form-control social_url" name="twitter_url" id="twitter_url" placeholder="Enter your website url" value="{{ twitter_url|default:'https://www.twitter.com/' }}">
+                            <input type="hidden" class="social_position" id="twitter_position" name="twitter_position" value=""/>
+                          </div>
+
+                          <div class="form-group" style="display:none;">
+                            <label for="youtube_url">
+                              Website URL
+                            </label>
+                            <input type="text" class="form-control social_url" name="youtube_url" id="youtube_url" placeholder="Enter your website url" value="{{ youtube_url|default:'https://www.youtube.com/' }}">
+                            <input type="hidden" class="social_position" id="youtube_position" name="youtube_position" value=""/>
+                          </div>
+
+                          <div class="form-group" style="display:none;">
+                            <label for="linkedin_url">
+                              Website URL
+                            </label>
+                            <input type="text" class="form-control social_url" name="linkedin_url" id="linkedin_url" placeholder="Enter your website url" value="{{ linkedin_url|default:'https://www.linkedin.com/' }}">
+                            <input type="hidden" class="social_position" id="linkedin_position" name="linkedin_position" value=""/>
+                          </div>
+
+                          <div class="form-group" style="display:none;">
+                            <label for="instagram_url">
+                              Website URL
+                            </label>
+                            <input type="text" class="form-control social_url" name="instagram_url" id="instagram_url" placeholder="Enter your website url" value="{{ instagram_url|default:'https://www.instagram.com/' }}">
+                            <input type="hidden" class="social_position" id="instagram_position" name="instagram_position" value=""/>
+                          </div>-->
+
+
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingTwo">
+                          <h4 class="panel-title">
+                              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" class="collapsed">
+                               Home About Us
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                          <div class="panel-body">
+                              <h6>
+                                General Info
+                                <a href="javascript:void(0);" class="tool-box">
+                                  <i class="fas fa-question-circle"></i>
+                                  <div class="tool-pic">
+                                    <img src="{% static 'admin/images/tooltip/about-us/aboutpage.png' %}" alt="">
+                                  </div>
+                                </a>
+                              </h6>
+
+                              <div class="form-group">
+                                <label for="about_us_title">
+                                  Title <span class="text-danger">*</span>
+                                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                    <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/about-us/about-us-title.jpg' %}" alt=""></span>
+                                  </div>
+                                </label>
+                                <input type="text" name="about_us_title" id="about_us_title" class="form-control" value="{{ website_details.custom_site_settings.about_title|default:'WHO WE ARE' }}">
+                              </div>
+                              <div class="form-group">
+                                <div class="clearfix">
+                                  <label for="about_us_description" class="black-text pb10">
+                                    Description <span class="text-danger">*</span>
+                                    <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                                      <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/about-us/about-us-description.jpg' %}" alt=""></span>
+                                    </div>
+                                  </label>
+                                </div>
+                                <textarea class="ckeditor form-control" name="about_us_description" id="about_us_description">{% if website_details.custom_site_settings.about_description %}{{ website_details.custom_site_settings.about_description }}{% else %}Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.{% endif %}</textarea>
+                              </div>
+                              {% comment %}
+                              <h6>
+                                Image
+                              </h6>
+                              <div class="upload-fav">
+                                <div class="item">
+                                  <div class="dropzone" id="aboutUsImgFrm">
+                                    <input type="hidden" id="about_us_image_id" name="about_us_image_id" value="{{ website_details.about_image_ids|default:'' }}"/>
+                                    <input type="hidden" name="about_us_image_name" id="about_us_image_name" value="{{ website_details.about_image_name|default:'' }}"/>
+                                    <div class="fallback">
+                                      <input name="file" type="file" id="about_us_image" name="about_us_image" />
+                                      <button><i class="fas fa-upload"></i> Upload favicon</button>
+                                    </div>
+                                  </div>
+
+                                </div>
+                                <div class="item">
+                                  <div class="tooltipp rgt"><i class="fas fa-question-circle"></i>
+                                    <span class="tooltipp__content right banner-img"><img src="{% static 'admin/images/tooltip/about-us/about-us-description.jpg' %}" alt=""></span>
+                                  </div>
+                                </div>
+                              </div><!-- End .uplaod-fav -->
+
+
+                              <p class="font15">
+                                Uploaded Photo
+                              </p>
+
+                              <div class="image-show-list" id="aboutUsImgDiv" style="{% if website_details.about_images %}{% else %}display:none;{% endif %}">
+                                <ul id="aboutUsImgList">
+                                  {% if website_details.about_images %}
+                                    {% for abt in  website_details.about_images %}
+                                      <li rel_id="{{ abt.upload_id }}">
+                                        <a href="javascript:void(0)" data-image-id="{{ abt.upload_id }}" data-image-name="{{ abt.doc_file_name }}" data-image-section="{{ abt.bucket_name }}"  class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+                                        <img src="{{ aws_url }}{{ abt.bucket_name }}/{{ abt.doc_file_name }}" alt="" width="211" height="113">
+                                        <figcaption>
+                                          <h6>
+                                            Image 1.jpg
+                                          </h6>
+                                          <p class="size_date_sec" data-file-size="{{ abt.file_size }}" data-added-date="{{ abt.added_date }}">
+                                            File Size: {{ abt.file_size|default:'2 MB' }} <br>
+                                            Uploaded: {{ abt.added_date|parse_iso|date:'M j, Y h:i:sa' }}
+                                          </p>
+
+                                          <div class="move">
+                                            <i class="fas fa-expand-arrows-alt"></i> Move
+                                          </div>
+                                        </figcaption>
+                                      </li>
+
+                                    {% endfor %}
+                                  {% endif %}
+                                </ul>
+                              </div>
+
+                              <h6>
+                                Articles
+                              </h6>
+                              {% if website_details.articles %}
+
+                                {% for article in website_details.articles %}
+                                <div class="testi-box add_more_div">
+                                    <input type="hidden"  class="sec_count" id="sec_count_{{ forloop.counter0 }}" value="{{ forloop.counter0 }}" />
+
+                                    <div class="form-group">
+                                        <label for="testimonial_title_{{ forloop.counter0 }}">
+                                          Title
+                                        </label>
+                                        <input type="text" name="testimonial_title_{{ forloop.counter0 }}" id="testimonial_title_{{ forloop.counter0 }}" class="form-control testimonial_title" value="{{ article.title|default:'' }}">
+                                    </div>
+                                    <div class="form-group">
+                                      <div class="clearfix">
+                                        <label for="testimonial_description_{{ forloop.counter0 }}" class="black-text pb10">
+                                          Description
+                                        </label>
+                                      </div>
+                                      <textarea class="testimonial_description ckeditor form-control" name="testimonial_description_{{ forloop.counter0 }}" id="testimonial_description_{{ forloop.counter0 }}">{{ article.description|default:'' }}</textarea>
+                                    </div>
+                                    <h6>
+                                      Article Image
+                                    </h6>
+
+                                    <div class="upload-fav">
+                                      <div class="item">
+                                        <div class="dropzone testimonialImgFrm" id="testimonialImgFrm_{{ forloop.counter0 }}" >
+                                          <input type="hidden" class="testimonial_image_id" id="testimonial_image_id_{{ forloop.counter0 }}" name="testimonial_image_id_{{ forloop.counter0 }}" value="{{ article.article_image_id|default:'' }}"/>
+                                          <input type="hidden" class="testimonial_image_name" name="testimonial_image_name_{{ forloop.counter0 }}" id="testimonial_image_name_{{ forloop.counter0 }}" value="{{ article.article_image_name|default:'' }}"/>
+                                          <div class="fallback">
+                                            <input name="file" type="file" class="testimonial_image_div" id="testimonial_image_div_{{ forloop.counter0 }}" name="testimonial_image_div_{{ forloop.counter0 }}" />
+                                            <button type="button"><i class="fas fa-upload"></i> Upload favicon</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="item testimonialImgDiv" id="testimonialImgDiv_{{ forloop.counter0 }}" style="{% if article.article_image_name %}{% else %}display:none;{% endif %}">
+                                        <div class="fav-icon">
+                                          <figure>
+                                            <img src="{{ aws_url }}{{ article.article_image_name_bucket_name }}/{{ article.article_image_name }}" class="testimonialImg" id="testimonialImg_{{ forloop.counter0 }}" alt="" width="211" height="113">
+                                          </figure>
+                                          <a href="javascript:void(0)" data-article-id="{{ article.id }}" data-image-id="{{ article.article_image_id }}" data-image-name="{{ article.article_image_name }}" data-image-section="{{ article.article_image_name_bucket_name }}" data-count="{{ forloop.counter0 }}" class="confirm_image_delete" ><i class="fas fa-trash-alt"></i></a>
+                                        </div>
+                                        <a href="#" data-toggle="tooltip" data-placement="left" title="Tooltip on bottom" class="tooltip-icon"><i class="fas fa-question-circle"></i></a>
+                                      </div>
+                                    </div><!-- End .uplaod-fav -->
+
+                                    <div class="form-group">
+                                        <label for="author_name_0">
+                                          Author Name
+                                        </label>
+                                        <input type="text" name="author_name_{{ forloop.counter0 }}" id="author_name_{{ forloop.counter0 }}" class="form-control author_name" value="{{ article.author_name|default:'' }}">
+                                    </div>
+                                  <h6>
+                                      Author Image
+                                    </h6>
+                                    <div class="upload-fav">
+                                      <div class="item">
+                                        <div class="dropzone testimonialAuthorImgFrm" id="testimonialAuthorImgFrm_{{ forloop.counter0 }}">
+                                          <input type="hidden" class="testimonial_author_image_id" id="testimonial_author_image_id_{{ forloop.counter0 }}" name="testimonial_author_image_id_{{ forloop.counter0 }}" value="{{ article.author_image_id|default:'' }}"/>
+                                          <input type="hidden" class="testimonial_author_image_name" name="testimonial_author_image_name_{{ forloop.counter0 }}" id="testimonial_author_image_name_{{ forloop.counter0 }}" value="{{ article.author_image_name|default:'' }}"/>
+                                          <div class="fallback">
+                                            <input name="file" type="file" class="testimonial_author_image_div" id="testimonial_author_image_div_{{ forloop.counter0 }}" name="testimonial_author_image_div_{{ forloop.counter0 }}" />
+                                            <button type="button"><i class="fas fa-upload"></i> Upload favicon</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="item testimonialAuthorImgDiv" id="testimonialAuthorImgDiv_{{ forloop.counter0 }}" style="{% if article.author_image_id %}{% else %}display:none;{% endif %}">
+                                        <div class="fav-icon">
+                                          <figure>
+                                            <img src="{{ aws_url }}{{ article.author_image_bucket_name }}/{{ article.author_image_name }}" class="testimonialAuthorImg" id="testimonialAuthorImg_{{ forloop.counter0 }}" alt="" width="75" height="75">
+                                          </figure>
+                                          <a href="javascript:void(0)" data-article-id="{{ article.id }}" data-image-id="{{ article.author_image_id }}" data-image-name="{{ article.author_image_name }}" data-image-section="{{ article.author_image_bucket_name }}" data-count="{{ forloop.counter0 }}" class="confirm_image_delete"><i class="fas fa-trash-alt"></i></a>
+                                        </div>
+                                        <a href="#" data-toggle="tooltip" data-placement="left" title="Tooltip on bottom" class="tooltip-icon"><i class="fas fa-question-circle"></i></a>
+                                      </div>
+                                    </div><!-- End .uplaod-fav -->
+
+                                    <div class="clearfix plus_div" style="{% if forloop.counter == website_details.articles|length %}{% else %}display:none;{% endif %}">
+                                      <button type="button" class="btn btn-secondary add_more" ><i class="fas fa-plus"></i> Add More</button>
+                                    </div>
+                                    <div class="clearfix minus_div" style="{% if forloop.counter < website_details.articles|length %}{% else %}display:none;{% endif %}">
+                                      <button class="btn btn-secondary remove"><i class="fas fa-times"></i> Delete</button>
+                                    </div>
+                                  </div>
+                                {% endfor %}
+                              {% else %}
+                                  <div class="testi-box add_more_div">
+                                    <input type="hidden"  class="sec_count" id="sec_count_0" value="0"/>
+                                    <div class="form-group">
+                                        <label for="testimonial_title_0">
+                                          Title
+                                        </label>
+                                        <input type="text" name="testimonial_title_0" id="testimonial_title_0" class="form-control testimonial_title">
+                                    </div>
+                                    <div class="form-group">
+                                      <div class="clearfix">
+                                        <label for="testimonial_description_0" class="black-text pb10">
+                                          Description
+                                        </label>
+                                      </div>
+                                      <textarea class="testimonial_description ckeditor form-control" name="testimonial_description_0" id="testimonial_description_0"></textarea>
+                                    </div>
+                                    <h6>
+                                      Article Image
+                                    </h6>
+                                    <div class="upload-fav">
+                                      <div class="item">
+                                        <div class="dropzone testimonialImgFrm" id="testimonialImgFrm_0">
+                                          <input type="hidden" class="testimonial_image_id" id="testimonial_image_id_0" name="testimonial_image_id_0" value=""/>
+                                          <input type="hidden" class="testimonial_image_name" name="testimonial_image_name_0" id="testimonial_image_name_0" value=""/>
+                                          <div class="fallback">
+                                            <input name="file" type="file" class="testimonial_image_div" id="testimonial_image_div_0" name="testimonial_image_div_0" />
+                                            <button type="button"><i class="fas fa-upload"></i> Upload favicon</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="item testimonialImgDiv" id="testimonialImgDiv_0" style="display:none;">
+                                        <div class="fav-icon">
+                                          <figure>
+                                            <img src="{% static 'admin/images/upload-banner-1.png' %}" class="testimonialImg" id="testimonialImg_0" alt="" width="211" height="113">
+                                          </figure>
+                                          <a href="#"><i class="fas fa-trash-alt"></i></a>
+                                        </div>
+                                        <a href="#" data-toggle="tooltip" data-placement="left" title="Tooltip on bottom" class="tooltip-icon"><i class="fas fa-question-circle"></i></a>
+                                      </div>
+                                    </div><!-- End .uplaod-fav -->
+
+                                    <div class="form-group">
+                                        <label for="author_name_0">
+                                          Author Name
+                                        </label>
+                                        <input type="text" name="author_name_0" id="author_name_0" class="form-control author_name">
+                                    </div>
+                                    <h6>
+                                      Author Image
+                                    </h6>
+                                    <div class="upload-fav">
+                                      <div class="item">
+                                        <div class="dropzone testimonialAuthorImgFrm" id="testimonialAuthorImgFrm_0">
+                                          <input type="hidden" class="testimonial_author_image_id" id="testimonial_author_image_id_0" name="testimonial_author_image_id_0" value=""/>
+                                          <input type="hidden" class="testimonial_author_image_name" name="testimonial_author_image_name_0" id="testimonial_author_image_name_0" value=""/>
+                                          <div class="fallback">
+                                            <input name="file" type="file" class="testimonial_author_image_div" id="testimonial_author_image_div_0" name="testimonial_author_image_div_0" />
+                                            <button type="button"><i class="fas fa-upload"></i> Upload favicon</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="item testimonialAuthorImgDiv" id="testimonialAuthorImgDiv_0" style="display:none;">
+                                        <div class="fav-icon">
+                                          <figure>
+                                            <img src="{% static 'admin/images/favicon-logo.png' %}" class="testimonialAuthorImg" id="testimonialAuthorImg_0" alt="" width="75" height="75">
+                                          </figure>
+                                          <a href="#"><i class="fas fa-trash-alt"></i></a>
+                                        </div>
+                                        <a href="#" data-toggle="tooltip" data-placement="left" title="Tooltip on bottom" class="tooltip-icon"><i class="fas fa-question-circle"></i></a>
+                                      </div>
+                                    </div><!-- End .uplaod-fav -->
+
+                                    <div class="clearfix plus_div">
+                                      <button type="button" class="btn btn-secondary add_more" ><i class="fas fa-plus"></i> Add More</button>
+                                    </div>
+                                    <div class="clearfix minus_div" style="display:none;">
+                                      <button class="btn btn-secondary remove"><i class="fas fa-times"></i> Delete</button>
+                                    </div>
+                                  </div>
+                              {% endif %}
+
+                              {% endcomment %}
+
+                          </div>
+                      </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingThree">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseTwo" class="collapsed">
+                              Property Bot Setting
+                              <span class="icon"></span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        <div class="panel-body">
+                          <h6>
+                            Select Property Type <span class="text-danger">*</span>
+                            <a href="javascript:void(0);" class="tool-box">
+                              <i class="fas fa-question-circle"></i>
+                              <div class="tool-pic">
+<!--                                <img src="{% static 'admin/images/tooltip/about-us/aboutpage.png' %}" alt="">-->
+                                <img src="{% static 'admin/images/tooltip/property_boat.png' %}" alt="">
+                              </div>
+                            </a>
+                          </h6>
+                          <div class="bot-check">
+                            <div class="block">
+                              <input id="asset_type_3" type="checkbox" name="asset_type" value="3" class="css-checkbox" {% if 3 in asset_type %}checked{% endif %}>
+                              <label for="asset_type_3" class="check-label"><span class="icon icon-residential"></span>RESIDENTIAL</label>
+                            </div>
+                            <div class="block">
+                              <input id="asset_type_2" type="checkbox" name="asset_type" value="2" class="css-checkbox" {% if 2 in asset_type %}checked{% endif %}>
+                              <label for="asset_type_2" class="check-label"><span class="icon icon-commercial"></span>COMMERCIAL</label>
+                            </div>
+                            <div class="block">
+                              <input id="asset_type_1" type="checkbox" name="asset_type" value="1" class="css-checkbox" {% if 1 in asset_type %}checked{% endif %}>
+                              <label for="asset_type_1" class="check-label"><span class="icon icon-land"></span>LAND</label>
+                            </div>
+
+                          </div>
+  
+                        </div>
+                    </div>
+                  </div><!-- End .panel -->
+
+                  <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingFour">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseTwo" class="collapsed">
+                              MLS Configuration
+                              <span class="icon"></span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+                        <div class="panel-body" style="min-height:250px;" >
+                          <label>
+                            MLS Configuration
+                          </label>
+                          <div class="form-group">
+                            <select name="mls_type" id="mls_type" class="select form-control mls_type">
+                              <option value="">Select MLS</option>
+                              {% for mls in mls_type %}
+                                <option value="{{mls.id}}" {% if mls_configuration is not None and mls_configuration.mls_type_id == mls.id %}selected{% endif %}>{{mls.name}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6 originating_system" style="{% if mls_configuration is not None and mls_configuration.mls_type_id == 3%}display:block;{% else %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="primary_domain">
+                                  Originating System Name <span class="text-danger">*</span>
+                                </label>
+                                <select name="originating_system" id="originating_system" class="select form-control">
+                                <option value="">Select Originating System Name</option>
+                                <option value="actris" {% if mls_configuration.originating_system == 'actris' %} selected {% endif %}>ACTRIS MLS</option>
+                                <option value="carolina" {% if mls_configuration.originating_system == 'carolina' %} selected {% endif %}>Canopy MLS</option>
+                                <option value="flinthills" {% if mls_configuration.originating_system == 'flinthills' %} selected {% endif %}>Flint Hills MLS</option>
+                                <option value="scranton" {% if mls_configuration.originating_system == 'scranton' %} selected {% endif %}>Greater Scranton Board of REALTORS</option>
+                                <option value="gniar" {% if mls_configuration.originating_system == 'gniar' %} selected {% endif %}>Northwest Indiana REALTORS</option>
+                                <option value="hmls" {% if mls_configuration.originating_system == 'hmls' %} selected {% endif %}>Heartland Multiple Listing Service, Inc.</option>
+                                <option value="highland" {% if mls_configuration.originating_system == 'highland' %} selected {% endif %}>Highland Lakes Association of REALTORS</option>
+                                <option value="lbor" {% if mls_configuration.originating_system == 'lbor' %} selected {% endif %}>Lawrence Board of REALTORS</option>
+                                <option value="lascruces" {% if mls_configuration.originating_system == 'lascruces' %} selected {% endif %}>Southern New Mexico MLS</option>
+                                <option value="maris" {% if mls_configuration.originating_system == 'maris' %} selected {% endif %}>MARIS MLS</option>
+                                <option value="mfrmls" {% if mls_configuration.originating_system == 'mfrmls' %} selected {% endif %}>My Florida Regional MLS DBA Stellar MLS</option>
+                                <option value="mibor" {% if mls_configuration.originating_system == 'mibor' %} selected {% endif %}>MIBOR REALTOR Association</option>
+                                <option value="mred" {% if mls_configuration.originating_system == 'mred' %} selected {% endif %}>MRED Midwest Real Estate Data</option>
+                                <option value="neirbr" {% if mls_configuration.originating_system == 'neirbr' %} selected {% endif %}>Northeast Iowa Regional Board of REALTORS</option>
+                                <option value="northstar" {% if mls_configuration.originating_system == 'northstar' %} selected {% endif %}>NorthstarMLS</option>
+                                <option value="nwmls" {% if mls_configuration.originating_system == 'nwmls' %} selected {% endif %}>Northwest MLS</option>
+                                <option value="onekey" {% if mls_configuration.originating_system == 'onekey' %} selected {% endif %}>OneKey® MLS</option>
+                                <option value="paar" {% if mls_configuration.originating_system == 'paar' %} selected {% endif %}>Prescott Area Association of REALTORS</option>
+                                <option value="pikewayne" {% if mls_configuration.originating_system == 'pikewayne' %} selected {% endif %}>Pike/Wayne Association of REALTORS</option>
+                                <option value="prairie" {% if mls_configuration.originating_system == 'prairie' %} selected {% endif %}>Mid-Kansas MLS</option>
+                                <option value="ranw" {% if mls_configuration.originating_system == 'ranw' %} selected {% endif %}>REALTOR Association Northeast Wisconsin</option>
+                                <option value="realtrac" {% if mls_configuration.originating_system == 'realtrac' %} selected {% endif %}>RT RealTracs</option>
+                                <option value="recolorado" {% if mls_configuration.originating_system == 'recolorado' %} selected {% endif %}>REcolorado</option>
+                                <option value="rmlsa" {% if mls_configuration.originating_system == 'rmlsa' %} selected {% endif %}>RMLS Alliance</option>
+                                <option value="rrar" {% if mls_configuration.originating_system == 'rrar' %} selected {% endif %}>Reelfoot Regional Association of REALTORS</option>
+                                <option value="sarmls" {% if mls_configuration.originating_system == 'sarmls' %} selected {% endif %}>Spokane Association of REALTORS</option>
+                                <option value="sckansas" {% if mls_configuration.originating_system == 'sckansas' %} selected {% endif %}>South Central Kansas MLS</option>
+                                <option value="sunflower" {% if mls_configuration.originating_system == 'sunflower' %} selected {% endif %}>Sunflower MLS</option>
+                              </select>
+                              </div>
+                            </div>
+
+                            <div class="col-md-6 mls_api_key" style="{% if mls_configuration is not None and mls_configuration.api_key%}display:block;{% else %}display:none;{% endif %}">
+                              <div class="form-group">
+                                <label for="primary_domain">
+                                  API Key <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" name="api_key" id="api_key" value="{{mls_configuration.api_key}}" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div><!-- End .panel -->
+
+              </div><!-- panel-group -->
+              </div><!-- End .customscroll -->
+
+              <div class="clearfix pt30">
+                <button class="btn btn-primary">Save</button> 
+                <!-- <button class="btn btn-primary-bdr">Cancel</button> -->
+              </div>
+
+
+            </div><!-- End .col-md-10 -->
+
+          </form>
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+      <div id="domainModal" class="modal centered-modal domainModalwrap" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Manage Domains</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="">Default Website slug</label>
+                <div class="domain-input top">
+                  <div class="domain-fixed">
+                    gsa.com
+                  </div>
+                  <input type="text" class="form-control" placeholder="" value="{{website_details.domain_name}}">
+                </div>
+              </div>
+    
+              <div class="form-group">
+                <label for="">Domains <a href="#" data-toggle="tooltip" data-placement="right" title="Your domain name should be registered with one of the domain registrars to be added here."><i class="fas fa-question-circle"></i></a></label>
+                
+                <div class="domain-input bottom">
+                  <div class="domain-btn">
+                    <a href="#"><img src="{% static 'admin/images/plus-icon.svg' %}" alt=""></a> &nbsp; 
+                    <a href="#" data-toggle="modal" data-target="#domainsettingModal"><img src="{% static 'admin/images/settings-icon.svg' %}" alt=""></a>
+                  </div>
+                  <input type="text" class="form-control" placeholder="abcd" value="{% if website_details.domain_type == 1 %}{{website_details.domain_url}}{% endif %}">
+                </div>
+              </div>
+              <!--<div class="domain-list">
+                <ul>
+                  <li>
+                    <input type="text" class="form-control" placeholder="abcd" value=""> <a href="#" class="delete-icon"><i class="far fa-trash-alt"></i></a>
+                  </li>
+                  <li>
+                    <input type="text" class="form-control" placeholder="abcd" value=""> <a href="#" class="delete-icon"><i class="far fa-trash-alt"></i></a>
+                  </li>
+                </ul>
+              </div>-->
+              <div class="clearfix pt20 center">
+                <button class="btn btn-primary-bdr" data-dismiss="modal">Cancel</button> <button class="btn btn-primary radius">Update</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- End .domainModal -->
+
+      <div id="domainsettingModal" class="modal centered-modal domainModalwrap" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Own DNS Servers setup for abcd</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="">1. Domain validation setup:</label>
+              </div>
+              <div class="clearfix pt20 center">
+                <button class="btn btn-primary-bdr">Close</button> <button class="btn btn-primary radius">Validate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- End .domainsettingModal -->
+
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+
+{% endblock %}
+{% block js_content %}
+
+    <!--<script type="text/javascript" src="{% static 'admin/js/tinymce/tinymce.min.js' %}"></script>-->
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/ckeditor/ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/website_setting.js' %}?v=4.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.3"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/website_tour.js' %}?v=3.1"></script>
+    <script>
+      var is_first_login = {{request.session.is_first_admin_login}};
+      var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }
+
+      $('[data-toggle="tooltip"]').tooltip();
+      //$('.expertise_icon').chosen();
+      $('.expertise_icon_type').chosen();
+      $(document).on('click', '#auctionTypeAll', function(){
+        if($(this).is(':checked') === true){
+
+          $('.check_auction_type').prop('checked', true);
+          $('.check_auction_type').each(function(){
+              if($(this).is(':checked') === true){
+                $(this).siblings('.selected_auction_type').val(1);
+              }
+          });
+        }else{
+          $('.check_auction_type').prop('checked', false);
+          $('.check_auction_type').each(function(){
+              if($(this).is(':checked') === false){
+                $(this).siblings('.selected_auction_type').val(2);
+              }
+          });
+        }
+
+      });
+      $(document).on('click', '#expertiseTypeAll', function(){
+        if($(this).is(':checked') === true){
+          $('.check_expertise').prop('checked', true);
+          $('.check_expertise').each(function(){
+              if($(this).is(':checked') === true){
+                $(this).siblings('.selected_expertise').val(1);
+              }
+          });
+        }else{
+          $('.check_expertise').prop('checked', false);
+          $('.check_expertise').each(function(){
+              if($(this).is(':checked') === false){
+                $(this).siblings('.selected_expertise').val(2);
+              }
+          });
+        }
+
+      });
+      check_auction();
+      $(document).on('click', '.check_auction_type', function(){
+        check_auction();
+      });
+      check_expertise();
+      $(document).on('click', '.check_expertise', function(){
+        check_expertise();
+
+      });
+      $(document).on('click', '.social_account', function(){
+        $('.social_url').closest('.form-group').hide();
+        if($(this).closest('li').hasClass('facebook')){
+          $('#facebook_url').closest('.form-group').show();
+        }else if($(this).closest('li').hasClass('twitter')){
+          $('#twitter_url').closest('.form-group').show();
+        }else if($(this).closest('li').hasClass('youtube')){
+          $('#youtube_url').closest('.form-group').show();
+        }else if($(this).closest('li').hasClass('linkedin')){
+          $('#linkedin_url').closest('.form-group').show();
+        }else if($(this).closest('li').hasClass('instagram')){
+          $('#instagram_url').closest('.form-group').show();
+        }
+      });
+
+      function check_expertise(){
+        var flag = true;
+          $('.check_expertise').each(function(){
+              if($(this).is(':checked') === false){
+                flag = false;
+                $(this).siblings('.selected_expertise').val(2);
+              }else{
+                $(this).siblings('.selected_expertise').val(1);
+              }
+          });
+          $('#expertiseTypeAll').prop('checked', flag);
+      }
+      function check_auction(){
+        var flag = true;
+        $('.check_auction_type').each(function(){
+            if($(this).is(':checked') === false){
+              flag = false;
+              $(this).siblings('.selected_auction_type').val(2);
+            }else{
+              $(this).siblings('.selected_auction_type').val(1);
+            }
+        });
+        $('#auctionTypeAll').prop('checked', flag);
+      }
+      $.each(CKEDITOR.dtd.$removeEmpty, function (i, value) {
+        CKEDITOR.dtd.$removeEmpty[i] = false;
+    });
+    $('.social-drags').sortable({
+        stop: function(e, ui) {
+            $.map($(this).find('li'), function(el) {
+                console.log($(el).attr('class'));
+                var custom_index = parseInt($(el).index())+1;
+                $(el).attr('rel_position', custom_index);
+
+            });
+            reindex_social_position();
+        }
+    });
+    $('#bannerImgList').sortable({
+        stop: function(e, ui) {
+            $.map($(this).find('li'), function(el) {
+                console.log($(el).attr('class'));
+                var custom_index = parseInt($(el).index())+1;
+                $(el).attr('rel_position', custom_index);
+
+            });
+            reindex_banner_list();
+        }
+
+    });
+    function reindex_social_position(){
+      $('.social-drags li').each(function(index){
+        var position = $(this).attr('rel_position');
+        if($(this).hasClass('facebook')){
+            $('#facebook_position').val(position);
+          }else if($(this).hasClass('twitter')){
+            $('#twitter_position').val(position);
+          }else if($(this).hasClass('youtube')){
+            $('#youtube_position').val(position);
+          }else if($(this).hasClass('linkedin')){
+            $('#linkedin_position').val(position);
+          }else if($(this).hasClass('instagram')){
+            $('#instagram_position').val(position);
+          }
+      });
+      $('.account_type').each(function(index){
+        var count = parseInt(index)+1;
+        $(this).attr('id', 'account_type_'+count).attr('name', 'account_type_'+count);
+      });
+    }
+    function reindex_banner_list(){
+      var img_id_list = [];
+      var img_name_list = [];
+      var str_img_id = '';
+      var str_img_name = '';
+      $('#bannerImgList li').each(function(index){
+        var rel_id = $(this).find('a').attr('data-image-id');
+        var rel_name = $(this).find('a').attr('data-image-name');
+        img_id_list.push(rel_id);
+        img_name_list.push(rel_name);
+      });
+      str_img_id = img_id_list.toString();
+      str_img_name = img_name_list.toString();
+      $('#banner_image_id').val(str_img_id);
+      $('#banner_image_name').val(str_img_name);
+    }
+    </script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.panel').click(function() {
+        $('.panel.panel-active').removeClass("panel-active");
+        $(this).addClass("panel-active");
+    });
+});
+</script>
+
+{% endblock %}

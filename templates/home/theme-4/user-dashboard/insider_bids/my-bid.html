@@ -1,0 +1,1191 @@
+{% extends "layout/theme-4/user-dashboard/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+   <style>
+     .bid_count > button{
+      cursor: text !important;
+     }
+   </style>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block content %}
+{% load humanize %}
+
+  <div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Insider Auction</strong>
+                </h6>
+              </div>
+              <div class="block">
+                <ul class="nav-tab">
+                  <li>
+                    <a href="/my-bids/">
+                      Classic Online
+                    </a>
+                  </li>
+                  <li class="active">
+                    <a href="/insider-bids/">
+                      Insider Auction
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+
+            <div class="mybid-wrap" id="bid_listing">
+              {% if bid_listing %}
+              {% for listing in bid_listing %}
+              {% now "U" as todays_date %}
+              {% define_var listing.bid_start_date|parse_iso|date:"U" as start_date %}
+              {% define_var listing.dutch_end_time|parse_iso|date:"U" as dutch_end_time %}
+              {% define_var listing.sealed_start_time|parse_iso|date:"U" as sealed_start_time %}
+              {% define_var listing.sealed_end_time|parse_iso|date:"U" as sealed_end_time %}
+              {% define_var listing.english_start_time|parse_iso|date:"U" as english_start_time %}
+              {% define_var listing.bid_end_date|parse_iso|date:"U" as end_date %}
+<!--              <div class="list block-item">-->
+              <div class="list block-item" id="bid_row_{{ listing.property }}" data-property="{{listing.property}}" data-auction="{{listing.auction_id}}" data-row="{{ listing.id }}" data-increment="{% if listing.auction_status == 1 and todays_date > dutch_end_time and todays_date < sealed_end_time %}1{% else %}{{listing.bid_increment}}{% endif %}" data-minimum="{{listing.start_price}}">
+                <div class="list-left">
+                  <figure>
+                    <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+                      <img class="slide-fixed" src="{% static 'theme-4/user-dashboard/images/transparent.png' %}" alt="real estate sales">
+                      <img class="slide-img" src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                    </a>
+                  </figure>
+                  <figcaption>
+                    <div class="item status">
+                      <span class="badge {% if listing.registration_status|lower == 'pending' %}badge-warning{% elif listing.registration_status|lower == 'approved' %}badge-success{% elif listing.registration_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+                        {{ listing.registration_status }}
+                      </span>
+                    </div>
+                    <div class="type">
+                      {{ listing.auction_type }}
+                    </div>
+                    <h6 class="name">
+                      <span class="blue-text" title="{{ listing.property_address_one }}">{% if listing.property_address_one|length > 18 %}{{ listing.property_address_one|slice:":15" }}...{% else %}{{ listing.property_address_one|default:'' }}{% endif %}</span>
+                    </h6>
+                    <div class="location">
+                      <i class="fa-solid fa-location-dot"></i> {{ listing.property_city }}, {{ listing.property_state }} {{ listing.property_postal_code }}
+                    </div>
+                  </figcaption>
+                </div><!-- End .list-left -->
+
+                <div class="list-right">
+
+                  <ul class="top-list">
+                    {% comment %} 
+                    <li>
+                      <h6>
+                        {{ listing.broker_name }}
+                        <span class="blue-text">
+                          <a href="{{ listing.domain_url }}" target="_blank">{{ listing.company }}</a>
+                        </span>
+                      </h6>
+                    </li> 
+                    {% endcomment %}
+                    <li>
+                      <h6>
+                        Starting Bids
+                        <span class="blue-text current_bids">
+                          ${{ listing.start_price|convert_num|intcomma|default:'0' }}
+                        </span>
+                      </h6>
+                    </li>
+                    
+                    <li>
+                      <h6>
+                        Bid Increment
+                        <span class="blue-text bid_increment">
+                          {% if listing.auction_status == 1 and todays_date > dutch_end_time and todays_date < sealed_end_time %}
+                            $1
+                          {% else %}
+                          ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+                          {% endif %}
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      <h6>
+                        Bid Count
+                        <span class="badge badge-info bids-limit">{{ listing.bid_count }}</span>
+                      </h6>
+                    </li>
+                    <li>
+                      <h6>
+                        My Bid 
+                        <span class="blue-text my_bid">
+                          {% if todays_date > sealed_start_time  and todays_date < sealed_end_time %}
+                          {% if listing.user_sealed_bid_amount %}
+                            ${{ listing.user_sealed_bid_amount|convert_num|intcomma|default:'0' }}
+                          {% else %}
+                            ${{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}
+                          {% endif %}
+
+                          {% else %}
+                            ${{ listing.my_bid|convert_num|intcomma|default:'0' }}
+                          {% endif %}
+                        </span>
+                      </h6>
+                    </li>
+                    <li class="item bidding_timer" rel_id="{{ listing.id }}" id="bidding_timer_{{ listing.id }}" data-start-date="{% if listing.auction_status == 1 %}{{listing.bid_start_date|default:''}}{% endif %}" data-dutch-end-date="{% if listing.auction_status == 1 %}{{listing.dutch_end_time|default:''}}{% endif %}" data-sealed-start-date="{% if listing.auction_status == 1 %}{{listing.sealed_start_time|default:''}}{% endif %}" data-sealed-end-date="{% if listing.auction_status == 1 %}{{listing.sealed_end_time|default:''}}{% endif %}" data-english-start-date="{% if listing.auction_status == 1 %}{{listing.english_start_time|default:''}}{% endif %}" data-end-date="{% if listing.auction_status == 1 %}{{listing.bid_end_date|default:''}}{% endif %}">
+                      <h6>
+                        Time Left
+                        <div class="countdown_text"></div><div class="time"><span class="day_remaining blue-text">00</span><span class="hr_remaining blue-text">00</span><span class="min_remaining blue-text">00</span><span class="sec_remaining blue-text">00</span></div>
+                      </h6>
+                    </li>
+                  </ul>
+                  
+                  {% if listing.auction_status != 1 %}
+                    <div class="bid-form bid">
+                      <span class="badge badge-success">Auction completed</span>
+                    </div>
+                  {% elif listing.is_approved %}
+                      {% if todays_date >= start_date and todays_date < dutch_end_time %}
+                      <div class="bid-form bid">
+                        {% if listing.round_one_winning_amount %}
+                          Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% else %}
+                        <form action="">
+                          <span class="dollar">$</span>
+                          <input type="text" class="form-control input-sm dutch_bid_amount dutch_bid_amount_{{ listing.property }}" name="dutch_bid_amount" value="{{ listing.decreased_amount|default:'0' }}" maxlength="10" readonly>
+                          <button type="button" class="btn btn-primary btn-sm dutch_bid_now">Place Bid</button>
+                        </form>
+                        {% endif %}
+                      </div>
+                    {% elif todays_date >= dutch_end_time and todays_date <= sealed_start_time %}
+                      <div class="bid-form bid">
+                        {% if request.session.user_id == listing.dutch_winning_user_id %}
+                        You are Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% else %}
+                          Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% endif %}
+                      </div>
+                    {% elif todays_date >= sealed_start_time and todays_date <= sealed_end_time %}
+                      {% if request.session.user_id == listing.dutch_winning_user_id %}
+                        <div class="bid-form bid">
+                        You are Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                      </div>
+                      {% else %}
+                      <div class="bid-form bid">
+                        <form action="">
+                          <span class="dollar">$</span>
+                          <input type="text" class="form-control input-sm sealed_bid_amount sealed_bid_amount_{{ listing.property }}" name="sealed_bid_amount" value="{% if listing.user_sealed_bid_amount %}{{listing.user_sealed_bid_amount|add:'1' }}{% else %}{{listing.round_one_winning_amount|add:'1' }}{% endif %}" maxlength="10">
+                          <button type="button" class="btn btn-primary btn-sm sealed_bid_now">Place Bid</button>
+                        </form>
+                      </div>
+                      {% endif %}
+                    {% elif todays_date >= sealed_end_time and todays_date <= english_start_time %}
+                      <div class="bid-form bid">
+                        {% if request.session.user_id == listing.sealed_winning_user_id %}
+                          You are Round Two Winner: <span>{{ listing.round_two_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% else %}
+                          Round Two Winner: <span>{{ listing.round_two_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% endif %}
+                      </div>
+                    {% elif todays_date >= english_start_time and todays_date <= end_date %}
+                      {% if request.session.user_id == listing.dutch_winning_user_id or request.session.user_id == listing.sealed_winning_user_id %}
+                      <div class="bid-form bid" >
+                        <form action="" >
+                          <span class="dollar">$</span>
+                          <input type="text" class="form-control input-sm bid_amount bid_amount_{{ listing.property }}" name="bid_amount" value="{{listing.next_bid}}" maxlength="10">
+                          <button type="button" class="btn btn-primary btn-sm bid_now">Place Bid</button>
+                        </form>
+                      </div>
+                    {% else %}
+                      <div class="bid-form bid">
+                      Current Bid: <span>${{ listing.current_bid|convert_num|intcomma|default:'0' }}</span>
+                      </div>
+                    {% endif %}
+                    {% elif todays_date > end_date %}
+                      <div class="bid-form bid">
+                        <span class="badge badge-success">Auction completed</span>
+                      </div>
+                    {% else %}
+                      <div class="bid-form bid">
+                          Registration Approved But Auction Not Started Yet
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="bid-form bid">
+                      {{ listing.approval_status }}
+                    </div>
+                  {% endif %}
+
+                </div><!-- End .list-right -->
+              </div><!-- End .list -->
+              {% endfor %}
+              {% else %}
+              <div class="list">
+                <div class="fullwidth">
+                  <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+                </div>
+              </div>
+              {% endif %}
+            </div><!-- End .mybid-wrap -->
+
+
+
+            <!-- <div class="default-table mybid-table">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Property Name
+                </div>
+                <div class="item">
+                  Auction Type
+                </div>
+                {% comment %} <div class="item">
+                  Broker/Company Name
+                </div> {% endcomment %}
+                <div class="item">
+                  Starting Bids
+                </div>
+                <div class="item">
+                  Bid Increment
+                </div>
+                <div class="item">
+                  My Bids
+                </div>
+                <div class="item">
+                  Bid Count
+                </div>
+                <div class="item">
+                  Approval Status
+                </div>
+                <div class="item">
+                  Bid
+                </div>
+                <div class="item">
+                  Time Left
+                </div>
+              </div>
+              <div class="block sscroll" id="bid_listing">
+                {% if bid_listing %}
+                {% for listing in bid_listing %}
+                {% now "U" as todays_date %}
+                {% define_var listing.bid_start_date|parse_iso|date:"U" as start_date %}
+                {% define_var listing.dutch_end_time|parse_iso|date:"U" as dutch_end_time %}
+                {% define_var listing.sealed_start_time|parse_iso|date:"U" as sealed_start_time %}
+                {% define_var listing.sealed_end_time|parse_iso|date:"U" as sealed_end_time %}
+                {% define_var listing.english_start_time|parse_iso|date:"U" as english_start_time %}
+                {% define_var listing.bid_end_date|parse_iso|date:"U" as end_date %}
+
+                <div class="block-item" id="bid_row_{{ listing.property }}" data-property="{{listing.property}}" data-auction="{{listing.auction_id}}" data-row="{{ listing.id }}" data-increment="{% if listing.auction_status == 1 and todays_date > dutch_end_time and todays_date < sealed_end_time %}1{% else %}{{listing.bid_increment}}{% endif %}" data-minimum="{{listing.start_price}}">
+                  <div class="item">
+                   {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+                    <div class="user-pics">
+                      <span class="user-pic"><img src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales"></span>
+                      <h6>
+                        <span class="blue-text" title="{{ listing.property_address_one }}">{% if listing.property_address_one|length > 18 %}{{ listing.property_address_one|slice:":15" }}...{% else %}{{ listing.property_address_one|default:'' }}{% endif %}</span>
+                        <i class="fas fa-map-marker-alt"></i> {{ listing.property_city }}, {{ listing.property_state }} {{ listing.property_postal_code }}
+                      </h6>
+                    </div>
+                    </a>
+                  </div>
+                  <div class="item">
+                    {{ listing.auction_type }}
+                  </div>
+                  {% comment %} <div class="item">
+                    <div class="brokr-nme">
+                      <span>{{ listing.broker_name }}</span>
+                      <small class="blue-text"><a href="{{ listing.domain_url }}" target="_blank">{{ listing.company }}</a></small>
+                    </div>
+                  </div> {% endcomment %}
+                  <div class="item current_bids">
+                    ${{ listing.start_price|convert_num|intcomma|default:'0' }}
+                  </div>
+                  <div class="item bid_increment">
+                    {% if listing.auction_status == 1 and todays_date > dutch_end_time and todays_date < sealed_end_time %}
+                      $1
+                    {% else %}
+                    ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+                    {% endif %}
+                  </div>
+                  <div class="item my_bid">
+                    {% if todays_date > sealed_start_time  and todays_date < sealed_end_time %}
+                      {% if listing.user_sealed_bid_amount %}
+                        ${{ listing.user_sealed_bid_amount|convert_num|intcomma|default:'0' }}
+                      {% else %}
+                        ${{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}
+                      {% endif %}
+
+                    {% else %}
+                      ${{ listing.my_bid|convert_num|intcomma|default:'0' }}
+                    {% endif %}
+
+                  </div>
+                  <div class="item bid_count">
+                    <button class="badge badge-info bids-limit">{{ listing.bid_count }}</button>
+                  </div>
+                  <div class="item status">
+                    <span class="badge {% if listing.registration_status|lower == 'pending' %}badge-warning{% elif listing.registration_status|lower == 'approved' %}badge-success{% elif listing.registration_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+                      {{ listing.registration_status }}
+                    </span>
+                  </div>
+                  {% if listing.auction_status != 1 %}
+                    <div class="item bid">
+                        Auction completed
+                    </div>
+                  {% elif listing.is_approved %}
+                      {% if todays_date >= start_date and todays_date < dutch_end_time %}
+                      <div class="item bid">
+                        {% if listing.round_one_winning_amount %}
+                          Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% else %}
+                        <form action="" class="make0ffer-form">
+                          <span>$</span>
+                          <input type="text" class="form-control input-sm dutch_bid_amount dutch_bid_amount_{{ listing.property }}" name="dutch_bid_amount" value="{{ listing.decreased_amount|default:'0' }}" maxlength="10" readonly>
+                          <button type="button" class="btn btn-primary btn-sm dutch_bid_now">Place Bid</button>
+                        </form>
+                        {% endif %}
+                      </div>
+                    {% elif todays_date >= dutch_end_time and todays_date <= sealed_start_time %}
+                      <div class="item bid">
+                        {% if request.session.user_id == listing.dutch_winning_user_id %}
+                        You are Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% else %}
+                          Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% endif %}
+                      </div>
+                    {% elif todays_date >= sealed_start_time and todays_date <= sealed_end_time %}
+                      {% if request.session.user_id == listing.dutch_winning_user_id %}
+                        <div class="item bid">
+                        You are Round One Winner: <span>{{ listing.round_one_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                      </div>
+                      {% else %}
+                      <div class="item bid" >
+                        <form action="" class="make0ffer-form">
+                          <span>$</span>
+                          <input type="text" class="form-control input-sm sealed_bid_amount sealed_bid_amount_{{ listing.property }}" name="sealed_bid_amount" value="{% if listing.user_sealed_bid_amount %}{{listing.user_sealed_bid_amount|add:'1' }}{% else %}{{listing.round_one_winning_amount|add:'1' }}{% endif %}" maxlength="10">
+                          <button type="button" class="btn btn-primary btn-sm sealed_bid_now">Bid Now</button>
+                        </form>
+                      </div>
+                      {% endif %}
+                    {% elif todays_date >= sealed_end_time and todays_date <= english_start_time %}
+                      <div class="item bid">
+                        {% if request.session.user_id == listing.sealed_winning_user_id %}
+                          You are Round Two Winner: <span>{{ listing.round_two_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% else %}
+                          Round Two Winner: <span>{{ listing.round_two_winning_amount|convert_num|intcomma|default:'0' }}</span>
+                        {% endif %}
+                      </div>
+                    {% elif todays_date >= english_start_time and todays_date <= end_date %}
+                      {% if request.session.user_id == listing.dutch_winning_user_id or request.session.user_id == listing.sealed_winning_user_id %}
+                      <div class="item bid" >
+                        <form action="" class="make0ffer-form">
+                          <span>$</span>
+                          <input type="text" class="form-control input-sm bid_amount bid_amount_{{ listing.property }}" name="bid_amount" value="{{listing.next_bid}}" maxlength="10">
+                          <button type="button" class="btn btn-primary btn-sm bid_now">Bid Now</button>
+                        </form>
+                      </div>
+                    {% else %}
+                      <div class="item bid">
+                      Current Bid: <span>${{ listing.current_bid|convert_num|intcomma|default:'0' }}</span>
+                      </div>
+                    {% endif %}
+                    {% elif todays_date > end_date %}
+                      <div class="item bid">
+                        Auction completed
+                      </div>
+                    {% else %}
+                      <div class="item bid">
+                          Registration Approved But Auction Not Started Yet
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="item bid">
+                      {{ listing.approval_status }}
+                    </div>
+                  {% endif %}
+                  <div class="item bidding_timer" rel_id="{{ listing.id }}" id="bidding_timer_{{ listing.id }}" data-start-date="{% if listing.auction_status == 1 %}{{listing.bid_start_date|default:''}}{% endif %}" data-dutch-end-date="{% if listing.auction_status == 1 %}{{listing.dutch_end_time|default:''}}{% endif %}" data-sealed-start-date="{% if listing.auction_status == 1 %}{{listing.sealed_start_time|default:''}}{% endif %}" data-sealed-end-date="{% if listing.auction_status == 1 %}{{listing.sealed_end_time|default:''}}{% endif %}" data-english-start-date="{% if listing.auction_status == 1 %}{{listing.english_start_time|default:''}}{% endif %}" data-end-date="{% if listing.auction_status == 1 %}{{listing.bid_end_date|default:''}}{% endif %}">
+                   <div class="time" style="text-align: left;"><div class="countdown_text"></div><span class="day_remaining red-text">00</span>:<span class="hr_remaining red-text">00</span>:<span class="min_remaining red-text">00</span>:<span class="sec_remaining red-text">00</span></div>
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+                  </div>
+                </div>
+                {% endif %}
+
+              </div>
+            </div> -->
+            
+            <!-- End .mybid-table -->
+            <div class="pagination" id="bid_pagination_block">
+              <ul>
+                {{ pagination_html }}
+              </ul>
+            </div>
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+<div id="bidderlistModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidders List
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table width="100%" class="table table-scroll bidderlisttable">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  <th>
+                    Bidder Name
+                  </th>
+                  <th>
+                    Email Address
+                  </th>
+                  <th>
+                    Phone No
+                  </th>
+                  <th>
+                    Address
+                  </th>
+                  <th>
+                    Approval
+                  </th>
+                  <th>
+                    Registered on
+                  </th>
+                  <th>
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderlistModal -->
+
+  <div id="listsettingModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Listing Setting
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 col-sm-5">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Auto Approval
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6 col-sm-7">
+              <div class="form-group lh46">
+                <input id="Residential" type="radio" name="gender" value="Residential" class="css-radio">
+                <label for="Residential" class="radio-label">Residential</label>
+                &nbsp; &nbsp; &nbsp;
+                <input id="Land" type="radio" name="gender" value="Land" class="css-radio" checked >
+                <label for="Land" class="radio-label">Land</label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group" >
+                <label for="" class="lh46">
+                  Show Reserve Not Met
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input id="Residential" type="radio" name="gender" value="Residential" class="css-radio">
+                <label for="Residential" class="radio-label">Yes</label>
+                &nbsp; &nbsp; &nbsp;
+                <input id="Land" type="radio" name="gender" value="Land" class="css-radio" checked >
+                <label for="Land" class="radio-label">No</label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Log Time Extention
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input id="Residential" type="radio" name="gender" value="Residential" class="css-radio">
+                <label for="Residential" class="radio-label">Yes</label>
+                &nbsp; &nbsp; &nbsp;
+                <input id="Land" type="radio" name="gender" value="Land" class="css-radio" checked >
+                <label for="Land" class="radio-label">No</label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Timer Flash*
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input type="text" class="form-control" placeholder="Timer flash">
+                <div class="tagline">Seconds</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Log Time Extention
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input type="text" class="form-control" placeholder="Timer flash">
+                <div class="tagline">Seconds</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  When to start adding
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" placeholder="When To Start Adding">
+            </div>
+          </div>
+
+          <div class="clearfix pt30 center">
+            <button class="btn btn-primary">Save</button> <button class="btn btn-primary-bdr">Cancel</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderrecordModal -->
+
+  <div id="bidderrecordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+    <input type="hidden" name="bidHistoryPropertyId" id="bidHistoryPropertyId" value=""/>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidding Records
+          </h5>
+          <div class="bidderrecord-top">
+            <figure>
+              <img src="{% static 'theme-4/images/default-img.png' %}" alt="real estate sales" id="bidHistoryPropertyImage">
+            </figure>
+            <figcaption>
+              <h6 id="bidHistoryPropertyName">
+                Loading...
+              </h6>
+              <ul>
+                <li>
+                  <span>Auction Type:</span><label id="bidHistoryAuctiontype">-</label>
+                </li>
+                <li>
+                  <span>Bid Increment:</span><label id="bidHistoryBidIncrement">-</label>
+                </li>
+              </ul>
+            </figcaption>
+            <div class="listing-bottom" id="export_bid_history">
+              <div class="block">
+                <button type="button" class="btn btn-primary btn-sm pl20"><i class="fas fa-file-export"></i> Export</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="table-responsive">
+            <table width="100%" class="table table-scroll bidderrecordTable">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  <th>
+                    Bidder Name
+                  </th>
+                  <th>
+                    Email
+                  </th>
+                  <th>
+                    Phone
+                  </th>
+                  <th>
+                    Bid Amount
+                  </th>
+                  <th>
+                  IP Address
+                  </th>
+                  <th>
+                    Bidding Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="bidHistoryList">
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination" id="bidHistoryPagination">
+              <ul id="bidHistoryPaginationList">
+                {{ pagination_html }}
+              </ul>
+          </div><!-- End .pagination -->
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderrecordModal -->
+
+<div id="confirmBidModal" class="modal centered-modal confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Bid Confirmation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4>
+          Please confirm your bid
+        </h4>
+        <input type="hidden" class= "biding_type" name="biding_type" value="">
+        <input type="hidden" class= "new_bid_amt" name="new_bid_amt" value="">
+        <input type="hidden" class= "popup_property_id" name="popup_property_id" value="">
+        <h5>
+          Your are about to bid $<span id="popup_bid_amt"></span>
+        </h5>
+        <div class="clearfix center">
+          <button class="btn btn-secondary confirm_bid_btn" id="confirm_bid_true">Confirm</button><button class="btn btn-secondary-bdr confirm_bid_btn" id="confirm_bid_false">Cancel bid</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .confirmBidModal -->
+
+<div id="biddingErrorBidModal" class="modal centered-modal SuccessModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Attention!</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4 class="red-text">
+          Attention Please!
+        </h4>
+        <h5 id="bidding_error_msg">
+
+        </h5>
+        <div class="clearfix center pb20">
+          <button class="btn btn-primary error_bid_close" id="error_bid_close" data-dismiss="modal" aria-label="Close">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .biddingErrorBidModal -->
+
+<div id="biddingSuccessBidModal" class="modal centered-modal SuccessModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Bid Success</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4>
+          Bidding Successfully
+        </h4>
+        <h5 id="bidding_success_msg">
+
+        </h5>
+<!--        <div class="clearfix center pb20">-->
+<!--          <button class="btn btn-primary error_bid_close" id="error_bid_close" data-dismiss="modal" aria-label="Close">Cancel</button>-->
+<!--        </div>-->
+      </div>
+    </div>
+  </div>
+</div><!-- End .biddingSuccessBidModal -->
+
+<div id="roundOneModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Round One</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body round-success">
+            <p>
+              <img src="{% static 'theme-4/images/trophy.svg' %}" alt="real estate sales">
+            </p>
+            <h6>
+              <strong>Congratulations! You Are The Winner Of Round One</strong>
+            </h6>
+            <h5 class="red-text">
+              <strong>Wait For Round Two</strong>
+            </h5>
+            <p id="dutch_winning_amount">
+              First Round Winning Bid Amount <strong>$40,000</strong>
+            </p>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- End .chatagentModal -->
+
+<div id="roundTwoModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Round Two</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body round-success">
+            <p>
+              <img src="{% static 'theme-4/images/trophy.svg' %}" alt="real estate sales">
+            </p>
+            <h6>
+              <strong>Congratulations! You Are The Winner Of Round Two</strong>
+            </h6>
+            <h5 class="red-text">
+              <strong>Wait For Round Three</strong>
+            </h5>
+            <p id="sealed_winning_amount">
+              Second Round Winning Bid Amount <strong>$40,000</strong>
+            </p>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- End .chatagentModal -->
+
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/user_dashboard_insider_socket_theme4.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/insider_countdown_timer.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dashboard_listing.js' %}?v=4.7"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script> {% endcomment %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/insider_tour.js' %}?v=3.1"></script>
+<script>
+var is_first_login = {{request.session.is_first_login}};
+//-------------Socket Variable------------
+{% comment %} const socket_domain = "{{node_url}}"; {% endcomment %}
+const ip_address = "{{ip_address}}";
+var domain_id = "{{domain_id}}"
+var user_id = "{{user_id}}"
+</script>
+{% endblock %}

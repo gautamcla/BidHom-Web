@@ -1,0 +1,238 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Lookup Status {% endblock title %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  
+  <div class="listing-top">
+    <div class="block">
+      <h3>Lookup Status</h3>
+    </div>
+    <div class="block">
+      <button type="button" class="btn btn-primary" style="float:right;" data-toggle="modal" data-target=".add-status"><i class="fa fa-plus-circle"></i> Add Status</button>
+    </div>
+  </div>
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>{{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+    <div class="table-responsive">
+      <table class="table table-striped jambo_table bulk_action">
+        <thead>
+          <tr class="headings">
+            <th class="column-title">ID </th>
+            <th class="column-title">Status Name </th>
+            {% comment %} <th class="column-title">Object Name </th> {% endcomment %}
+            <th class="column-title">Status </th>
+            <th class="column-title no-link last"><span class="nobr">Action</span>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% if data %}
+              {% for status in data %}
+              <tr class="even pointer">
+              <td class=" ">{{ forloop.counter }}</td>
+              <td class=" ">{{status.status_name}}</td>
+              {% comment %} <td class=" ">-</td> {% endcomment %}
+
+              <td class=" ">
+                {% if status.is_active %}
+                <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{status.id}}">Active</button> 
+                {% else %}
+                <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{status.id}}">Inactive</button> 
+                  {% endif %}
+              </td>
+              <td class="last">
+                <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                  <form method="post" data-id="{{status.id}}" action="{% url 'admin-lookup-status-change' %}" class="ActiveInactive" >
+                    {% csrf_token %}
+                    <input type="hidden" name="status_id" value="{{status.id}}">
+                    <input type="hidden" class="status-change" name="status" value="{{status.is_active|yesno:"0,1"}}">
+                    {% if status.is_active %}
+                      <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                    {% else %}
+                      <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                    {% endif %}
+                  </form>
+                  <button type="button" data-id="{{status.id}}" data-name="{{status.status_name}}" data-status="{{status.is_active}}" class="btn btn-xs btn-round btn-primary edit-status"><i class="fa fa-edit"></i> Edit</button>
+                </div>
+
+              </td>
+              </tr>
+              {% endfor %}
+          {% else %}
+              <tr>  <td class=" ">No Status available </td></tr>
+          {% endif %}
+          
+        </tbody>
+      </table>
+    </div>
+            
+  </div>
+
+
+  <!-- Add theme modal -->
+  <div class="modal fade add-status centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Add Status</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="name">Status Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            {% comment %} <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="name">Object Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="select form-control" id="object_id" name="object_id" required="required" >
+                    <option value="">Choose available object</option>
+                    {% for obj in objectlist %}
+                    {% if obj.is_active %}
+                    <option value="{{obj.id}}">{{obj.object_name}}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+              </div>
+              <a href="{% url 'admin-lookup-objects' %}#add-object" target="_blank" type="button" class="btn btn-primary btn-round"> Add Object <i class="fa fa-external-link"></i></a>
+
+            </div> {% endcomment %}
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="select form-control" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-3 col-sm-3 col-xs-12">
+                &nbsp;
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+  <!--Edit thene Modal-->
+  <div class="modal fade edit-status-modal centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Edit Status</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" data-parsley-validate class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <input type="hidden" id="status_id" name="status_id" >
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="edit_name">Status Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="edit_name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            {% comment %} <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="name">Object Name <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="select form-control" id="object_id" name="object_id" required="required" >
+                    <option value="">Choose available object</option>
+                    {% for obj in objectlist %}
+                    {% if obj.is_active %}
+                    <option value="{{obj.id}}">{{obj.object_name}}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+              </div>
+              <a href="{% url 'admin-lookup-objects' %}#add-object" target="_blank" type="button" class="btn btn-primary btn-round"> Add Object <i class="fa fa-external-link"></i></a>
+
+            </div> {% endcomment %}
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="edit_is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="select form-control" id="edit_is_active" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-3 col-sm-3 col-xs-12">
+                &nbsp;
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End modal-->
+</div>
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+
+      // hit add status modal
+      if(window.location.hash && window.location.hash == '#add-status' ) {
+          var hash = window.location.hash;
+          window.history.pushState({}, "", window.location.href.split("#")[0]);
+          $('.' + hash.split('#')[1]).modal('show');
+      }
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/lookup-status.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+
+{% endblock %}

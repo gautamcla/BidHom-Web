@@ -1,0 +1,103 @@
+{% load static %}
+
+<div class="table-responsive">
+<table class="table table-striped jambo_table bulk_action">
+    <thead>
+    <tr class="headings">
+    <th class="column-title">ID </th>
+        <th class="column-title" style="width:10%">Domain Name </th>
+        <th class="column-title">Event Name </th>
+        <th class="column-title">Subject </th>
+        <th class="column-title">Slug</th>
+        <th class="column-title" style="width:10%">Added on </th>
+        <th class="column-title">Status </th>
+        <th class="column-title no-link last" style="width:14%"><span class="nobr">Action</span>
+        </th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% if data.total > 0 %}
+        {% for template in data.data %}
+        <tr class="even pointer">
+                <td class=" ">{{ forloop.counter|add:start_index }}</td>
+        <td>
+            {{template.domain|default:'-'}}
+        </td>
+        <td class=" ">
+            {{template.event_name}}
+        </td>
+        <td class=" ">
+            {% autoescape off %}
+            {{ template.email_subject|striptags|truncatewords:"8" }}
+            {% if template.email_subject|striptags|wordcount > 8 %}
+            <a href="javascript:;" class="text-primary" data-toggle="tooltip" title="{{ template.email_subject|striptags|safe}}">view more</a>
+            {% endif %}
+            {% endautoescape %}
+        </td>
+        <td class=" ">
+            {{template.event_slug}}
+        </td>
+        <td class="convert_to_local_date" data-value="{{ template.added_on|default:'' }}">{{template.added_on|parse_iso|date:'m-d-Y g:i A'}}</td>
+        <td class=" ">
+            <a type="button" class="btn  btn-xs btn-round {% if template.status == 1 %} btn-success {% elif template.status == 5 %} btn-danger {% else %} btn-warning {% endif %}" id="statusText{{template.id}}">{{template.status_name}}</a> 
+        </td>
+        <td class="last">
+            <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+            <a href="{% url 'admin-edit-email-template' template.id %}" type="button" class="btn btn-xs btn-round btn-primary edit-template"><i class="fa fa-edit"></i> Edit</a>
+            <form method="post" action="{% url 'admin-email-template-status-change' %}" data-id="{{template.id}}" action="" class="ActiveInactive" >
+                {% csrf_token %}
+                <input type="hidden" name="template_id" value="{{template.id}}">
+                <input type="hidden" class="status-change" name="status" value="{% if template.status == 1 %}2{% else %}1{% endif %}">
+                {% if template.status == 1 %}
+                <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                {% else %}
+                <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                {% endif %}
+            </form>
+            </div>
+
+        </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>  <td class=" ">No CMS available </td></tr>
+    {% endif %}
+    
+    </tbody>
+</table>
+</div>
+
+{% if data.total > 0 %}
+<nav aria-label="Page navigation example" style="float:right;">
+  <ul class="pagination justify-content-end">
+    {{pagination|safe}}
+  </ul>
+</nav>
+{% endif %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+       $('#totalCount').html('{{data.total}}');
+
+
+      $('.convert_to_local_date').each(function(){
+        try{
+            var added_on = $(this).attr('data-value');
+            if(added_on.trim() != "" && added_on.trim() != "None"){
+                var local_date = getLocalDate(added_on.trim(), 'mm/dd/yyyy','ampm');
+                var actual_date = local_date.split(" ");
+                actual_date = actual_date[0]+' '+actual_date[1]+' '+actual_date[2];
+                $(this).html(actual_date);
+            }else{
+                $(this).html('-');
+            }
+        }catch(ex){
+            console.log(ex);
+        }
+    });
+  });
+  </script>
+{% endblock %}

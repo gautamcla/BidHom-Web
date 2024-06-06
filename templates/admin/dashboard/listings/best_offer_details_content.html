@@ -1,0 +1,474 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+  <div class="head">
+                  <h5>
+                    Details
+                  </h5>
+                  {% if offer.is_sold %}
+                    {% if offer.is_accepted %}
+                      {% if offer.is_accepted.accepted and offer.is_accepted.accepted_by|lower == 'seller' %}
+                        {% define_var 'Offer Accepted' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                        {% define_var 'btn-success' as btn_color %}
+                      {% else %}
+                        {% define_var 'Offer Accepted by buyer' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                        {% define_var 'btn-success' as btn_color %}
+                      {% endif %}
+                    {% elif offer.is_rejected %}
+                      {% if offer.is_rejected.declined and offer.is_rejected.declined_by|lower == 'seller' %}
+                        {% define_var 'Offer Rejected' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                        {% define_var 'btn-danger' as btn_color %}
+                      {% else %}
+                        {% define_var 'Offer Rejected by buyer' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                        {% define_var 'btn-danger' as btn_color %}
+                      {% endif %}
+                    {% else %}
+                      {% define_var 'Sold' as offer_text %}
+                      {% define_var 2 as offer_val %}
+                      {% define_var 'btn-danger' as btn_color %}
+                    {% endif %}
+                  {% else %}
+                    {% define_var 'In Progress' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                        {% define_var 'btn-success' as btn_color %}
+                    {% comment %}
+                    {% if offer.is_accepted %}
+                      {% if offer.is_accepted.accepted and offer.is_accepted.accepted_by|lower == 'seller' %}
+                        {% define_var 'Offer Accepted' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                      {% else %}
+                        {% define_var 'Offer Accepted by buyer' as offer_text %}
+                        {% define_var 1 as offer_val %}
+                      {% endif %}
+                    {% elif offer.is_rejected %}
+                      {% if offer.is_rejected.declined and offer.is_rejected.declined_by|lower == 'seller' %}
+                        {% define_var 'Offer Rejected' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                      {% else %}
+                        {% define_var 'Offer Rejected by buyer' as offer_text %}
+                        {% define_var 2 as offer_val %}
+                      {% endif %}
+                    {% else %}
+                      {% define_var 'Offer Pending' as offer_text %}
+                      {% define_var 2 as offer_val %}
+                    {% endif %}
+                    {% endcomment %}
+                  {% endif %}
+                  <div class="btns">
+                    <a href="#" class="btn {{ btn_color }} btn-sm">{{ offer_text }}</a>
+                    {% if offer.buyer_id != session_user_id %}<a href="javascript:void(0)" class="btn btn-secondary btn-sm" onclick="show_offer_chat('{{ offer.property|default:'' }}','{{ offer.buyer_id }}')">Chat</a>{% endif %}
+                  </div>
+                </div>
+
+                <div class="offerdetail-main-bg">
+                  <div class="bidderrecord-top">
+                    <figure>
+                      <img src="{% if offer.property_detail.property_image.image %}{{ aws_url }}{{ offer.property_detail.property_image.bucket_name }}/{{ offer.property_detail.property_image.image }}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt="">
+                    </figure>
+                    <figcaption>
+                      <h6>
+                        {{ offer.property_detail.address_one|default:'' }}
+                        <span><i class="fas fa-map-marker-alt"></i> {{ offer.property_detail.city|default:'' }}, {{ offer.property_detail.state|default:'' }}, {{ offer.property_detail.postal_code|default:'' }}</span>
+                      </h6>
+                    </figcaption>
+                    <ul>
+                      <li>
+                        <span>Listing type:</span> Highest and Best Offer
+                      </li>
+                      <li>
+                        <span>Price:</span> {% if offer.asking_price %}${{ offer.asking_price|convert_float|intcomma|default:'0' }}{% else %}Unpriced{% endif %}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingOne">
+                          <h4 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="">
+                                Buyer Information
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="collapseOne">
+                        <div class="panel-body">
+                          <div class="table-responsive">
+                            <table class="offerdetailListtable">
+                              <tr>
+                                <td>
+                                  Buyer
+                                </td>
+                                <td>
+                                  {{ offer.user_detail.first_name|default:'' }} {{ offer.user_detail.last_name|default:'' }}
+                                </td>
+                                <td>
+                                  Phone
+                                </td>
+                                <td>
+                                  {{ offer.user_detail.phone_no|format_phone|default:'' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Buyer Email
+                                </td>
+                                <td>
+                                  {{ offer.user_detail.email|default:'' }}
+                                </td>
+                                <td>
+                                  Date
+                                </td>
+                                <td>
+                                  <p class="convert_to_local_date_time" data-value="{{ offer.added_on|default:'' }}">{{ offer.added_on|default:'' }}</p>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Address
+                                </td>
+                                <td>
+                                  {{ offer.user_detail.address_first|default:'' }} {{ offer.user_detail.city|default:'' }}, {{ offer.user_detail.state|default:'' }}, {{ offer.user_detail.postal_code|default:'' }}
+                                </td>
+                                <td>
+                                  Price
+                                </td>
+                                <td>
+                                  ${{ offer.offer_price|convert_float|intcomma|default:'0' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td colspan="4" class="terms-offered">
+                                  <h6>
+                                    Terms offered
+                                  </h6>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Loan Type
+                                </td>
+                                <td>
+                                  {{ offer.offer_detail.financing|default:'-' }}
+                                </td>
+                                <td>
+                                  Down payment
+                                </td>
+                                <td>
+                                  {% if offer.offer_detail.down_payment %}
+                                    ${{ offer.offer_detail.down_payment|convert_float|intcomma|default:'0' }}
+                                  {% else %}
+                                  -
+                                  {% endif %}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Earnest Money Deposit
+                                </td>
+                                <td>
+                                  {% if offer.offer_detail.current_earnest_money_deposit %}
+                                    ${{ offer.offer_detail.current_earnest_money_deposit|convert_float|intcomma|default:'0' }} or {{ offer.offer_detail.current_earnest_money_deposit_percent|convert_num|intcomma|default:'0' }} %
+                                  {% else %}
+                                  -
+                                  {% endif %}
+                                </td>
+                                <td>
+                                  Inspection Contingency
+                                </td>
+                                <td>
+                                  {{ offer.offer_detail.due_diligence_period|default:'-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Financing Contingency
+                                </td>
+                                <td>
+                                  {% if offer.offer_detail.offer_contingent == 1 %}
+                                  Yes
+                                  {% elif offer.offer_detail.offer_contingent == 2 %}
+                                  No
+                                  {% elif offer.offer_detail.offer_contingent == 3 %}
+                                  Cash Buyer
+                                  {% else %}
+                                  -
+                                  {% endif %}
+                                </td>
+                                <td>
+                                  Appraisal Contingency
+                                </td>
+                                <td>
+                                  {% if offer.offer_detail.appraisal_contingent == True %}
+                                  Yes
+                                  {% elif offer.offer_detail.appraisal_contingent == False %}
+                                  No
+                                  {% else %}
+                                  -
+                                  {% endif %}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Property Sale Contingency
+                                </td>
+                                <td>
+                                  {% if offer.offer_detail.sale_contingency == True %}
+                                  Yes
+                                  {% elif offer.offer_detail.sale_contingency == False %}
+                                  No
+                                  {% else %}
+                                  -
+                                  {% endif %}
+                                </td>
+                                <td>
+                                  Closing Date
+                                </td>
+                                <td>
+                                  {{ offer.offer_detail.closing_period|default:'-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  Closing Costs
+                                </td>
+                                <td colspan="3">
+                                  {% if offer.offer_detail.closing_cost == 1 %}
+                                    Buyer agrees to pay for all loan-related closing costs and half of the transaction closing costs.
+                                  {% elif offer.offer_detail.closing_cost == 2 %}
+                                    Buyer agrees to pay for all loan-related closing costs and all of the transaction closing costs.
+                                  {% elif offer.offer_detail.closing_cost == 3 %}
+                                    Seller to pay for all loan-related closing costs and all of the transaction closing costs.
+                                  {% else %}
+                                  -
+                                  {% endif %}
+                                </td>
+                              </tr>
+                              {% if offer.user_type == 4 %}
+                              <tr>
+                                <td colspan="4">
+                                  <span>Are you representing and bidding on behalf of a buyer/client of yours?: </span>
+                                  
+                                    {% if offer.user_detail.behalf_of_buyer == True %}
+                                      Yes
+                                      {% elif offer.user_detail.behalf_of_buyer == False %}
+                                      No
+                                      {% else %}
+                                      -
+                                      {% endif %}
+                                
+                                </td>
+                              </tr>
+                              {% if offer.user_detail.behalf_of_buyer == True %}
+                                <tr>
+                                  <td>
+                                    Buyer's Name
+                                  </td>
+                                  <td>
+                                    {{ offer.user_detail.buyer_first_name|default:'' }} {{ offer.user_detail.buyer_last_name|default:'' }}
+                                  </td>
+                                  <td>
+                                    Buyer's Email
+                                  </td>
+                                  <td>
+                                    {{ offer.user_detail.buyer_email|default:'' }}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Buyer's Phone
+                                  </td>
+                                  <td>
+                                    {{ offer.user_detail.buyer_phone_no|format_phone|default:'' }}
+                                  </td>
+                                  <td>
+                                    Buyer's Company/Entity
+                                  </td>
+                                  <td>
+                                    {{ offer.user_detail.buyer_company|default:'' }}
+                                  </td>
+                                </tr>
+                              {% endif %}
+                              {% endif %}
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingTwo">
+                          <h4 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" class="">
+                                Buyer Questionnaire
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                          <ul class="offerdetailList">
+                            {% if offer.user_type == 2 %}
+                              <li>
+                                <span>Have you committed to working with an buyer's agent yet?: </span>
+                                {% if offer.working_with_agent %}Yes, I have{% else %} No, I haven’t{% endif %}
+                                <!--<input type="radio" class="css-radio" id="1" checked>
+                                <label for="1" class="radio-label">{% if offer.working_with_agent %}Yes, I have{% else %} No, I haven’t{% endif %}</label>-->
+
+                              </li>
+                              {% if not offer.working_with_agent %}
+                              <li>
+                                <span>Have you toured the property in person?: </span>
+                                {% if offer.property_in_person == 1 %}Yes, I have{% elif offer.property_in_person == 2 %} No, not yet{% else %}I would like to see it{% endif %}
+                                <!--<input type="radio" class="css-radio" id="2" checked>
+                                <label for="2" class="radio-label">{% if offer.property_in_person == 1 %}Yes, I have{% elif offer.property_in_person == 2 %} No, not yet{% else %}I would like to see it{% endif %}</label>-->
+
+                              </li>
+                              <li>
+                                <span>Have you been pre-qualified by your lender?: </span>
+                                {% if offer.pre_qualified_lender == 1 %}Yes, I have{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %} I’m buying with all cash{% endif %}
+                                <!--<input type="radio" class="css-radio" id="3" checked>
+                                <label for="3" class="radio-label">{% if offer.pre_qualified_lender == 1 %}Yes, I have{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %} I’m buying with all cash{% endif %}</label>-->
+
+                              </li>
+                              {% endif %}
+                            {% else %}
+                              <li>
+                                <span>Have you toured the property with your client in person?: </span>
+                                {% if offer.property_in_person == 1 %}Yes, we have{% elif offer.property_in_person == 2 %} No, not yet{% else %} We would like to see it{% endif %}
+                                <!-- <input type="radio" class="css-radio" id="4" checked>
+                                <label for="4" class="radio-label">{% if offer.property_in_person == 1 %}Yes, we have{% elif offer.property_in_person == 2 %} No, not yet{% else %} We would like to see it{% endif %}</label>-->
+
+                              </li>
+                              <li>-
+                                <span>Has your client been pre-qualified by a lender?: </span>
+                                {% if offer.pre_qualified_lender == 1 %}Yes{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %}  Buying with all cash{% endif %}
+                                <!--<input type="radio" class="css-radio" id="5" checked>
+                                <label for="5" class="radio-label">{% if offer.pre_qualified_lender == 1 %}Yes{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %}  Buying with all cash{% endif %}</label>-->
+
+                              </li>
+                            {% endif %}
+                          </ul>
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingThree">
+                        <h4 class="panel-title">
+                          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree" class="">
+                            Offer Documents
+                            <span class="icon"></span>
+                          </a>
+                        </h4>
+                      </div>
+                      <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingThree">
+                        <div class="panel-body">
+                          <div class="buyer-doc">
+                            <h6>Buyer Documents</h6>
+                            <div class="btns">
+                              {% if offer.document %}<a href="javascript:void(0)" class="btn btn-secondary btn-sm" onclick="get_offer_documents('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}');"><i class="fas fa-eye"></i> View Document</a>{% endif %}
+                              {% if offer.user %}<a href="/admin/download-loi/?property={{ offer.property_detail.id|default:'' }}&user={{ offer.user|default:'' }}" class="btn btn-blue btn-sm"><i class="fas fa-download"></i> Download Offer</a>
+                              <a href="javascript:void(0)" onclick="send_loi_popup('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}', '{{ offer.user|default:'' }}')" class="btn btn-blue-bdr btn-sm"><i class="far fa-paper-plane"></i> Send Offer</a>{% endif %}
+                              {% if not offer.document and not offer.user %}-{% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id="headingFour">
+                          <h4 class="panel-title">
+                              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="true" aria-controls="collapseFour" class="">
+                                Offer Details
+                                <span class="icon"></span>
+                              </a>
+                          </h4>
+                      </div>
+                      <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFour">
+                        <div class="panel-body">
+                          <div class="table-responsive">
+                            <table width="100%" class="table table-scroll offerdetailTable">
+                              <thead>
+                                <tr>
+                                  <th>
+                                    User
+                                  </th>
+                                  <th>
+                                    Offer Amount
+                                  </th>
+                                  <th>
+                                    Status
+                                  </th>
+                                  <th>
+                                    Action
+                                  </th>
+                                  <th>
+                                    Date
+                                  </th>
+
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% if offer.offer_history|length > 0 %}
+                                  {% for history in offer.offer_history %}
+
+                                  <tr>
+                                    <td>
+                                      {% if history.offer_by == 2 %}
+                                      You
+                                    {% else %}
+                                      {{ history.first_name }} {{ history.last_name }}
+                                    {% endif %}
+                                    </td>
+                                    <td>
+                                      ${{ history.offer_price|convert_float|intcomma|default:'0' }}
+                                    </td>
+                                    <td>
+                                      <span class="badge {% if history.status|lower == 'offer declined' %}badge-danger{% else %}badge-success{% endif %}">
+                                        {{ history.status }}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <!--<a href="javascript:void(0)" onclick="show_best_offer_message('{{ history.comments|escape_char|default:'NA' }}');" class="blue-text" title="View Message"><i class="far fa-eye"></i></a> -->
+                                      <a href="javascript:void(0)" onclick="{% if history.status|lower == 'offer declined' %}get_declined_history_details('{{ offer.property_detail.id|default:'' }}','{{ history.id|default:'' }}'){% else %}get_best_offer_history_details('{{ offer.property_detail.id|default:'' }}','{{ history.id|default:'' }}'){% endif %}" class="blue-text" title="View Details">View Details</a>
+                                    </td>
+                                    <td class="convert_to_local_date_time" data-value="{{ history.added_on|default:'' }}">
+                                      {{ history.added_on|default:'' }}
+                                    </td>
+
+                                  </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                  <td colspan="5">
+                                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                                  </td>
+                                </tr>
+                                {% endif %}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!--<div class="font13">
+                            By clicking Make Counter Offer you understand that if the participant accept, <br>
+                            your listing will immediately end per the <span class="blue-text">listing agreement.</span>
+                          </div>-->
+                        </div>
+                      </div>
+                    </div><!-- End .panel-default -->
+
+                  </div><!-- End .panel-group -->
+
+                </div>
+                <div class="clearfix">
+                  <button class="btn btn-green btn-sm" id="approve_offer" {% if offer.can_accept %}onclick="confirm_seller_approve_best_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_accept %}disabled{% endif %}>Make Highest Offer</button><button class="btn btn-primary btn-sm" id="counter_offer" {% if offer.can_counter %}onclick="counter_best_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_counter %}disabled{% endif %} >Make Counter Offer</button><button class="btn btn-secondary btn-sm" id="reject_offer"  {% if offer.can_reject %}onclick="confirm_seller_reject_best_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_reject %}disabled{% endif %}>Decline Offer</button><button class="btn btn-green btn-sm" id="accept_offer" {% if offer.can_offer_accept %}onclick="confirm_seller_accept_best_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_offer_accept %}disabled{% endif %}>Accept Offer</button>
+                </div>
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+{% endblock %}

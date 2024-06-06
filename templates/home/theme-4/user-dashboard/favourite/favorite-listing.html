@@ -1,0 +1,1142 @@
+{% extends "layout/theme-4/user-dashboard/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+
+  <div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Favorite Listings</strong>
+                </h6>
+              </div>
+              <div class="block">
+                <form action="" class="search-field ui-widget">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" name="favourite_search" placeholder="Search" id="favourite_search" class="form-control sugesstion_input" value="{{ request.GET.search|default:'' }}"><button type="button" id="searchFavBtn" class="btn btn-secondary ml10" onclick="favouriteListingSearch()">Search</button>
+                </form>
+              </div>
+            </div>
+            <div class="listing-bottom">
+              <div class="block right">
+                <i class="fas fa-filter"></i> Filter
+              </div>
+              <div class="block">
+                <select name="favourite_num_record" id="favourite_num_record" class="select form-control" onchange="favouriteListingSearch()">
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="40">40</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+              <div class="block">
+                <a href="javascript:void(0)" onclick="clear_favourite_search()" class="blue-text">Clear All</a>
+              </div>
+            </div>
+            
+
+            <div class="mybid-wrap" id="favourite_listing">
+              {% if favorite_listing %}
+              {% for listing in favorite_listing %}
+              <div class="list">
+                <div class="list-left">
+                  <figure>
+                    <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+                      <img class="slide-fixed" src="{% static 'theme-4/user-dashboard/images/transparent.png' %}" alt="real estate sales">
+                      <img class="slide-img" src="{% if listing.image.image %}{{ aws_url }}{{ listing.image.bucket_name }}/{{ listing.image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                    </a>
+                  </figure>
+                  <figcaption>
+                    <div class="type">
+                      {{ listing.auction_type }}
+                    </div>
+                    <h6 class="name">
+                      <span title="{{ listing.address_one }}">{% if listing.address_one|length > 18 %}{{ listing.address_one|slice:":15" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+                    </h6>
+                    <div class="location">
+                      <i class="fa-solid fa-location-dot"></i> {{ listing.city }}, {{ listing.state }}
+                    </div>
+                  </figcaption>
+                </div><!-- End .list-left -->
+
+                <div class="list-right">
+                  <ul class="top-list">
+                    <li>
+                      <h6>
+                        Property Type
+                        <span class="blue-text">
+                          {{ listing.property_type }}
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      <h6>
+                        Asset Information
+                        {% if listing.auction_type_id == 4  %}
+                          <div class="price-info">
+                            <div class="price">
+                              <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                            </div>
+                          </div>
+                        {% elif listing.auction_type_id == 6  %}
+                          <div class="price-info">
+                            <div class="price">
+                              <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                            </div>
+                          </div>
+                        {% elif listing.auction_type_id == 7  %}
+                          <div class="price-info">
+                            <div class="price">
+                              {% if listing.un_priced == True %}
+                                {% if listing.current_best_offer_amount %}
+                                  <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                                {% else %}
+                                <span class="blue-text">Unpriced</span>
+                                {% endif %}
+                              {% else %}
+                                {% if listing.un_priced == False %}
+                                  {% if listing.highest_best_format == 3 %}
+                                    {% if listing.current_best_offer_amount %}
+                                      <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                                    {% else %}
+                                      <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                                    {% endif %}
+                                  {% else %}
+                                    <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                                  {% endif %}
+                                {% endif %}
+    
+                              {% endif %}
+                            </div>
+                          </div>
+                        {% else %}
+                          <div class="price-info">
+                            <div class="price">
+                              <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                            </div>
+                            <div class="price">
+                              <span class="blue-text">Bid Increment:</span> ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+                            </div>
+                          </div>
+                        {% endif %}
+                      </h6>
+                    </li>
+                    <li>
+                      <h6>
+                        Unfavorite
+                        <span>
+                          <a href="javascript:void(0)" onclick="fav_property_delete_confirmation({{ listing.property }});" class="badge badge-info"><i class="fa fa-trash"></i></a>
+                        </span>
+                      </h6>
+                    </li>
+                  </ul>
+                </div><!-- End .list-right -->
+                
+              </div><!-- End .list -->
+              {% endfor %}
+              {% else %}
+              <div class="list">
+                <div class="fullwidth">
+                  <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+                </div>
+              </div>
+              {% endif %}
+            </div><!-- End .mybid-wrap -->
+
+
+
+            <!-- <div class="default-table favorite-table">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Property Name
+                </div>
+                <div class="item">
+                  Property Type
+                </div>
+                <div class="item">
+                  Auction Type
+                </div>
+                <div class="item">
+                  Asset Information
+                </div>
+                <div class="item">
+                  Unfavorite
+                </div>
+              </div>
+              <div class="block sscroll" id="favourite_listing">
+                {% if favorite_listing %}
+                {% for listing in favorite_listing %}
+
+                <div class="block-item" id="favourite_row_{{ listing.property }}">
+                  <div class="item id_column">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+                    <div class="user-pics">
+                      <span class="user-pic"><img src="{% if listing.image.image %}{{ aws_url }}{{ listing.image.bucket_name }}/{{ listing.image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales"></span>
+                      <h6>
+                        <span class="blue-text" title="{{ listing.address_one }}">{% if listing.address_one|length > 18 %}{{ listing.address_one|slice:":15" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+                        <i class="fas fa-map-marker-alt"></i> {{ listing.city }}, {{ listing.state }}
+                      </h6>
+                    </div>
+                    </a>
+                  </div>
+                  <div class="item">
+                    {{ listing.property_type }}
+                  </div>
+                  <div class="item">
+                    {{ listing.auction_type }}
+                  </div>
+
+                  <div class="item">
+                    {% if listing.auction_type_id == 4  %}
+                      <div class="price-info">
+                        <div class="price">
+                          <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                        </div>
+                      </div>
+                    {% elif listing.auction_type_id == 6  %}
+                      <div class="price-info">
+                        <div class="price">
+                          <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                        </div>
+                      </div>
+                    {% elif listing.auction_type_id == 7  %}
+                      <div class="price-info">
+                        <div class="price">
+                          {% if listing.un_priced == True %}
+                            {% if listing.current_best_offer_amount %}
+                              <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                            {% else %}
+                            <span class="blue-text">Unpriced</span>
+                            {% endif %}
+                          {% else %}
+                            {% if listing.un_priced == False %}
+                              {% if listing.highest_best_format == 3 %}
+                                {% if listing.current_best_offer_amount %}
+                                  <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                                {% else %}
+                                  <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                                {% endif %}
+                              {% else %}
+                                <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                              {% endif %}
+                            {% endif %}
+
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% else %}
+                      <div class="price-info">
+                        <div class="price">
+                          <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                        </div>
+                        <div class="price">
+                          <span class="blue-text">Bid Increment:</span> ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+                        </div>
+                      </div>
+                    {% endif %}
+
+                  </div>
+                  <div class="item">
+                    <a href="javascript:void(0)" onclick="fav_property_delete_confirmation({{ listing.property }});" class="badge badge-danger"><i class="fa fa-trash"></i></a>
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+                  </div>
+                </div>
+                {% endif %}
+
+              </div>
+            </div> -->
+            
+            <!-- End .create-table -->
+
+
+            <div class="pagination" id="fav_pagination_block">
+              <ul>
+                {{ pagination_html }}
+              </ul>
+            </div>
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+
+<div class="overlay" style="display:none;">
+  <div class="loader">Loading...</div>
+</div>
+
+  <div id="confirmPropertyDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Confirmation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="font15 center">
+            Are you sure you want to delete?
+          </p>
+          <div class="clearfix center">
+            <button class="btn btn-primary-bdr del_prop_btn" id="del_prop_false">No</button> <button class="btn btn-primary del_prop_btn" id="del_prop_true">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .logoutModal -->
+{% endblock %}
+  <div id="bidderlistModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidders List
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table width="100%" class="table table-scroll bidderlisttable">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  <th>
+                    Bidder Name
+                  </th>
+                  <th>
+                    Email Address
+                  </th>
+                  <th>
+                    Phone No
+                  </th>
+                  <th>
+                    Address
+                  </th>
+                  <th>
+                    Approval
+                  </th>
+                  <th>
+                    Registered on
+                  </th>
+                  <th>
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderlistModal -->
+
+  <div id="bidderrecordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidding Records
+          </h5>
+          <div class="bidderrecord-top">
+            <figure>
+              <img src="{% static 'theme-4/user-dashboard/images/upload-banner-1.png' %}" alt="real estate sales">
+            </figure>
+            <figcaption>
+              <h6>
+                M&T Bank Building
+                <span><i class="fas fa-map-marker-alt"></i> Altoona, Pennsylvania</span>
+              </h6>
+              <ul>
+                <li>
+                  <span>Auction type:</span> English
+                </li>
+                <li>
+                  <span>Bid Increment:</span> $300
+                </li>
+              </ul>
+            </figcaption>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="table-responsive">
+            <table width="100%" class="table table-scroll bidderrecordTable">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  <th>
+                    Bidder Name
+                  </th>
+                  <th>
+                    Email
+                  </th>
+                  <th>
+                    Phone
+                  </th>
+                  <th>
+                    Bid Amount
+                  </th>
+                  <th>
+                    Bidding Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    $1,500
+                  </td>
+                  <td>
+                    01-14-2021 04:45 PM
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderrecordModal -->
+
+  <div id="listsettingModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Listing Setting
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 col-sm-5">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Auto Approval
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6 col-sm-7">
+              <div class="form-group lh46">
+                <input id="Residential" type="radio" name="gender" value="Residential" class="css-radio">
+                <label for="Residential" class="radio-label">Residential</label>
+                &nbsp; &nbsp; &nbsp;
+                <input id="Land" type="radio" name="gender" value="Land" class="css-radio" checked >
+                <label for="Land" class="radio-label">Land</label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group" >
+                <label for="" class="lh46">
+                  Show Reserve Not Met
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input id="Residential" type="radio" name="gender" value="Residential" class="css-radio">
+                <label for="Residential" class="radio-label">Yes</label>
+                &nbsp; &nbsp; &nbsp;
+                <input id="Land" type="radio" name="gender" value="Land" class="css-radio" checked >
+                <label for="Land" class="radio-label">No</label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Log Time Extention
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input id="Residential" type="radio" name="gender" value="Residential" class="css-radio">
+                <label for="Residential" class="radio-label">Yes</label>
+                &nbsp; &nbsp; &nbsp;
+                <input id="Land" type="radio" name="gender" value="Land" class="css-radio" checked >
+                <label for="Land" class="radio-label">No</label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Timer Flash*
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input type="text" class="form-control" placeholder="Timer flash">
+                <div class="tagline">Seconds</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  Log Time Extention
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group lh46">
+                <input type="text" class="form-control" placeholder="Timer flash">
+                <div class="tagline">Seconds</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="" class="lh46">
+                  When to start adding
+                  <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                    <span class="tooltipp__content right banner-img">Favicon is also known as tab icon, URL icon, or bookmark icon. It is a small, iconic image that represents your website. Preferred image size is 32 x 32 px </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" placeholder="When To Start Adding">
+            </div>
+          </div>
+
+          <div class="clearfix pt30 center">
+            <button class="btn btn-primary">Save</button> <button class="btn btn-primary-bdr">Cancel</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderrecordModal -->
+
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-4/js/autosuggestion.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dashboard_listing.js' %}?v=4.7"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/favorite_tour.js' %}?v=3.1"></script>
+<script>
+  var is_first_login = {{request.session.is_first_login}};
+  $('#favourite_num_record').chosen();
+</script>
+{% endblock %}

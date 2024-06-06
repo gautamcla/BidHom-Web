@@ -1,0 +1,262 @@
+{% extends "admin/layouts/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+
+{% block title %} Add Blog {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link href="{% static 'css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>Add Blog</h3>
+        </div>
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            
+            <div class="x_content">
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+              <form method="post" id="addArticle" action="{% url 'admin-ajax-add-blog' %}" class="form-horizontal form-label-left" data-parsley-validate autocomplete="off">
+                {% csrf_token %}
+
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="site">Choose Domain
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+
+                    <select class="form-control" id="site" name="site_id" >
+                        <option value="" selected>Choose Available Domain</option>
+                        {% for obj in domain_list %}
+                            {% if obj.is_active %}
+                                <option value="{{obj.id}}">{{obj.domain_name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    </div>
+                    <a href="{% url 'admin-subdomain-list' %}" target="_blank" type="button" class="btn btn-primary btn-round"> Explore <i class="fa fa-external-link"></i></a>
+
+                </div>
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="asset">Choose Category <span class="required">*</span>
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+
+                    <select class="form-control" id="asset" name="asset" required="required" >
+                        <option value="" selected>Choose Available Category</option>
+                        {% for obj in asset_list %}
+                          <option value="{{obj.id}}">{{obj.name}}</option>
+                        {% endfor %}
+                    </select>
+                    </div>
+                    <a href="{% url 'admin-blog-categories' %}#add-blog-category" target="_blank" type="button" class="btn btn-primary btn-round"> Add more <i class="fa fa-external-link"></i></a>
+
+
+                </div>
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="site">Status <span class="required">*</span>
+                  </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+
+                    <select class="form-control" id="status" name="status" required="required" >
+                        <option value="" selected>Choose Status</option>
+                        {% for obj in status_list %}
+                            {% if obj.is_active %}
+                                <option value="{{obj.id}}">{{obj.status_name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    </div>
+                    <a href="{% url 'admin-lookup-status' %}#add-status" target="_blank" type="button" class="btn btn-primary btn-round"> Add more <i class="fa fa-external-link"></i></a>
+
+                </div>
+
+
+                <span class="section">Blog Info</span>
+                
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">Title <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" class="form-control col-md-7 col-xs-12" data-parsley-trigger="keyup" required="required" placeholder="Enter title" name="title">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="description">Description <span class="required">*</span>
+                  </label>
+                  <div class="col-md-8 col-sm-8 col-xs-12">
+                    <textarea class="form-control col-md-7 col-xs-12 description" data-parsley-trigger="keyup" required="required" placeholder="Enter article description..." name="description"></textarea>
+                  </div>
+                </div>
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Blog Image <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="upload-fav">
+                        <div class="item">
+                          <div class="dropzone testimonialImgFrm" id="testimonialImgFrm">
+                            <input type="hidden" class="upload" id="upload" name="upload" value=""/>
+                            <input type="hidden" class="upload_name" name="upload_name" id="upload_name" value=""/>
+                            <div class="fallback">
+                              <input name="file" type="file" class="testimonial_image_div" id="testimonial_image_div" name="testimonial_image_div" />
+                              <button><i class="fa fa-upload"></i> Upload favicon</button>
+                            </div>
+                          </div>
+                        </div>                  
+                        <br>
+                        <div class="item testimonialImgDiv" id="testimonialImgDiv" style="display:none;">
+                          <div class="fav-icon">
+                            <figure>
+                              <img src="{% static 'admin/images/upload-banner-1.png' %}" class="testimonialImg" id="testimonialImg" alt="" width="211" height="113">
+                            </figure>
+                            <a href="#"><i class="fa fa-trash text-danger"></i></a>
+                          </div>
+                        </div>
+                    </div>
+                  </div> 
+                </div>
+                
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="author_name">Author Name <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" class="form-control col-md-7 col-xs-12" data-parsley-trigger="keyup" required="required"  placeholder="Enter author name" name="author_name">
+
+                  </div>
+                </div>
+
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Author Image <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="upload-fav">
+
+                      <div class="item">
+                        <div class="dropzone testimonialAuthorImgFrm" id="testimonialAuthorImgFrm">
+                          <input type="hidden" class="author_image" id="author_image" name="author_image" value=""/>
+                          <input type="hidden" class="author_image_name" name="author_image_name" id="author_image_name" value=""/>
+                          <div class="fallback">
+                            <input name="file" type="file" class="testimonial_author_image_div" id="testimonial_author_image_div" name="testimonial_author_image_div" />
+                            <button><i class="fa fa-upload"></i> Upload favicon</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <br>
+                      <div class="item testimonialAuthorImgDiv" id="testimonialAuthorImgDiv" style="display:none;">
+                        <div class="fav-icon">
+                          <figure>
+                            <img src="{% static 'admin/images/favicon-logo.png' %}" class="testimonialAuthorImg" id="testimonialAuthorImg" alt="" width="75" height="75">
+                          </figure>
+                          <a href="#"><i class="fa fa-trash text-danger"></i></a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> 
+
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="publish_date">Publish Date <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class='input-group date' id='datetimepicker3'>
+                      <input type='text' class="form-control date-picker-listing" data-parsley-trigger="keyup" data-parsley-required="true" name="virtual_publish_date" id="virtual_publish_date" placeholder="dd/mm/yyyy hh:mm AM/PM" value="">
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar calender-icon"></span>
+                      </span>
+                      <input autocomplete="off" type='hidden' class="form-control" name="publish_date_local" id="publish_date_local" />
+                      <input autocomplete="off" type='hidden' class="form-control" name="publish_date" id="publish_date" value=""/>
+                    </div>      
+                  </div>            
+                </div>
+
+                
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-md-offset-3">
+                    <button type="reset" class="btn btn-primary">Reset</button>
+                    <button id="submitAddCms" type="submit" class="btn btn-success">Add</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+ <!-- Add Event type modal -->
+  <div class="modal fade add-event-type" id="confirmImageDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Delete Confirmation</h4>
+        </div>
+        <div class="modal-body text-center">
+          <input type="hidden" name="popup_article_id" id="popup_article_id" value=""/>
+          <input type="hidden" name="popup_section" id="popup_section" value=""/>
+          <input type="hidden" name="popup_image_id" id="popup_image_id" value=""/>
+          <input type="hidden" name="popup_image_name" id="popup_image_name" value=""/>
+          <input type="hidden" name="popup_count" id="popup_count" value=""/>
+          <input type="hidden" name="popup_agent_id" id="popup_agent_id" value=""/>
+          <p>Are you sure you want to delete?</p>
+          
+          <div class="text-center">
+            <button type="button" class="btn btn-default del_user_btn" id="del_image_false" data-dismiss="modal">No</button>
+            <button type="submit" class="btn btn-primary del_user_btn" id="del_image_true"> Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  <script>
+  let aws_url = '{{aws_url}}';
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/add-article.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/jquery-ui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/tinymce/tinymce.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/dropzone.js' %}"></script>
+
+
+
+
+{% endblock javascripts %}

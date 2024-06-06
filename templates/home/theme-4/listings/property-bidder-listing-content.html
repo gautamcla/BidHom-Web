@@ -1,0 +1,33 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if bidder_listing %}
+    {% for bidder in bidder_listing %}
+        <tr>
+            <td>
+              {% if bidder.user_id == user_id %}
+                You
+              {% else %}
+                {{ bidder.bidder }}
+              {% endif %}
+            </td>
+            <td>
+              {{ bidder.bids }}
+            </td>
+            <td>
+              ${{ bidder.high_bids|convert_num|intcomma|default:'0' }}
+            </td>
+<!--            <td class="covert_bidding_date" data-value="{{ bidder.date|default:'' }}">-->
+<!--              Nov 23, 2021 12:00 AM CT {{ bidder.date|default:'' }}-->
+<!--            </td>-->
+            <td class="convert_to_local_date_time" data-value="{{ bidder.date|default:'' }}"></td>
+        </tr>
+    {% endfor %}
+{% else %}
+<tr>
+    <td colspan="4">
+        <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" alt="real estate sales" role="img" />
+    </td>
+</tr>
+{% endif %}
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>

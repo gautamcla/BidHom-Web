@@ -1,0 +1,277 @@
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    &.homepage-header {
+        .header-ani {
+            background: transparent;
+            border-bottom: none;
+            @include breakpoint(xs) {
+                background: $black;
+            }
+        }
+        &.header {
+            .dashoard-user {
+                .user-icon {
+                    background-position: -22px -349px;
+                }
+                .arrow-icon {
+                    background-position: -72px -340px;
+                }
+            }
+        }
+    }
+    
+    &.fixed-header {
+        .header-ani {
+            background: $black !important;
+            
+            // .logo {
+            //     display: none;
+            // }
+            .logo-black {
+                display: block;
+            }
+            .dashoard-user {
+                .user-icon {
+                    background-position: -22px -349px;
+                }
+                .arrow-icon {
+                    background-position: -72px -340px;
+                }
+            }
+        }    
+    }
+    
+    .header-ani {
+        background: $black;
+        padding: 20px 0;
+        @include css3-transition(transition, all 0.4s ease-out);
+        @include breakpoint(md) {
+          padding: 10px 0;
+        }
+        .logo {
+            @include breakpoint(xs) {
+                display: none;
+            }
+        }
+        .logo-black {
+            display: none;
+        }
+        .logo-icon {
+            display: none;
+            @include breakpoint(xs) {
+                display: block;
+            }
+        }
+    }
+
+    .user-links {
+        display: flex;
+        flex-flow: row;
+        justify-content: flex-end;
+        align-items: center;
+        li {
+            padding: 0 0 0 15px;
+            @include breakpoint(xs) {
+                padding: 0 0 0 5px;
+            }
+            &:first-child {
+                padding-left: 0;
+            }
+            &.register-btn {
+                a {
+                    background: $secondary;
+                    border: 2px solid $secondary;
+                    span {
+                        @include breakpoint(md) {
+                            display: none;
+                        }
+                    }
+                    &:hover {
+                        border: 2px solid $white;
+                    }
+                }
+            }
+            a {
+                font-size: $fontLarge;
+                line-height: 42px;
+                padding: 0 15px;
+                text-transform: uppercase;
+                display: inline-block;
+                border: 2px solid $white;
+                color: $white;
+                letter-spacing: 0.5px;
+                @include border-radius (30px);
+                @include breakpoint(laptop) {
+                    font-size: $fontMedium;
+                }
+                @include breakpoint(lg) {
+                    font-size: $font14;
+                }
+                @include breakpoint(sm) {
+                    font-size: $fontSmall;
+                    padding: 0 10px;
+                    line-height: 32px;
+                }
+                &:hover {     
+                    color: $secondary;
+                    background: $white;
+                }       
+            }
+        }
+    }
+
+
+    .dashoard-user {
+        position: relative;
+        a {
+            display: flex !important;
+            align-items: center;
+            font-weight: 400;
+            line-height: 15px;
+            font-size: $fontMedium;
+            color: $black;
+            position: relative;
+            border: none !important;
+            padding: 0 !important;
+            &:hover {
+                background: transparent !important;
+            }
+            ul {
+                position: absolute;
+                top: 20px;
+            }
+        }
+        .name {
+            padding: 0 10px;
+            @include breakpoint(xs) {
+                display: none;
+            }
+        }
+        .user-icon {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            @include iconBg();
+            background-position: -22px -349px;
+            // background-position: -22px -320px;
+        }
+        .arrow-icon {
+            width: 13px;
+            height: 8px;
+            display: inline-block;
+            @include iconBg();
+            background-position: -72px -340px;
+            // background-position: -72px -328px;
+        }
+        .dropdown-menu {
+            width: 210px;
+            top: 40px;
+            box-shadow: none;
+            border: none;
+            @include breakpoint(xs) {
+                top: 52px;
+            }
+            li {
+                padding: 0 !important;
+                a {
+                    padding: 10px 15px !important;
+                    color: $white !important;
+                    background: $black !important;
+                    line-height: 1.428571429 !important;
+                    font-size: $fontLarge;
+                    text-transform: inherit;
+                    letter-spacing: normal;
+                    &:hover {
+                        background: $secondary !important;
+                    }
+                    .icon {
+                        width: 18px;
+                        height: 17px;
+                        display: inline-block;
+                        margin-right: 15px;
+                        @include iconBg();
+                        &.dashboard-icon {
+                            background-position: -323px -354px;
+                        }
+                        &.bid-icon {
+                            background-position: -351px -353px;
+                            height: 20px;
+                        }
+                        &.favorite-icon {
+                            background-position: -382px -353px;
+                        }
+                        &.website-icon {
+                            background-position: -323px -322px;
+                        }
+                        &.personal-icon {
+                            background-position: -354px -321px;
+                        }
+                        &.security-icon {
+                            background-position: -385px -320px;
+                        }
+                        &.logout-icon {
+                            background-position: -414px -320px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    .table {
+        box-shadow: none;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+        background: transparent;
+        @include breakpoint(sm) {
+            padding-right: 30px;
+        }
+        @include breakpoint(xs) {
+            padding-right: 5px;
+        }
+        .table-cell {
+            display: table-cell;
+            
+            &:first-child {
+                width: 18%;
+                height: 46px;
+                @include breakpoint(lg) {
+                    width: 18%;
+                }
+                @include breakpoint(xs) {
+                    width: 50px;
+                }
+                img {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+            }
+            &:nth-child(2){
+                width: 57%;
+                @include breakpoint(sm) {
+                    width: 42%;
+                }
+                @include breakpoint(xs) {
+                    width: auto;
+                }
+            }
+            &:last-child {
+                width: 25%;
+                @include breakpoint(lg) {
+                    width: 27%;
+                }
+                @include breakpoint(sm) {
+                    width: 40%;
+                }
+                @include breakpoint(xs) {
+                    width: 75%;
+                }
+            }
+        }
+    }
+}

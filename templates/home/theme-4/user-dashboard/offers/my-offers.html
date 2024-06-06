@@ -1,0 +1,944 @@
+{% extends "layout/theme-4/user-dashboard/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+
+  <div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>My Offers</strong>
+                </h6>
+              </div>
+              <div class="block">
+                <ul class="nav-tab">
+                  <li>
+                    <a href="/best-offers/">
+                      Highest & Best Offer
+                    </a>
+                  </li>
+                  <li class="active">
+                    <a href="/my-offers/">
+                      Traditional Sale
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+
+            <div class="mybid-wrap" id="offer_listing">
+              {% if offer_listing %}
+              {% for listing in offer_listing %}
+              <div class="list">
+                <div class="list-left">
+                  <figure>
+                    <a href="/asset-details/?property_id={{ listing.id }}" target="_blank">
+                      <img class="slide-fixed" src="{% static 'theme-4/user-dashboard/images/transparent.png' %}" alt="real estate sales">
+                      <img class="slide-img" src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                    </a>
+                  </figure>
+                  <figcaption>
+                    <span class="badge {% if listing.property_status|lower == 'pending' %}badge-warning{% elif listing.property_status|lower == 'approved' %}badge-success{% elif listing.property_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+                      {{ listing.property_status }}
+                    </span>
+                    <div class="type">
+                      {{ listing.auction_type }}
+                    </div>
+                    <h6 class="name">
+                      <span title="{{ listing.address_one }}">{% if listing.address_one|length > 18 %}{{ listing.address_one|slice:":15" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+                    </h6>
+                    <div class="location">
+                      <i class="fa-solid fa-location-dot"></i> {{ listing.city }}, {{ listing.state }} {{ listing.postal_code }}
+                    </div>
+                  </figcaption>
+                </div><!-- End .list-left -->
+
+                <div class="list-right">
+                  <ul class="top-list">
+                    <li>
+                      <h6>
+                        Asking Price
+                        <span class="blue-text">
+                          ${{ listing.asking_price|convert_num|intcomma|default:'0' }}
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      <h6>
+                        My Offer
+                        <span class="blue-text">
+                          ${{ listing.your_max_offer|convert_num|intcomma|default:'0' }}
+                        </span>
+                      </h6>
+                    </li>
+                    <li>
+                      <h6>
+                        Offer Status
+                        <span>
+                          <button class="badge {% if listing.offer_status|lower == 'offer sent' %}badge-success{% else %}badge-danger{% endif %}" onclick="viewOfferDetails('{{ listing.id }}')">
+                            {{ listing.offer_status }}
+                          </button>
+                        </span>
+                      </h6>
+                    </li>
+                  </ul>
+                </div><!-- End .list-right -->
+                
+              </div><!-- End .list -->
+              {% endfor %}
+              {% else %}
+              <div class="list">
+                <div class="fullwidth">
+                  <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+                </div>
+              </div>
+              {% endif %}
+            </div><!-- End .mybid-wrap -->
+
+            <!-- <div class="default-table myOffer-table">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Property Name
+                </div>
+                <div class="item">
+                  Auction Type
+                </div>
+                <div class="item">
+                  Asking Price
+                </div>
+                <div class="item">
+                  My Offer
+                </div>
+                <div class="item">
+                  Offer Status
+                </div>
+                <div class="item">
+                  Property Status
+                </div>
+
+              </div>
+              <div class="block sscroll" id="offer_listing">
+                {% if offer_listing %}
+                {% for listing in offer_listing %}
+                <div class="block-item" id="bid_row_{{ listing.id }}" data-property="{{listing.id}}" data-row="{{ listing.id }}">
+                  <div class="item">
+                   {{ forloop.counter0|add:sno }}
+                  </div>
+                  <div class="item">
+                    <a href="/asset-details/?property_id={{ listing.id }}" target="_blank">
+                    <div class="user-pics">
+                      <span class="user-pic"><img src="{% if listing.property_image.image %}{{ aws_url }}{{ listing.property_image.bucket_name }}/{{ listing.property_image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales"></span>
+                      <h6>
+                        <span class="blue-text" title="{{ listing.address_one }}">{% if listing.address_one|length > 18 %}{{ listing.address_one|slice:":15" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+                        <i class="fas fa-map-marker-alt"></i> {{ listing.city }}, {{ listing.state }} {{ listing.postal_code }}
+                      </h6>
+                    </div>
+                    </a>
+                  </div>
+                  <div class="item">
+                    {{ listing.auction_type }}
+                  </div>
+
+                  <div class="item current_bids">
+                    ${{ listing.asking_price|convert_num|intcomma|default:'0' }}
+                  </div>
+                  <div class="item bid_increment">
+                    ${{ listing.your_max_offer|convert_num|intcomma|default:'0' }}
+                  </div>
+                  <div class="item bid">
+                    <button class="badge {% if listing.offer_status|lower == 'offer sent' %}badge-success{% else %}badge-danger{% endif %}" onclick="viewOfferDetails('{{ listing.id }}')">
+                      {{ listing.offer_status }}
+                    </button>
+                  </div>
+                  <div class="item status">
+                    <span class="badge {% if listing.property_status|lower == 'pending' %}badge-warning{% elif listing.property_status|lower == 'approved' %}badge-success{% elif listing.property_status|lower == 'declined' %}badge-danger{% else %}badge-info{% endif %}">
+                      {{ listing.property_status }}
+                    </span>
+                  </div>
+
+
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+                  </div>
+                </div>
+                {% endif %}
+
+              </div>
+            </div> -->
+            <!-- End .mybid-table -->
+            <div class="pagination" id="offer_pagination_block">
+              <ul>
+                {{ pagination_html }}
+              </ul>
+            </div>
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+
+      <div id="viewofferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-laptop" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <h5>
+                Offer Details
+              </h5>
+            </div>
+            <div class="modal-body">
+              <div class="viewoffer-wrap">
+                <div class="offerdetail-main" id="offer_details">
+                  <div class="bidderrecord-top">
+                    <figure>
+                      <img src="https://realtyonegroup.s3.us-west-1.amazonaws.com/property_image/1621582048.0981665_traditional_2.jpeg" alt="real estate sales">
+                    </figure>
+                    <figcaption>
+                      <h6>
+                        221 E Kansas Ave
+                        <span><i class="fas fa-map-marker-alt"></i> Smith Center, Arkansas, 66967</span>
+                      </h6>
+                    </figcaption>
+                    <ul>
+                      <li>
+                        <span>Listing type:</span> Traditional Sale
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="space">
+                    <div class="table-responsive">
+                      <table class="offerdetailListtable">
+                        <tr>
+                          <td>
+                            Buyer
+                          </td>
+                          <td>
+                            &nbsp;
+                          </td>
+                          <td>
+                            Phone
+                          </td>
+                          <td>
+                            &nbsp;
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            Buyer Email
+                          </td>
+                          <td>
+                            &nbsp;
+                          </td>
+                          <td>
+                            Date
+                          </td>
+                          <td>
+                            &nbsp;
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                    <!-- <ul class="offerdetailList">
+                      <li>
+                        <label for="">User:</label>
+                      </li>
+                      <li>
+                        <label for="">Offer:</label>
+                      </li>
+                      <li>
+                        <label for="">Date:</label>
+                      </li>
+                      <li>
+                        <label for="">Message:</label>
+                      </li>
+                    </ul> -->
+    
+                    <div class="table-responsive">
+                      <table width="100%" class="table table-scroll offerdetailTable">
+                        <thead>
+                          <tr>
+                            <th>
+                              User
+                            </th>
+                            <th>
+                              Offer Amount
+                            </th>
+                            <th>
+                              Status
+                            </th>
+                            <th>
+                              Action
+                            </th>
+                            <th>
+                              Date
+                            </th>
+                            
+                            
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>      
+
+                            </td>     
+                            <td>              
+
+                            </td>
+                            <td>
+
+                            </td>
+                            <td>
+
+                            </td>
+                            <td>
+
+                            </td>
+                            
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+    
+                    <!--<p class="font13">
+                      By clicking Submit Counter Offer you understand that if the participant accept, <br>
+                      your listing will immediately end per the <span class="blue-text">listing agreement.</span>  
+                    </p>-->
+    
+                    <div class="clearfix">
+                      <button class="btn btn-green">Accept Offer</button> <button class="btn btn-primary"  data-toggle="modal" data-target="#counterOfferModal">Make Counter Offer</button>
+                      <button class="btn btn-secondary">Decline Offer</button> <!--<button class="btn btn-blue">Rescind</button>-->
+                    </div>
+                  </div>
+    
+                </div>
+              </div><!-- End .viewoffer-wrap -->
+                        
+            </div>
+          </div>
+        </div>
+      </div><!-- End .bidderlistModal -->
+
+<div id="bidderlistModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidders List
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table width="100%" class="table table-scroll bidderlisttable">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  <th>
+                    Bidder Name
+                  </th>
+                  <th>
+                    Email Address
+                  </th>
+                  <th>
+                    Phone No
+                  </th>
+                  <th>
+                    Address
+                  </th>
+                  <th>
+                    Approval
+                  </th>
+                  <th>
+                    Registered on
+                  </th>
+                  <th>
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">
+                      Not Approval
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-success">
+                      Approved
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    1
+                  </td>
+                  <td>
+                    John
+                  </td>
+                  <td>
+                    John@gmail.com
+                  </td>
+                  <td>
+                    +1-202-555-0137
+                  </td>
+                  <td>
+                    4215  Clarence Court
+                  </td>
+                  <td>
+                    <span class="badge badge-danger">
+                      Expired
+                    </span>
+                  </td>
+                  <td>
+                    01-12-2021
+                  </td>
+                  <td>
+                    <a href="#" class="badge badge-info"><i class="far fa-edit"></i></a> <a href="#" class="badge badge-danger ml5"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderlistModal -->
+
+<div id="confirmBidModal" class="modal centered-modal confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Bid Confirmation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4>
+          Please confirm your bid
+        </h4>
+        <input type="hidden" class= "new_bid_amt" name="new_bid_amt" value="">
+        <input type="hidden" class= "popup_property_id" name="popup_property_id" value="">
+        <h5>
+          Your are about to bid $<span id="popup_bid_amt"></span>
+        </h5>
+        <div class="clearfix center">
+          <button class="btn btn-secondary confirm_bid_btn" id="confirm_bid_true">Confirm</button><button class="btn btn-secondary-bdr confirm_bid_btn" id="confirm_bid_false">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .confirmBidModal -->
+
+<div id="biddingErrorBidModal" class="modal centered-modal SuccessModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Attention!</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4 class="red-text">
+          Attention Please!
+        </h4>
+        <h5 id="bidding_error_msg">
+
+        </h5>
+        <div class="clearfix center pb20">
+          <button class="btn btn-primary error_bid_close" id="error_bid_close" data-dismiss="modal" aria-label="Close">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .biddingErrorBidModal -->
+<div id="counterOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Counter Offer</h5>
+          <button type="button" class="close" id="close_counter_popup_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="counter_offer_frm" id="counter_offer_frm" method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <input type="hidden" name="property_id" id="counter_property_id" value="" />
+            <input type="hidden" name="negotiated_id" id="negotiated_id" value="" />
+            <div class="form-group">
+              <label for="existing_offer_price" class="pb10">Existing Offer amount</label>
+              <input type="text" class="form-control bdr" name="existing_offer_price" id="existing_offer_price" placeholder="Enter Existing Offer Amount" readonly>
+            </div>
+            <div class="form-group">
+              <label for="offer_price" class="pb10">Counter Offer amount</label>
+              <input type="text" class="form-control bdr" name="offer_price" id="offer_price" placeholder="Enter Counter Offer Amount" maxlength="19">
+            </div>
+            <div class="form-group">
+              <label for="offer_comment" class="pb10">Message</label>
+              <textarea name="offer_comment" class="form-control textarea bdr" id="offer_comment" cols="30" rows="2" placeholder="Enter Your Message"></textarea>
+            </div>
+            <!--<p class="font13">
+              By clicking Submit Counter Offer you understand that if the participant accept, <br>
+              your listing will immediately end per the <span class="blue-text">listing agreement.</span>
+            </p>-->
+            <div class="clearfix center">
+               <button class="btn btn-secondary" id="submit_counter_offer">Submit Counter Offer</button> <button type="button" class="btn btn-primary-bdr" id="close_counter_popup">Cancel</button>
+
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .counterOfferModal -->
+<div id="biddingSuccessBidModal" class="modal centered-modal SuccessModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Bid Success</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4>
+          Bidding Successfully
+        </h4>
+        <h5 id="bidding_success_msg">
+
+        </h5>
+        <div class="clearfix center pb20">
+          <button class="btn btn-primary error_bid_close" id="error_bid_close" data-dismiss="modal" aria-label="Close">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- End .biddingSuccessBidModal -->
+<div id="viewMsgHistoryModal" class="modal centered-modal personalModalwrap confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Message</h5>
+        <button type="button" class="close" id="msg_close_true" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="user_msg">
+
+        </p>
+        <div class="clearfix center">
+          <p>
+            <button type="" class="btn btn-secondary confirm_bid_btn" id="msg_true">OK</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+<div id="confirmRejectOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Reject Confirmation</h5>
+                  <button type="button" class="close" id="reject_offer_false_top">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="property_id" id="rej_property_id" value=""/>
+                <input type="hidden" name="negotiated_id" id="rej_negotiated_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center" id="trad_reject_msg">
+                    Do you want to Reject Offer?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button" class="btn btn-primary reject_offer_btn" id="reject_offer_true">Yes</button> <button type="button" class="btn btn-primary-bdr reject_offer_btn" id="reject_offer_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+<div id="confirmAcceptOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Accept Confirmation</h5>
+                  <button type="button" class="close" id="accept_offer_false_top">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="property_id" id="accept_property_id" value=""/>
+                <input type="hidden" name="negotiated_id" id="accept_negotiated_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Do you want to Accept Offer?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button" class="btn btn-primary accept_offer_btn" id="accept_offer_true">Yes</button> <button type="button" class="btn btn-primary-bdr accept_offer_btn" id="accept_offer_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .confirmAcceptOfferModal -->
+<div id="viewOfferDocumentModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Documents</h5>
+          <button type="button" class="close" id="close_offer_doc_popup_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <ul class="document-list" id="offer_doc_list">
+
+              </ul>
+
+            </div>
+
+            <div class="clearfix center">
+               <button type="button" class="btn btn-primary-bdr" id="close_offer_doc_popup">Close</button>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div><!-- End .viewOfferDocumentModal -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/dashboard_listing.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/my_offers.js' %}?v=1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/custom_validator.js' %}?v=1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/traditional_tour.js' %}?v=3.1"></script>
+<script>
+  var is_first_login = {{request.session.is_first_login}};
+</script>
+{% endblock %}

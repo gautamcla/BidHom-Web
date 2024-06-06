@@ -1,0 +1,289 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Video Tutorials {% endblock title %}
+
+{% block styles %}
+  <link href="{% static 'admin/vendors/jQuery-Multiple-Select/dist/css/selectize.bootstrap3.css' %}" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+  
+    <div class="listing-top">
+      <div class="block">
+        <h6>Video Tutorials : <b id="totalCount">Loading...</b></h6>
+      </div>
+
+      <div class="block">
+        <form action="" class="search-field last top_search">
+            <div class="search-icon"><i class="fas fa-search"></i></div>
+            <input type="text" id="search" class="form-control input-sm" placeholder="Search for...">
+            <button class="btn btn-primary btn-sm pl20 searchBtn"  type="submit">Go!</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="listing-bottom">
+      <div class="block right">
+        <i class="fa fa-filter"></i> Filters
+      </div>
+      <div class="block">
+        <select class="form-control" id="site" name="site_id" multiple>
+            <option value="" selected disabled>Filter Domain</option>
+            {% for obj in domain_list %}
+                {% if obj.is_active %}
+                    <option value="{{obj.id}}">{{obj.domain_name}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+      </div>
+      <div class="block">
+        <select class="form-control" name="prop_filter_status" id="prop_filter_status" multiple>
+          <option value="" selected disabled>Filter Status</option>
+          {% for obj in status_list %}
+                <option value="{{obj.id}}">{{obj.status_name}}</option>
+            {% endfor %}
+        </select>
+      </div>
+
+      <div class="block" style="min-width: 130px;">
+        <select class="form-control" name="per_page_record" id="per_page_record">
+          <option value="10">10 Records</option>
+          <option value="20" selected>20 Records</option>
+          <option value="30">30 Records</option>
+          <option value="40">40 Records</option>
+          <option value="50">50 Records</option>
+        </select>
+      </div>
+
+      <div class="block">
+        <a type="button" class="btn btn-primary" data-toggle="modal" data-target=".add-videoo" ><i class="fa fa-plus-circle"></i> Add Tutorial</a>
+      </div>
+
+    </div>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>{{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+    <input type="hidden" name="page-video-list" id="page-video-list" value="1">						
+    
+    <span id="span-ajax-video-list">
+      <div class="table-responsive">
+      <table class="table table-striped jambo_table bulk_action">
+        <thead>
+            <tr class="headings">
+            <th class="column-title">ID </th>
+              <th class="column-title">Title </th>
+              <th class="column-title">Video Url </th>
+              <th class="column-title" style="width:10%">Domain </th>
+              {% comment %} <th class="column-title">Publish Date </th> {% endcomment %}
+              <th class="column-title">Status </th>
+              <th class="column-title no-link last" style="width:15%"><span class="nobr">Action</span>
+              </th>
+            </tr>
+          </thead>
+            
+          <tbody>							  			  
+          </tbody>
+        </table>
+      </div>
+    </span> 
+
+  </div>
+
+
+   <!-- Add video modal -->
+  <div class="modal fade add-videoo" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Add Tutorial</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'admin-ajax-add-video' %}" data-parsley-validate class="form-horizontal form-label-left form-subs add-video-form">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="site_id">Choose Domain
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select name="site_id" id="site_id" class="select form-control">
+                  <option value="" disabled selected>Select</option>
+                  {% if domain_list %}
+                  {% for item in domain_list %}
+                    {% if item.is_active %}
+                    <option value="{{ item.id }}">{{ item.domain_name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                  {% endif %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="title">Title <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" name="title" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="description">Description<span class="required">*</span>
+              </label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <textarea class="form-control description" name="description" required="required" rows="3" placeholder="Enter tutorial description..." style="height: 120px;" spellcheck="true"></textarea>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="video_url">
+                Video Url <span class="required">*</span> 
+                <sub>(YouTube links only)</sub>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" name="video_url" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="lh46 col-md-3 col-sm-3 col-xs-12" for="site">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="form-control" id="status" name="status" required="required" >
+                    <option value="" selected>Choose Status</option>
+                    {% for obj in status_list %}
+                        {% if obj.is_active %}
+                            <option value="{{obj.id}}">{{obj.status_name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-3 col-sm-3 col-xs-12">
+                &nbsp;
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+
+
+  <!--Edit video Modal-->
+  <div class="modal fade edit-video-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Edit Tutorial</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'admin-ajax-add-video' %}" data-parsley-validate class="form-horizontal form-label-left form-subs edit-video-form">
+            {% csrf_token %}
+            <input type="hidden" id="video_id" name="video_id" >
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="site_id">Choose Domain
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select name="site_id" id="editSiteId" class="select form-control">
+                  <option value="" disabled selected>Select</option>
+                  {% if domain_list %}
+                  {% for item in domain_list %}
+                    {% if item.is_active %}
+                    <option value="{{ item.id }}">{{ item.domain_name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                  {% endif %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">Title <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="editTitle" name="title" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="description">Description<span class="required">*</span>
+              </label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <textarea class="form-control description" id="editDescription" name="description" required="required" rows="3" placeholder="Enter tutorial description..." style="height: 120px;" spellcheck="true"></textarea>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="video_url">Video Url <span class="required">*</span>  <br><sub>(YouTube links only)</sub>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="editVideoUrl" name="video_url" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="site">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="form-control" id="editStatus" name="status" required="required" >
+                    <option value="" selected>Choose Status</option>
+                    {% for obj in status_list %}
+                        {% if obj.is_active %}
+                            <option value="{{obj.id}}">{{obj.status_name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+              </div>
+            </div>
+
+
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End modal-->
+
+</div>
+{% endblock %}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/status-active-inactive.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/video-list.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/tinymce/tinymce.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/jquery-ui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/jQuery-Multiple-Select/dist/js/standalone/selectize.js' %}"></script>
+{% endblock %}

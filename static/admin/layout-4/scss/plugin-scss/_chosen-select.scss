@@ -1,0 +1,26 @@
+.chosen-container {
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+  height: 45px;
+  @include border-radius (8px);
+
+  &.chosen-container-single {
+    .chosen-single {
+      color: $black;
+      line-height: 44px;
+      text-align: left;
+      padding: 0 35px 0 10px;
+      @include border-radius (8px);
+
+      div {
+        right: 10px !important;
+      }
+    }
+  }
+
+  .chosen-results {
+    li {
+      padding: 8px 10px;
+    }
+  }
+}

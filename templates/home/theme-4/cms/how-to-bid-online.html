@@ -1,0 +1,158 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+  
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  How to 
+                </h3>
+                <h1>
+                  Bid
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+
+    <section class="bidprocess-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <h2>
+              How the registration and bidding<span class="hr-line"></span>
+            </h2>
+            <h2 class="tagline">
+              process <span class="red-text pl10">works online</span>
+            </h2>
+            <p>
+              Bidding is simple and intuitive. We take you through a quick registration to get you set up and off you go. Here’s a quick overview.
+            </p>
+
+            <ul class="progress-barr">
+              <li>
+                <div class="icon-box">
+                  <div class="icons"><span class="icon icon-1" role="presentation"></span></div>
+                </div>
+                <div class="number">1</div> <h6>Choose your <span class="required">Property</span></h6></li>
+              <li>
+                <div class="icon-box">
+                  <div class="icons"><span class="icon icon-2" role="presentation"></span></div>
+                </div>
+                <div class="number">2</div> <h6>Register to <span class="required">bid</span></h6></li>
+              <li>
+                <div class="icon-box">
+                  <div class="icons"><span class="icon icon-3" role="presentation"></span></div>
+                </div>
+                <div class="number">3</div> <h6>Once <span class="required">approved</span>, we’ll keep you updated with <span class="required">reminders</span></h6></li>
+              <li>
+                <div class="icon-box">
+                  <div class="icons"><span class="icon icon-4" role="presentation"></span></div>
+                </div>
+                <div class="number">4</div> <h6>On auction day, sign in and select your <span class="required">auction</span></h6></li>
+              <li>
+                <div class="icon-box">
+                  <div class="icons"><span class="icon icon-5" role="presentation"></span></div>
+                </div>
+                <div class="number">5</div> <h6><span class="required">Watch and bid</span> with confidence</h6></li>
+              <li>
+                <div class="icon-box">
+                  <div class="icons"><span class="icon icon-6" role="presentation"></span></div>
+                </div>
+                <div class="number">6</div> <h6>If you are successful you’ll receive a call from the Vendor’s agent and proceed to electronic <span class="required">contract signing</span></h6></li>
+            </ul>
+
+          </div><!-- End .col-lg-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </section> <!-- End .bidprocess-wrap -->
+
+    <section class="bidwork-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <h2>{{ bid.page_title|default:'How to Bid Online' }}</h2>
+            <div class="item">
+              <div class="block">
+                {% if bid.page_content %}
+                {% autoescape off %}
+                {{ bid.page_content }}
+                {% endautoescape %}
+                {% else %}
+                <p>
+                  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                </p>
+                <p>
+                  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+                </p>
+                {% endif %}
+
+              </div>
+              <div class="block">
+                <div class="pic">
+                  <a role="button" href="javascript:void(0)" aria-label="video" tabindex="1" data-toggle="modal" data-target="#videoModal">
+                    <iframe width="100%" height="396" src="https://www.youtube.com/embed/y9j-BL5ocW8" title="YouTube video player" aria-label="video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% if not request.session.user_id %}
+    <div class="register-today">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="register-today-wrap">
+              <h3>
+                Why wait? Register today!
+              </h3>
+              <form action="">
+                <input type="text" class="form-control" placeholder="Your email address" role="textbox" aria-label="Email Address">
+                <button role="button" class="btn btn-primary" aria-label="Signup">Signup</button>
+              </form>
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .register-today -->
+    {% endif %}
+  <div id="videoModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <iframe width="100%" height="495" src="https://www.youtube.com/embed/y9j-BL5ocW8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .logoutModal -->
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+{% endblock %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+{% endblock %}

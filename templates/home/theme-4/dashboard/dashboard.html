@@ -1,0 +1,809 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+<div id="main-link" class="body-content">
+    
+  <div class="banner-wrap">
+    <div class="banner-slider">
+    {% if dashboard_data.banner_images %}
+      {% for banner in dashboard_data.banner_images %}
+        <div class="item">
+          <img src="{{ aws_url }}{{ banner.bucket_name }}/{{ banner.doc_file_name }}" alt="real estate sales">
+        </div>
+      {% endfor %}
+    {% else %}
+          <div class="item">
+            <img src="{% static 'theme-4/images/banner-1.png' %}" alt="real estate sales">
+          </div>
+    {% endif %}
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-5 col-md-6 col-sm-12">
+          <h4 aria-level="4">
+            <strong>{{ dashboard_data.custom_site_settings.website_name|default:'Gsa Group' }}</strong>
+          </h4>
+          <h1 aria-level="1" aria-label="heading">
+            {{ dashboard_data.custom_site_settings.banner_headline|default:'Selling To The Highest Bidder'|slice:":40" }}
+          </h1>
+          
+          <a role="button" href="/our-listing" class="btn btn-primary" tabindex="10">START BIDDING NOW</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .banner-wrap -->
+
+  <div class="welcome-wrap">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-10 col-lg-offset-1 col-md-12">
+          <h2 aria-level="2">
+            Welcome to <span>{{ dashboard_data.custom_site_settings.website_name|default:'Who We Are' }}</span>
+          </h2>
+          
+            <p>
+              {% if dashboard_data.custom_site_settings.about_description %}
+              {% autoescape off %}
+              {{ dashboard_data.custom_site_settings.about_description|striptags }}
+              {% endautoescape %}
+
+            {% else %}
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+            {% endif %}
+            </p>
+            <div class="pt10">
+              <a role="button" href="/bid-online/" class="btn btn-primary" tabindex="11">View More</a>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- End .welcome-wrap -->
+
+  <div class="real-wrap">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 center pb20">
+          <h2 aria-level="2">
+            RETHINK
+            <span>
+              Real Estate
+            </span>
+          </h2>
+          {% if dashboard_data.custom_site_settings.extended_description %}
+          <p>
+            {% autoescape off %}
+            {{ dashboard_data.custom_site_settings.extended_description }}
+            {% endautoescape %}
+          </p>
+          {% else %}
+          <p>
+            <strong>Gsa Group </strong> is revolutionizing the way real estate is sold.
+          </p>
+          <p>
+            We took the best features from real estate auctions and traditional real estate and created an innovative multi auction platform that works better than any other selling methods in any market condition
+          </p>
+          {% endif %}
+        </div>
+
+        <div class="col-lg-12 col-md-12">
+          <div class="real-slider">
+            {% for auctions in auction_name %}
+              <div class="item">
+                <a role="button" href="/auction-type/" tabindex="35">
+                  <div class="box">
+                    <div class="icon-box">
+                      <span>
+                        <img src="{% static auctions.img_path %}" role="img" alt="real estate sales">
+                      </span>
+                    </div>
+                    <h3 aria-level="3">
+                      {{auctions.auction_name|safe}}
+                    </h3>
+                    <p>{{auctions.text}}</p>
+                  </div>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- End .real-wrap -->
+
+      
+
+      <div class="experties-wrap">
+
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-8 col-md-10 col-sm-12 col-lg-offset-2  col-md-offset-1 center">
+              <h2 aria-level="2">
+                Our Expertise <span>Specializing In</span>
+              </h2>
+              <h5 aria-level="5">
+                {{ site_detail.website_name|default:'Gsa Group' }} is revolutionizing the way real estate is sold.
+              </h5>
+              <p>
+                We took the best features from real estate auctions and traditional real estate and created an innovative multi auction platform that works better than any other selling methods in any market condition
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="experties-bg">
+          <div class="container-fluid">
+            
+              <ul>
+                {% comment %}
+                <li>
+                  <div class="bg">
+                    <div class="pic">
+                      <img src="{% static 'theme-4/images/exp-2.jpg' %}" alt="real estate sales">
+                    </div>
+                    <div class="content">
+                      <h5 aria-level="2">
+                        House
+                      </h5>
+                      <p>
+                        revolutionizing the way real estate is sold We took the best
+                      </p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="bg">
+                    <div class="pic">
+                      <img src="{% static 'theme-4/images/exp-3.jpg' %}" alt="real estate sales">
+                    </div>
+                    <div class="content">
+                      <h5 aria-level="2">
+                        Auction
+                      </h5>
+                      <p>
+                        revolutionizing the way real estate is sold We took the best
+                      </p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="bg">
+                    <div class="pic">
+                      <img src="{% static 'theme-4/images/exp-4.jpg' %}" alt="real estate sales">
+                    </div>
+                    <div class="content">
+                      <h5 aria-level="2">
+                        Land
+                      </h5>
+                      <p>
+                        revolutionizing the way real estate is sold. We took the best features from real estate
+                      </p>
+                    </div>
+                  </div>
+                </li>
+                
+                <li>
+                  <div class="bg">
+                    <div class="pic">
+                      <img src="{% static 'theme-4/images/exp-6.jpg' %}" alt="real estate sales">
+                    </div>
+                    <div class="content">
+                      <h5 aria-level="2">
+                        Commercial
+                      </h5>
+                      <p>
+                        revolutionizing the way real estate is sold We took the best
+                      </p>
+                    </div>
+                  </div>
+                </li>
+                {% endcomment %}
+                {% for expertise in expertise_name %}
+                  {% if forloop.counter == 4 %}
+                    
+                  {% endif %}
+                  <li>
+                    <div class="bg">
+                      <div class="pic">
+                        <img src="{% static expertise.img_path %}" alt="real estate sales">
+                      </div>
+                      <div class="content">
+                        <h5 aria-level="2">
+                          {{expertise.expertise_name}}
+                        </h5>
+                        <p>
+                          {{expertise.text}}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+                  
+          </div>
+        </div>
+      </div><!-- End .experties-wrap -->
+
+      {% if dashboard_data.featured_property|length > 0 %}
+      <div id="featured-property" class="featured-property">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <h2 aria-level="2">
+                Featured
+                <span>
+                  Properties
+                </span>
+              </h2>
+              <p>
+                Is revolutionizing the way real estate is sold. We took the best features from
+              </p>
+              {% if dashboard_data.featured_property|length < 3 %}
+              <div class="featured-slider">
+              {% else %}
+              <div class="featured-slider featured-sliderr">
+              {% endif %}
+                {% for property in dashboard_data.featured_property %}
+                  {% now "U" as todays_date %}
+                  {% define_var property.start_date|parse_iso|date:"U" as start_date %}
+                  {% define_var property.end_date|parse_iso|date:"U" as end_date %}
+                  {% define_var property.end_date|remaining_hours|default:'' as remain_hr %}
+                  {% add_days property.added_on|parse_iso 15 as traditional_time %}
+                  {% define_var traditional_time|date:"U" as traditional_status_time %}
+                <div class="itemm {% if property.sale_by_type_id == 4 %}auction-hide{% endif %}">
+                  <div class="shadow">
+                    <div role="button" aria-label="like button" tabindex="1" class="like_post {% if property.is_favourite %}active{% endif %}" {% if request.session.user_id %}onclick="dashboard_favourite_listing({{ property.id }}, this);"{% else %}onclick="location.href='{% url 'login' %}?next=/'"{% endif %}>
+                      <span class="icon star-icon" role="presentation">&nbsp;</span>
+                    </div><!-- End .like_post -->
+                    <a role="button" href="/asset-details/?property_id={{ property.id }}">
+                      <div class="pic" role="figure">
+                        <img class="slide-fixed" src="{% static 'theme-4/images/transparent2.png' %}" alt="real estate sales">
+                        {% if property.idx_property_image|length and property.idx_property_id %}
+                          <img class="slide-img" src="{% if property.idx_property_image.upload %}{{property.idx_property_image.upload}}{% else %}{% static 'theme-4/images/default-img.png' %}{% endif %}" alt="real estate sales">
+                        {% else %}
+                          <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/default-img.png' %}{% endif %}" alt="real estate sales">
+                        {% endif %}
+                        <div class="top">
+                          <h6 class="property-price" aria-level="6">
+                            
+                              {% if property.sale_by_type_id == 4 %}
+                                Asking Price
+                              {% elif property.sale_by_type_id == 7 %}
+                            
+                                {% if property.highest_best_format == 3 %}
+                                  {% if property.un_priced == True %}
+                                    {% if property.current_best_offer %}
+                                      Current Offer
+                                    {% else %}
+                                      Unpriced
+                                    {% endif %}
+                                  {% else %}
+                                    {% if property.current_best_offer %}
+                                      Current Offer
+                                    {% else %}
+                                      Asking Price
+                                    {% endif %}
+                                  {% endif %}
+                                {% else %}
+                                  {% if property.un_priced == True %}
+                                    Unpriced
+                                  {% else %}
+                                    Asking Price
+                                  {% endif %}
+
+                                {% endif %}
+                              {% else %}
+                                {% if property.property_current_price %}
+                                  Current Bid
+                                {% else %}
+                                  Starting Bid
+                                {% endif %}
+                              {% endif %}
+                            
+                            {% if property.sale_by_type_id == 7 %}
+                            <span>
+                              {% if property.highest_best_format == 3 %}
+                                {% if property.un_priced == True %}
+                                  {% if property.current_best_offer %}
+                                    ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                  {% endif %}
+                                {% else %}
+                                  {% if property.current_best_offer %}
+                                    ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                  {% else %}
+                                    ${{ property.start_price|convert_num|intcomma|default:'0' }}
+                                  {% endif %}
+                                {% endif %}
+                              {% else %}
+                                {% if property.un_priced == False %}
+                                  ${{ property.start_price|convert_num|intcomma|default:'0' }}
+                                {% endif %}
+                              {% endif %}
+                            </span>
+                            {% else %}
+                            <span>
+                              {% if property.property_current_price %}
+                                ${{ property.property_current_price|convert_num|intcomma|default:'0' }}
+                              {% else %}
+                                ${{ property.start_price|convert_num|intcomma|default:'0' }}
+                              {% endif %}
+                            </span>
+                            {% endif %}
+                          </h6>
+                          <div class="badgeBoxes">
+                            <span class="stripe">
+                              {% if property.sale_by_type_id == 1 %}
+                                    {% if todays_date <= start_date %}
+                                    Coming Soon
+                                    {% elif todays_date > start_date and todays_date <= end_date %}
+                                      {% if remain_hr > 24 %}
+                                      Now Bidding
+                                      {% else %}
+                                      Closing Today
+                                      {% endif %}
+                                    {% else %}
+                                    {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type_id == 4 %}
+                                    {% if property.status_id == 1 %}
+                                      {% if todays_date < traditional_status_time %}
+                                        New
+                                      {% else %}
+                                        {{ property.status|default:'' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+      
+                                  {% else %}
+                                  {{ property.status|default:'' }}
+                                  {% endif %}
+                            </span>
+                          </div><!-- End .badgeBoxes -->
+                        </div>
+                      </div>
+                      <div class="content">
+                        <div class="auction-startup">
+                          <div class="property-info">
+                            <h6 aria-level="6">
+                              <span>
+                                {{property.property_asset}}- ({{property.auction_type}})
+                              </span>
+                              {{property.address}}
+                            </h6>
+                          </div><!-- End .property-info -->
+                          <div class="auction-start" style="{% if property.sale_by_type_id == 4 %}display:none;{% endif %}">
+                            <span class="covert_auction_date_range_all_listings" data-start-date="{{ property.start_date|default:'' }}" data-end-date="{{ property.end_date|default:'' }}">
+                              Auction On August 30 - September 1 , 2021 3 PM CT
+                            </span>
+                          </div><!-- End .auction-start -->
+                        </div><!-- End .auction-startup -->
+
+                        <ul class="tags">
+                          <li>
+                            {{ property.auction_type|default:'' }}
+                          </li>
+                          <li class="blue-bg">
+                            {{ property.property_asset|default:'' }}
+                          </li>
+                        </ul><!-- End .tags -->
+
+                      </div>
+                    </a>
+                  </div>
+                </div>
+                
+                {% endfor %}
+              </div>
+
+              <div class="right pt20">
+                <a role="button" href="/our-listing/" class="btn btn-primary" tabindex="20">View All Properties</a>
+              </div>
+                
+            </div>
+          </div>
+        </div>
+      </div><!-- End .featured-property -->
+
+      {% endif %}
+      <div class="why-works">
+        <h2 aria-level="2">
+          Why Work With Us
+          <span>Proven Performance</span>
+        </h2>
+        <div class="inner-wrap">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-6 col-lg-offset-6 col-md-6 col-md-offset-6 col-sm-12">
+                <ul>
+                  {% for item in pre_number_list %}
+                  {% get_list_value dashboard_data.dashboard_numbers forloop.counter0 'id' as number_id %}
+                  {% get_list_value dashboard_data.dashboard_numbers forloop.counter0 'title' as number_title %}
+                  {% get_list_value dashboard_data.dashboard_numbers forloop.counter0 'value' as number_value %}
+                  {% get_list_value dashboard_data.dashboard_numbers forloop.counter0 'status' as number_status %}
+                  <li>
+                    <div class="block">
+                      <h2 class="count" aria-level="2">
+                        {% if number_value %}{{ number_value }}{% else %}{{ item.value }}{% endif %}
+                      </h2>
+                      <h3 aria-level="3">
+                        {% if number_title %}{{ number_title }}{% else %}{{ item.title }}{% endif %}
+                      </h3>
+                    </div>
+                  </li>
+                  {% endfor %}
+                  {% comment %}
+                  <li>
+                    <div class="block">
+                      <h2 class="count" aria-level="2">
+                        26
+                      </h2>
+                      <h3 aria-level="3">
+                        Exceptional <span>Properties</span>
+                      </h3>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="block">
+                      <h2 class="count" aria-level="2">
+                        200
+                      </h2>
+                      <h3 aria-level="3">
+                        Satisfied <span>Buyer-Seller</span>
+                      </h3>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="block">
+                      <h2 aria-level="2">
+                        +20K
+                      </h2>
+                      <h3 aria-level="3">
+                        Email <span>Subscriber</span>
+                      </h3>
+                    </div>
+                  </li>
+                  {% endcomment %}
+                </ul>
+                
+              </div><!-- End .col-lg-12 -->
+            </div><!-- End .row -->
+          </div><!-- End .container-fluid -->
+        </div><!-- End .inner-wrap -->
+      </div><!-- End .brokerage-works -->
+
+      <div class="property-value">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-10 col-lg-offset-1 col-md-12">
+              <h2 aria-level="2">
+                <span>Property Bot</span>
+                Property Value Estimator
+              </h2>
+  
+              <div class="content">
+                <div class="pic">
+                  <img src="{% static 'theme-4/images/property-value.png' %}" alt="real estate sales">
+                </div>
+                <h3 aria-level="3">
+                  Get Your <span>Estimation</span>
+                </h3>
+                <h5 aria-level="5">
+                  How much is your property worth?
+                </h5>
+  
+                <ul>
+                  <li>
+                    <div class="icons">
+                      <img src="{% static 'theme-4/images/bot-icon-1.svg' %}" alt="real estate sales">
+                    </div>
+                    <h5 aria-level="5">
+                      Enter the address and confirm details about your property
+                    </h5>
+                  </li>
+                  <li>
+                    <div class="icons">
+                      <img src="{% static 'theme-4/images/bot-icon-2.svg' %}" alt="real estate sales">
+                    </div>
+                    <h5 aria-level="5">
+                      Your detailed property valuation report delivered in 24 hours
+                    </h5>
+                  </li>
+                  <li>
+                    <div class="icons">
+                      <img src="{% static 'theme-4/images/bot-icon-3.svg' %}" alt="real estate sales">
+                    </div>
+                    <h5 aria-level="5">
+                      Quality review by our specialist
+                    </h5>
+                  </li>
+                </ul>
+                
+                <a role="button" href="/property-value-estimator/" class="btn btn-primary" tabindex="21">Get Estimate</a>
+              </div>
+              
+            </div><!-- End .col-md-12 -->
+          </div><!-- End .row -->
+        </div><!-- End .container -->
+      </div><!-- End .modern-business -->
+      
+      
+      {% if dashboard_data.articles %}
+      <div class="article-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 aria-level="2">
+                Latest <span>Blogs</span>
+              </h2>
+              
+              <ul>
+                {% for article in dashboard_data.articles %}
+                <li>
+                  <div class="item">
+                    <div class="pic">
+                      <img class="slide-fixed" src="{% static 'theme-4/images/trans16x9.png' %}" alt="real estate sales">
+                      <img class="slide-img" src="{% if article.article_image_name %}{{ aws_url}}{{ article.article_image_name_bucket_name }}/{{ article.article_image_name }}{% else %}{% static 'theme-4/images/article-1.jpg' %}{% endif %}" alt="real estate sales">
+                      <small>
+                        {{ article.category_name|striptags|slice:":30"|default:'Business' }}
+                      </small>
+                    </div>
+                    <div class="content">
+                      <div class="date">05 May 2021</div>
+                      <h6 aria-level="6">
+                        {% autoescape off %}
+                        {{ article.title|striptags|slice:":51"|default:'Skills That You Can Learn In The Real Estate Market' }}
+                        {% endautoescape %}
+                      </h6>
+                      <p>
+                        Lorem Ipsum is simply dummy text of the printing and typeing industry Lorem Ipsum
+                      </p>
+                      <div class="more">
+                        <a role="button" href="/blog-details/?id={{ article.id }}" tabindex="22">View More <i class="fa-light fa-circle-arrow-right" role="presentation"></i></a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+              
+            </div>
+          </div>
+        </div>
+      </div><!-- End .article-wrap -->
+
+      <div class="partners-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              {% if site_detail.footer_images|length > 6 %}
+              <ul data-logo-count="{% if site_detail.footer_images %}{{ site_detail.footer_images|length }}{% else %}0{% endif %}" >
+              {% else %}
+              <ul data-logo-count="{% if site_detail.footer_images %}{{ site_detail.footer_images|length }}{% else %}0{% endif %}">
+                {% endif %}
+                {% if site_detail.footer_images %}
+                  {% for footer in site_detail.footer_images %}
+                  <li>
+                    <img src="{% if footer.doc_file_name %}{{ aws_url}}{{ footer.bucket_name }}/{{ footer.doc_file_name }}{% else %}{% static 'theme-4/images/partner-1.png' %}{% endif %}" alt="real estate sales">
+                  </li>
+                  {% endfor %}
+                  {% endif %}
+                </ul>
+              </ul>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% endif %}
+{% if request.session.user_id %}
+      {% else %}
+      <div class="register-today">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12 col-md-12">
+              <div class="register-today-wrap">
+                <h3 aria-level="3">
+                  Why wait? Register today!
+                </h3>
+                <form action="" role="form">
+                  <input type="text" class="form-control" placeholder="Your email address" role="textbox" aria-label="Email Address">
+                  <button role="button" class="btn btn-primary" aria-label="Signup">Signup</button>
+                </form>
+              </div>
+            </div><!-- End .col-md-12 -->
+          </div><!-- End .row -->
+        </div><!-- End .container-fluid -->
+      </div><!-- End .register-today -->
+  {% endif %}
+
+  </div><!-- end .body-content -->
+{% endblock %}
+{% block js_content %}
+
+  <script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+  <script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=1.1"></script>
+  <script type="text/javascript" src="{% static 'theme-common/js/slick.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+<!--  <script type="text/javascript" src="{% static 'theme-common/js/home_tour.js' %}?v=3.1"></script>-->
+<script>
+<!--    var is_first_login = {{is_first_login}};-->
+<!--    var user_id = {{ request.session.user_id }};-->
+    $(".banner-slider").slick({
+        dots: true,
+        infinite: true,
+        slidesToShow: 1,
+        adaptiveHeight:true,
+      });
+
+      $(".real-sliderrr").slick({
+        dots: false,
+        infinite: true,
+        slidesToShow: 4,
+        adaptiveHeight:true,
+        responsive: [
+          {
+            breakpoint: 1281,
+            settings: {
+              slidesToShow: 3,
+              slidesToScroll: 1,
+              infinite: true,
+              dots: true
+            }
+          },
+          {
+            breakpoint: 767,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1
+            }
+          }
+        ]
+      });
+
+      $(".featured-sliderr").slick({
+        dots: false,
+        infinite: true,
+        slidesToShow: 3,
+        adaptiveHeight:true,
+        responsive: [
+          {
+            breakpoint: 1281,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1,
+              infinite: true,
+              dots: true
+            }
+          },
+          {
+            breakpoint: 767,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1
+            }
+          }
+        ]
+      });
+
+    // Counter
+    $(document).ready(function() {
+
+      var counters = $(".count");
+      var countersQuantity = counters.length;
+      var counter = [];
+
+      for (i = 0; i < countersQuantity; i++) {
+        counter[i] = parseInt(counters[i].innerHTML);
+      }
+
+      var count = function(start, value, id) {
+        var localStart = start;
+        setInterval(function() {
+          if (localStart < value) {
+            localStart++;
+            counters[id].innerHTML = localStart;
+          }
+        }, 40);
+      }
+
+      for (j = 0; j < countersQuantity; j++) {
+        count(0, counter[j], j);
+      }
+      });
+  // End counter
+
+    $('.dashboard_date_to_local_time').each(function(){
+        try{
+            var added_on = $(this).html();
+            if(added_on.trim() != "" && added_on.trim() != "None"){
+                var local_date = getLocalDate(added_on.trim(), 'mm-dd-yyyy','ampm');
+                //console.log(local_date);
+                actual_date = local_date.split(" ");
+                //actual_date = actual_date[0]+' '+actual_date[1]+' '+actual_date[2];
+                $(this).html(actual_date[0]);
+            }else{
+                $(this).html('');
+            }
+        }catch(ex){
+            console.log(ex);
+        }
+    });
+    function getLocalDate(myTimeStamp, dateformat, timeformat){
+    var dateX = new Date(myTimeStamp);
+    var dateY = new Date();
+    var date = '';
+    if(myTimeStamp.includes('Z')){
+        //if utc format
+        date = new Date(dateX.getTime());
+    }
+    else{
+        // for non utc format
+        date = new Date(dateX.getTime() - dateY.getTimezoneOffset() * 60000);
+    }
+    var fullyear = date.getFullYear();
+    var halfYear = parseInt(date.getFullYear().toString().substr(2,2), 10);
+    var mts = date.getMonth()+1;
+    var short_month_name = date.toLocaleString('default', { month: 'short' })
+    var long_month_name = date.toLocaleString('default', { month: 'long' })
+    var month_num = (mts < 10)?'0'+mts:mts;
+    var dt = (date.getDate() < 10)?'0'+date.getDate():date.getDate();
+    var hrs = (date.getHours() < 10)?'0'+date.getHours():date.getHours();
+    var mins = (date.getMinutes() < 10)?'0'+date.getMinutes():date.getMinutes();
+    var secs = (date.getSeconds() < 10)?'0'+date.getSeconds():date.getSeconds();
+    var timeStp = '';
+    if(dateformat == 'yyyy-mm-dd'){
+        timeStp = fullyear+'-'+month_num+'-'+dt;
+    }else if(dateformat == 'mm-dd-yyyy'){
+        timeStp = month_num+'-'+dt+'-'+fullyear;
+    }else if(dateformat == 'dd-mm-yyyy'){
+        timeStp = dt+'-'+month_num+'-'+fullyear;
+    }else if(dateformat == 'dd-mm-yy'){
+        timeStp = dt+'-'+month_num+'-'+halfYear;
+    }else if(dateformat == 'mm-dd-yy'){
+        timeStp = month_num+'-'+dt+'-'+halfYear;
+    }else if(dateformat == 'yy-mm-dd'){
+        timeStp = halfYear+'-'+month_num+'-'+dt;
+    }else if(dateformat == 'j m, Y'){
+        timeStp = dt+' '+short_month_name+', '+fullyear;
+    }else if(dateformat == 'm j, Y'){
+        timeStp = short_month_name+', '+dt+' '+fullyear;
+    }else if(dateformat == 'M j, Y'){
+        timeStp = long_month_name+' '+dt+', '+fullyear;
+    }else if(dateformat == 'j M, Y'){
+        timeStp = dt+' '+long_month_name+', '+fullyear;
+    }
+    if(timeformat =='ampm'){
+        var mer = (parseInt(hrs) >= 12)?'PM':'AM';
+        hrs = parseInt(hrs) % 12;
+        hrs = (hrs)?hrs:12;
+        timeStpDate = timeStp+" "+hrs+":"+mins+" "+mer;
+    }else{
+        timeStpDate = timeStp+" "+hrs+":"+mins+":"+secs;
+    }
+    return timeStpDate;
+}
+  </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script>
+  const socket_domain = "{{ node_url }}";
+  var site_id = "{{ site_id|default:'' }}";
+</script>
+<script type="text/javascript" src="{% static 'theme-common/js/home_socket.js' %}?v=1.1"></script>
+{% endblock %}

@@ -1,0 +1,268 @@
+.footer {
+  @include fullwidth();
+  padding: 50px 0 0;
+  margin: 0;
+  background: #262424;
+  color: $white;
+  clear: both;
+  @include breakpoint(xs) {
+    padding: 30px 0 0;
+  }
+  .footer-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 25px;
+    @include breakpoint(xs) {
+      display: block;
+    }
+    .block {
+      width: 18%;
+      padding: 0 20px;
+      @include breakpoint(xs) {
+        width: 100%;
+        padding: 0 0 20px;
+      }
+      &:first-child {
+        width: 28%;
+        padding-left: 0;
+        padding-right: 30px;
+        @include breakpoint(xs) {
+          width: 100%;
+          padding-right: 0px;
+        }
+      }
+      &:last-child {
+        padding-right: 0;
+      }
+      h6 {
+        border-bottom: 1px solid $white;
+        display: inline-block;
+        font-weight: 400;
+      }
+      .address {
+        li { 
+          padding: 8px 0 8px 45px;
+          font-size: $fontExtraLarge;
+          font-weight: 300;
+          display: flex;
+          position: relative;
+          @include breakpoint(sm) {
+            font-size: $fontLarge;
+          }
+          @include breakpoint(xxs) {
+            font-size: $fontMiddle;
+          }
+          .icon {
+            position: absolute;
+            left: 0;
+            @include iconBg();
+            background-color: transparent;
+            width: 30px;
+            height: 31px;
+            
+            &.home-icon {
+                background-position: -380px -245px;
+            }
+            &.email-icon {
+                background-position: -448px -245px;
+            }
+            &.ph-icon {
+                background-position: -515px -245px;
+            }
+            &.book-icon {
+                background-position: -583px -241px;
+            }
+            
+        }
+        }
+      }
+
+      ul.links {
+        li {
+          padding: 5px 0;
+          a {
+            color: $white;
+            font-weight: 300;
+            &:hover {
+              color: rgba($color: #FFF, $alpha: 0.5);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .footer-middle  {
+    padding: 15px 50px;
+    margin-bottom: 20px;
+    position: relative;
+    @include breakpoint(xs) {
+      padding: 0 10px;
+    }
+    .owl-carousel .owl-stage {
+      display: flex;
+      align-items: center;
+      .owl-item {
+        img {
+          -webkit-filter: grayscale(100%);
+          filter: grayscale(100%);
+          -webkit-transition: .3s ease-in-out;
+          transition: .3s ease-in-out;
+        }
+        &:hover {
+          img {
+            -webkit-filter: grayscale(0);
+            filter: grayscale(0);
+          }
+        }
+      }
+    }
+    .company-logo {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      > div {
+          width: 16%;
+          padding: 0 10px;
+          @include breakpoint(xs) {
+            width: 20%;
+          }
+          img {
+            -webkit-filter: grayscale(100%);
+            filter: grayscale(100%);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+          }
+          &:hover {
+            img {
+              -webkit-filter: grayscale(0);
+              filter: grayscale(0);
+            }
+          }
+      }
+    }
+    
+    ul  {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      li {
+        img {
+          -webkit-filter: grayscale(100%);
+          filter: grayscale(100%);
+          -webkit-transition: .3s ease-in-out;
+          transition: .3s ease-in-out;
+        }
+        &:hover {
+          img {
+            -webkit-filter: grayscale(0);
+	          filter: grayscale(0);
+          }
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    font-weight: 300;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-top: 1px solid rgba($color: #FFF, $alpha: 0.5);
+    @include breakpoint(xs) {
+      display: block;
+    }
+    @include breakpoint(xxs) {
+      font-size: $fontMiddle;
+    }
+    ul {
+      display: flex;
+      &.social-links {
+        li {
+          padding: 0 6px;
+          &:first-child {
+            padding-left: 0;
+          }
+          &:last-child {
+            padding-right: 0;
+          }
+          &.facebook {
+            a {
+              &:hover {
+                color: #1877f2;
+              }
+            }
+          }
+          &.twitter {
+            a {
+              &:hover {
+                color: #1da1f2;
+              }
+            }
+          }
+          &.youtube {
+            a {
+              &:hover {
+                color: #ff0000;
+              }
+            }
+          }
+          &.linkedin {
+            a {
+              &:hover {
+                color: #0a66c2;
+              }
+            }
+          }
+          &.instagram {
+            a {
+              &:hover {
+                color: #517fa4;
+              }
+            }
+          }
+          a {
+            color: $white;
+            text-align: center;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            font-size: $fontMiddle;
+            border: 1px solid $white;
+            display: inline-block;
+            @include border-radius(100%);
+            background: rgba($color: #484848, $alpha: 0.5);
+            &:hover {
+                background: $white;
+            }
+          }
+        }
+      }
+      li {
+        padding: 0 15px;
+        @include breakpoint(xs) {
+          padding: 0 15px 5px 0;
+        }
+        a {
+          color: rgba($color: #FFF, $alpha: 0.5);
+          &:hover {
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+.copyright {
+  clear: both;
+  padding: 10px 0;
+  background: $gray;
+  text-align: right;
+  color: $white;
+  font-size: $fontMiddle;
+  line-height: 28px;
+  font-weight: 300;
+}

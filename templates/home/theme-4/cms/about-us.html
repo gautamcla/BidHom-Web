@@ -1,0 +1,141 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+   
+  <div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="blog-header-inner">
+              <div class="heading">
+                <h3>
+                  About Our 
+                </h3>
+                <h1>
+                  Company
+                </h1>
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <div class="our-mission">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="item">
+              <div class="block">
+                <h2>
+                  {{ data.content.page_title|default:'About Us' }}
+                </h2>            
+              </div>
+              <div class="block">
+                <figure>
+                  <span class="wwwu-inner-border-accent wow fadeInLeft"></span>
+                  <span class="wwwu-outer-border-accent wow fadeInRight"></span>
+                  <img src="{% static 'theme-4/images/about.png' %}" alt="real estate sales">
+                </figure>
+              </div>
+            </div>
+            <div class="content">
+              {% autoescape off %}
+                  {{ data.content.page_content|default:'' }}
+              {% endautoescape %}
+            </div>
+          </div>
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .our-mission -->   
+
+
+    <div class="list-items">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <ul>
+              <li>
+                <div class="heading">
+                  <h5>
+                    Our 
+                  </h5>
+                  <h4>
+                    Listings
+                  </h4>
+                  <a role="button" tabindex="1" href="/our-listing" class="btn btn-secondary">Search</a>
+                </div>
+              </li>
+              <li>
+                <div class="heading">
+                  <h5>
+                    Property BOT 
+                  </h5>
+                  <h4>
+                    Value Estimator
+                  </h4>
+                  <a role="button" tabindex="2" href="/property-value-estimator/" class="btn btn-secondary">Get Started</a>
+                </div>
+              </li>
+              <li>
+                <div class="heading">
+                  <h5>
+                    Auction 
+                  </h5>
+                  <h4>
+                    Types
+                  </h4>
+                  <a role="button" tabindex="3" href="/auction-type/" class="btn btn-secondary">Learn More</a>
+                </div>
+              </li>
+              <li>
+                <div class="heading">
+                  <h5>
+                    Stay Informed 
+                  </h5>
+                  <h4>
+                    Listing Alerts
+                  </h4>
+                  <a role="button" tabindex="4" href="{% url 'register' %}" class="btn btn-secondary">Sign Up</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div><!-- End .list-items -->
+
+    {% if sess_user_id %}
+    {% else %}
+    <div class="register-today">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="register-today-wrap">
+              <h3>
+                Why wait? Register today!
+              </h3>
+              <form action="">
+                <input type="text" class="form-control" placeholder="Your email address" role="textbox" aria-label="Email Address">
+                <button role="button" class="btn btn-primary" aria-label="Signup">Signup</button>
+              </form>
+              <!-- <div class="button">
+                <a href="{% if sess_user_id %}javascript:void(0);{% else %}{% url 'register' %}{% endif %}" class="btn btn-primary">Signup now</a>
+              </div> -->
+            </div>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .register-today -->
+    {% endif %}
+  </div><!-- end .body-content -->
+{% endblock %}
+
+{% block js_content %}
+<script type="text/javascript" src="{% static '/theme-common/js/common.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,237 @@
+@mixin breakpoint($point) {
+  @if $point == laptop {
+    @media (max-width: 1500px) {
+      @content;
+    }
+  } @else if $point == lg {
+    @media (max-width: 1280px) {
+      @content;
+    }
+  } @else if $point == md {
+    @media (max-width: 1199px) {
+      @content;
+    }
+  } @else if $point == sm {
+    @media (max-width: 991px) {
+      @content;
+    }
+  } @else if $point == xs {
+    @media (max-width: 767px) {
+      @content;
+    }
+  } @else if $point == xxs {
+    @media (max-width: 479px) {
+      @content;
+    }
+  }
+}
+
+//Import custom varialbles
+@import "../custom-scss/custom-variable";
+
+input[type="checkbox"].css-checkbox {
+  position: absolute;
+  z-index: -1000;
+  left: -1000px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+input[type="checkbox"].css-checkbox + label.check-label {
+  padding-left: 25px;
+  height: 17px;
+  display: inline-block;
+  line-height: 17px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  font-size: $fontMedium;
+  vertical-align: middle;
+  cursor: pointer;
+  color: $black;
+  letter-spacing: normal;
+  text-transform: capitalize;
+  margin-bottom: 0;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  @include breakpoint(laptop) {
+    font-size: $fontMiddle;
+  }
+}
+input[type="checkbox"].css-checkbox:checked + label.check-label {
+  background-position: 0 -31px;
+  color: $black;
+}
+label.check-label {
+  background-image: url(../images/checkbox.svg);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+
+
+input[type=radio].css-radio {
+  position:absolute; 
+  z-index:-1000; 
+  left:-1000px; 
+  overflow: hidden; 
+  clip: rect(0 0 0 0); 
+  height:1px; 
+  width:1px; 
+  margin:-1px; 
+  padding:0; 
+  border:0;
+}
+input[type=radio].css-radio + label.radio-label {
+  padding-left:28px;
+  height:18px; 
+  display:inline-block;
+  line-height:20px;
+  background-repeat:no-repeat;
+  background-position: 0 -58px;
+  font-size: $fontMedium;
+  font-weight: 400;
+  // @include font-regular();
+  vertical-align:middle;
+  cursor:pointer;
+  @include breakpoint(laptop) {
+    font-size: $fontMiddle;
+  }
+}
+input[type=radio].css-radio:checked + label.radio-label {
+  background-position: 0 0;
+}
+label.radio-label {
+  background-image:url(../images/radio-btn.svg);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+
+
+
+
+input[type=radio].avai-radio {
+  position:absolute; 
+  z-index:-1000; 
+  left:-1000px; 
+  overflow: hidden; 
+  clip: rect(0 0 0 0); 
+  height:1px; 
+  width:1px; 
+  margin:-1px; 
+  padding:0; 
+  border:0;
+}
+input[type=radio].avai-radio + label.avai-label {
+  display:inline-block;
+  font-size: $fontMiddle;
+  color: $black;
+  font-weight: 500;
+  vertical-align:middle;
+  cursor:pointer;
+  text-align: center;
+  padding: 8px 0;
+  min-width: 115px;
+  border: 1px solid #707070;
+  @include border-radius (12px);
+}
+input[type=radio].avai-radio:checked + label.avai-label {
+  border: 1px solid $secondary;
+}
+label.avai-label {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+input[type=radio].css-radioo {
+  position:absolute; 
+  z-index:-1000; 
+  left:-1000px; 
+  overflow: hidden; 
+  clip: rect(0 0 0 0); 
+  height:1px; 
+  width:1px; 
+  margin:-1px; 
+  padding:0; 
+  border:0;
+}
+input[type=radio].css-radioo + label.radioo-label {
+  height:30px; 
+  display:inline-block;
+  line-height:30px;
+  font-size: $fontMedium;
+  color: $black;
+  font-weight: 400;
+  padding: 0 20px;
+  vertical-align:middle;
+  cursor:pointer;
+}
+input[type=radio].css-radioo:checked + label.radioo-label {
+  background: $secondary;
+  color: $white;
+}
+label.radioo-label {
+  background: $white;
+  box-shadow: 0 1px 2px rgba($color: #000000, $alpha: 0.3);
+  @include border-radius(15px);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+// Custom Upload Button
+
+
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+.upload-btn {
+  border: 1px solid #d9d9d9;
+  color: $black;
+  background-color: $white;
+  padding: 9px 20px;
+  border-radius: 5px;
+  font-size: $fontMedium;
+  width: 100%;
+  line-height: 24px;
+  // @include font-regular();
+}
+
+.upload-btn-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}

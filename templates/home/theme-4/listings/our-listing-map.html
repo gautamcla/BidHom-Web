@@ -1,0 +1,2242 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/css/bootstrap-tour.css">
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+  <div class="body-content listing-body">
+
+    <div class="search-wrap" area-label="search banner" role="img">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <h1>
+              Bid or Sell a Wide Range of Properties
+            </h1>
+            <div class="search-block">
+              <form class="input-group" role="form">
+                <input type="text" class="form-control sugesstion_input" name="property_map_search_text" id="property_map_search_text" placeholder="Search City, State, Zip, Address, MLS ID" aria-label="Address" role="textbox">
+                <input type="hidden" name="agent_id" id="agent_id">
+                <button role="button" id="searchPropertyMapBtn" class="btn btn-secondary" tabindex="12" onclick="getresultmap('our_listing',1,'','','','');"><i class="fas fa-search" role="img"></i> Search</button>
+              </form>
+            </div>
+            <a role="button" href="javascript:void(0)" class="btn btn-secondary burger" aria-label="Filter" tabindex="1">More Filters <i class="fa-solid fa-filter" role="img"></i></a>
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .search-wrap -->
+
+    <div class="filter-wrap">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="filter-tab">
+              <ul class="nav nav-tabs" id="listing-tab">
+                <li class="{% if listing_filter %}{% else %}active{% endif %} all_listing_map listing_map_tab" onclick="filter_listing_map(this);">
+                  <a role="button" href="#all-listing-map" data-toggle="tab" tabindex="2">
+                    All Listings
+                  </a>
+                </li>
+                <li class="auctions_listing_map listing_map_tab {% if listing_filter == 'auctions_listing' %}active{% endif %}" onclick="filter_listing_map(this);">
+                  <a role="button" href="#auctions-listing-map" data-toggle="tab" tabindex="3">
+                    Auction Listings
+                  </a>
+                </li>
+                <li class="traditional_listing_map listing_map_tab {% if listing_filter == 'traditional_listing' %}active{% endif %}" onclick="filter_listing_map(this);">
+                  <a role="button" href="#traditional-listing-map" data-toggle="tab" tabindex="4">
+                    Traditional Listings
+                  </a>
+                </li>
+                <li class="new_listing_map listing_map_tab {% if listing_filter == 'new_listing' %}active{% endif %}" onclick="filter_listing_map(this);">
+                  <a role="button" href="#newlistings-listing-map" data-toggle="tab" tabindex="5">
+                    Newest Listings
+                  </a>
+                </li>
+                {% comment %}
+                <li class="featured_map listing_map_tab {% if listing_filter == 'featured' %}active{% endif %}" onclick="filter_listing_map(this);">
+                  <a role="button" href="#featured-map" data-toggle="tab" tabindex="6">
+                    Featured Listings
+                  </a>
+                </li>
+                {% endcomment %}
+                <li class="recent_sold_listing_map listing_map_tab {% if listing_filter == 'recent_sold_listing' %}active{% endif %}" onclick="filter_listing_map(this);">
+                  <a role="button" href="#recently-listing-map" data-toggle="tab" tabindex="7">
+                    Recently Sold
+                  </a>
+                </li>
+              </ul>
+              <div class="sorting">
+                <select name="map_datesort" class="form-control" id="map_datesort" onchange="getresultmap('our_listing',1,'','','','');" aria-label="Sort" tabindex="10">
+                  {% comment %} <option value="auction_start_date_asc" {% if sort_column == 'auction_start_date_asc' %}selected{% endif %}>Auction Start Date(ASC)</option>
+                  <option value="auction_start_date_desc" {% if sort_column == 'auction_start_date_desc' %}selected{% endif %}>Auction Start Date(DESC)</option>
+                  <option value="auction_end_date_asc" {% if sort_column == 'auction_end_date_asc' %}selected{% endif %}>Auction End Date(ASC)</option>
+                  <option value="auction_end_date_desc" {% if sort_column == 'auction_end_date_desc' %}selected{% endif %}>Auction End Date(DESC)</option> {% endcomment %}
+                  <option value="ending_soonest" {% if sort_column == 'ending_soonest' %}selected{% endif %}>Ending Soonest</option>
+                  <option value="ending_latest" {% if sort_column == 'ending_latest' %}selected{% endif %}>Ending Latest</option>
+                  <option value="highest_price" {% if sort_column == 'highest_price' %}selected{% endif %}>Highest Price</option>
+                  <option value="lowest_price" {% if sort_column == 'lowest_price' %}selected{% endif %}>Lowest Price</option>
+                  <option value="page_default" {% if sort_column == 'page_default' %}selected{% endif %}>Default Sort</option>
+                </select>
+              </div>
+            </div><!-- End .filter-tab -->
+          </div>
+        </div>
+      </div>
+
+    </div><!-- End .filter-wrap -->
+    <div id="property_map_list">
+      <div class="product-listing map-wrap">
+        <div class="container-fluid">
+
+          <div class="filter-data">
+            <div class="record">
+              {% if total %}
+              Showing page {{ page }} of {{ no_page }}
+              {% endif %}
+            </div>
+            <ul class="map-tabs" id="property-tab">
+              <li>
+                <a role="button" href="/our-listing/" tabindex="8"><i class="fas fa-list" role="img"></i>List</a>
+              </li>
+              <li class="active">
+                <a role="button" href="javascript:void(0);" tabindex="9"><i class="fas fa-map-marker-alt" role="img"></i> Map</a>
+              </li>
+            </ul>
+          </div><!-- End .filter-data -->
+
+          <div class="listing-map-wrap">
+
+            <div class="property-map listing-map-area" style="margin-top: 0;">
+              <div id="mapView" class="map_view" style="height: 700px; position: relative; overflow: hidden;"></div>
+              <div class="maps-direction zoom-control">
+                {% comment %} <button type="button" class="d-btn"><span class="icon direction-btn"></span></button> {% endcomment %}
+                <button role="button" type="button" class="d-btn fullscreen-control-icon fullscreen-control" id="maximize_map" title="Toggle Fullscreen"><span class="icon rotate-btn"></span></button>
+                <button role="button" class="d-btn zoom-control-in" title="Zoom In" id="zoom_in"><span class="icon plus-btn"></span></button>
+                <button role="button" class="d-btn zoom-control-out" title="Zoom Out" id="zoom_out"><span class="icon minus-btn"></span></button>
+              </div>
+              {% comment %}
+              <div class="map-route">
+                <div class="block">
+                  <div class="location-a pink">A</div>
+                  <div class="location-reverse"><img src="{% static 'theme-4/images/arrow-two.png' %}" alt="real estate sales"></div>
+                  <input type="text" class="form-control" placeholder="Choose a starting place" aria-label="Choose a starting place">
+                </div>
+                <div class="block">
+                  <div class="location-a gray">B</div>
+                  <input type="text" class="form-control" placeholder="Choose destination" aria-label="Choose destination">
+                </div>
+              </div>
+              <div class="traffic-list">
+                <ul>
+                  <li class="active">
+                    <a href="#">Traffic</a>
+                  </li>
+                  <li>
+                    <a href="#">Driving</a>
+                  </li>
+                  <li>
+                    <a href="#">Walking</a>
+                  </li>
+                  <li>
+                    <a href="#">Cycling</a>
+                  </li>
+                </ul>
+              </div>
+              {% endcomment %}
+            </div><!-- End .property-map -->
+
+            <div class="listing-list">
+              <div class="tab-content">
+                <div id="all-listing-map" class="tab-pane all_listing_map_content listing_map_tab_content {% if listing_filter %}{% else %}active{% endif %}">
+                  <ul class="listing listing-map">
+                    {% if property_list|length > 0 and listing_filter == '' %}
+                    {% for property in property_list %}
+                    {% now "U" as todays_date %}
+                    {% define_var property.bidding_start|parse_iso|date:"U" as start_date %}
+                    {% define_var property.bidding_end|parse_iso|date:"U" as end_date %}
+                    {% define_var property.bidding_end|remaining_hours|default:'' as remain_hr %}
+                    {% add_days property.added_on|parse_iso 15 as traditional_time %}
+                    {% define_var traditional_time|date:"U" as traditional_status_time %}
+                    <li id="listing_map_{{ property.id }}" class="{% if property.sale_by_type == 4 %}auction-hide{% endif %}" >
+                      <div class="itemm">
+                        <div role="button" aria-label="like button" tabindex="1" class="like_post {% if property.is_favourite %}active{% endif %}" title="Add to favorite" title="Add to favorite" {% if sess_user_id %}onclick="make_favourite_listing({{ property.id }}, this);"{% else %}onclick="location.href='{% url 'login' %}?next=/our-listing-map/'"{% endif %}>
+                          <span class="icon star-icon" role="presentation">&nbsp;</span>
+                        </div><!-- End .like_post -->
+                        {% if property.is_multiple_parcel %}
+                        <a tabindex="11" role="button" href="/multiple-parcel/?portfolio_id={{ property.parcel_id }}">
+                        {% else %}
+                        <a tabindex="11" role="button" href="/asset-details/?property_id={{ property.id }}">
+                        {% endif %}
+                          <div class="pic">
+                            <img class="slide-fixed" src="{% static 'theme-4/images/transparent2.png' %}" alt="Transparent">
+<!--                            <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">-->
+                            {% if property.idx_property_image|length and property.idx_property_id %}
+                            <img class="slide-img" src="{% if property.idx_property_image.upload %}{{property.idx_property_image.upload}}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                            {% else %}
+                            <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                            {% endif %}
+                            <div class="top">
+                              <h4 class="property-price">
+                                {% if property.sale_by_type == 4 %}
+                                      Asking Price
+                                    {% elif property.sale_by_type == 7 %}
+
+                                      {% if property.highest_best_format == 3 %}
+                                        {% if property.un_priced == True %}
+                                          {% if property.current_best_offer %}
+                                            Current Offer
+                                          {% else %}
+                                            Unpriced
+                                          {% endif %}
+                                        {% else %}
+                                          {% if property.current_best_offer %}
+                                            Current Offer
+                                          {% else %}
+                                            Asking Price
+                                          {% endif %}
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.un_priced == True %}
+                                          Unpriced
+                                        {% else %}
+                                          Asking Price
+                                        {% endif %}
+
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.property_current_price %}
+                                        Current Bid
+                                      {% else %}
+                                        Starting Bid
+                                      {% endif %}
+                                    {% endif %}
+
+                                  {% if property.sale_by_type == 7 %}
+                                  <span>
+                                    {% if property.highest_best_format == 3 %}
+                                      {% if property.un_priced == True %}
+                                        {% if property.current_best_offer %}
+                                          ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.current_best_offer %}
+                                          ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                        {% else %}
+                                          ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                        {% endif %}
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.un_priced == False %}
+                                        ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    {% endif %}
+                                  </span>
+                                  {% else %}
+                                  <span>
+                                    {% if property.property_current_price %}
+                                      ${{ property.property_current_price|convert_num|intcomma|default:'0' }}
+                                    {% else %}
+                                      ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                    {% endif %}
+                                  </span>
+                                  {% endif %}
+                              </h4>
+                              <div class="badgeBoxes">
+                                <span class="stripe">
+                                  {% if property.sale_by_type == 1 %}
+                                    {% if property.new_today and todays_date < start_date%}
+                                      New Today
+                                    {% elif todays_date <= start_date %}
+                                    Coming Soon
+                                    {% elif todays_date > start_date and todays_date <= end_date %}
+                                      {% if remain_hr > 24 %}
+                                      Now Bidding
+                                      {% else %}
+                                      Closing Today
+                                      {% endif %}
+                                    {% else %}
+                                    {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 4  %}
+                                    {% if property.status_id == 1 %}
+                                      {% if property.new_today and todays_date < start_date%}
+                                        New Today
+                                      {% elif todays_date < traditional_status_time %}
+                                        New
+                                      {% else %}
+                                        {{ property.status|default:'' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 6  %}
+                                    {% if property.new_today and todays_date < start_date%}
+                                      New Today
+                                    {% elif todays_date <= start_date %}
+                                      Coming Soon
+                                    {% elif todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% elif property.sale_by_type == 7 %}
+                                    {% if property.new_today and todays_date < start_date%}
+                                      New Today
+                                    {% elif todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% else %}
+                                    {% if property.new_today and todays_date < start_date%}
+                                        New Today
+                                    {% else %}    
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% endif %}
+                                </span>
+                              </div><!-- End .badgeBoxes -->
+                            </div>
+                            {% if property.is_multiple_parcel %}
+                            <div class="nume">
+                              <span>Number of Items: {{property.no_lots|default:""}}</span>
+                            </div>
+
+                            {% endif %}
+                          </div>
+                          <div class="content">
+                            <div class="auction-startup">
+                              <div class="property-info">
+                                <h2 title="{{ property.address_one|default:'' }}">
+                                  <span>
+                                    {% if property.address_one|length > 28 %}
+                                      {{ property.address_one|slice:":25"|default:'' }}...
+                                      {% else %}
+                                      {{ property.address_one|default:'' }}
+                                    {% endif %}
+                                  </span>
+                                  {{ property.city|capfirst|default:'' }}, {{ property.state_name|default:'' }} {{ property.postal_code|default:'' }}
+                                </h2>
+                              </div>
+                              {% if property.sale_by_type != 4 %}
+                              <div class="auction-start">
+                                <span class="covert_auction_date_range_all_listings" data-start-date="{{ property.bidding_start|default:''}}" data-end-date="{{ property.bidding_end|default:''}}"></span>
+                              </div><!-- End .auction-start -->
+                            </div><!-- End .auction-startup -->
+                            <ul class="tags">
+                              <li>
+                                <h3>
+                                  {{ property.auction_type|default:'' }}
+                                </h3>
+                              </li>
+                              <li class="blue-bg">
+                                <h3>
+                                  {{ property.property_asset|default:'' }}
+                                </h3>
+                              </li>
+                            </ul><!-- End .tags -->
+                            {% endif %}
+                          </div>
+                        </a>
+                      </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="text-center text-danger" style="width:100%;">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" alt="No Data Found" role="img" /></li>
+                    {% endif %}
+                  </ul>
+                </div><!-- End .listing-content -->
+
+                <div id="auctions-listing-map" class="tab-pane auctions_listing_map_content listing_map_tab_content {% if listing_filter == 'auctions_listing' %}active{% endif %}">
+                  <ul class="listing listing-map">
+                    {% if property_list|length > 0 and listing_filter == 'auctions_listing'  %}
+                    {% for property in property_list %}
+                    {% now "U" as todays_date %}
+                    {% define_var property.bidding_start|parse_iso|date:"U" as start_date %}
+                    {% define_var property.bidding_end|parse_iso|date:"U" as end_date %}
+                    {% define_var property.bidding_end|remaining_hours|default:'' as remain_hr %}
+                    {% add_days property.added_on|parse_iso 15 as traditional_time %}
+                    {% define_var traditional_time|date:"U" as traditional_status_time %}
+                    <li id="listing_map_{{ property.id }}" class="{% if property.sale_by_type == 4 %}auction-hide{% endif %}">
+                      <div class="itemm">
+                        <div role="button" aria-label="like button" tabindex="1" class="like_post {% if property.is_favourite %}active{% endif %}" title="Add to favorite" {% if sess_user_id %}onclick="make_favourite_listing({{ property.id }}, this);"{% else %}onclick="location.href='{% url 'login' %}?next=/our-listing-map/'"{% endif %}>
+                          <span class="icon star-icon" role="presentation">&nbsp;</span>
+                        </div><!-- End .like_post -->
+                        <a role="button" href="/asset-details/?property_id={{ property.id }}">
+                          <div class="pic">
+                            <img class="slide-fixed" src="{% static 'theme-4/images/transparent2.png' %}" alt="Transparent">
+<!--                            <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">-->
+                            {% if property.idx_property_image|length and property.idx_property_id %}
+                            <img class="slide-img" src="{% if property.idx_property_image.upload %}{{property.idx_property_image.upload}}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                            {% else %}
+                            <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                            {% endif %}
+                            <div class="top">
+                              <h4 class="property-price">
+
+                                  {% if property.sale_by_type == 4 %}
+                                    Asking Price
+                                  {% elif property.sale_by_type == 7 %}
+
+                                    {% if property.highest_best_format == 3 %}
+                                      {% if property.un_priced == True %}
+                                        {% if property.current_best_offer %}
+                                          Current Offer
+                                        {% else %}
+                                          Unpriced
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.current_best_offer %}
+                                          Current Offer
+                                        {% else %}
+                                          Asking Price
+                                        {% endif %}
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.un_priced == True %}
+                                        Unpriced
+                                      {% else %}
+                                        Asking Price
+                                      {% endif %}
+
+                                    {% endif %}
+                                  {% else %}
+                                    {% if property.property_current_price %}
+                                      Current Bid
+                                    {% else %}
+                                      Starting Bid
+                                    {% endif %}
+                                  {% endif %}
+
+                                {% if property.sale_by_type == 7 %}
+                                <span>
+                                  {% if property.highest_best_format == 3 %}
+                                    {% if property.un_priced == True %}
+                                      {% if property.current_best_offer %}
+                                        ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.current_best_offer %}
+                                        ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                      {% else %}
+                                        ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    {% endif %}
+                                  {% else %}
+                                    {% if property.un_priced == False %}
+                                      ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                    {% endif %}
+                                  {% endif %}
+                                </span>
+                                {% else %}
+                              <span>
+                                  {% if property.property_current_price %}
+                                    ${{ property.property_current_price|convert_num|intcomma|default:'0' }}
+                                  {% else %}
+                                    ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                  {% endif %}
+                                </span>
+                                {% endif %}
+                              </h4>
+                              <div class="badgeBoxes">
+                                <span class="stripe">
+                                  {% if property.sale_by_type == 1 %}
+                                    {% if todays_date <= start_date %}
+                                    Coming Soon
+                                    {% elif todays_date > start_date and todays_date <= end_date %}
+                                      {% if remain_hr > 24 %}
+                                      Now Bidding
+                                      {% else %}
+                                      Closing Today
+                                      {% endif %}
+                                    {% else %}
+                                    {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 4  %}
+                                    {% if property.status_id == 1 %}
+                                      {% if todays_date < traditional_status_time %}
+                                        New
+                                      {% else %}
+                                        {{ property.status|default:'' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 6  %}
+
+                                    {% if todays_date <= start_date %}
+                                      Coming Soon
+                                    {% elif todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% elif property.sale_by_type == 7 %}
+                                    {% if todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% else %}
+                                  {{ property.status|default:'' }}
+                                  {% endif %}
+                                </span>
+                              </div><!-- End .badgeBoxes -->
+                            </div>
+
+                          </div>
+                          <div class="content">
+                            <div class="auction-startup">
+                              <div class="property-info">
+                                <h2 title="{{ property.address_one|default:'' }}">
+                                  <span>
+                                    {% if property.address_one|length > 28 %}
+                                      {{ property.address_one|slice:":25"|default:'' }}...
+                                      {% else %}
+                                      {{ property.address_one|default:'' }}
+                                    {% endif %}
+                                  </span>
+                                  {{ property.city|capfirst|default:'' }}, {{ property.state_name|default:'' }} {{ property.postal_code|default:'' }}
+                                </h2>
+                              </div>
+
+                              <div class="auction-start">
+                                <span class="covert_auction_date_range_all_listings" data-start-date="{{ property.bidding_start|default:''}}" data-end-date="{{ property.bidding_end|default:''}}"></span>
+                              </div><!-- End .auction-start -->
+                            </div><!-- End .auction-startup -->
+                            <ul class="tags">
+                              <li>
+                                <h3>
+                                  {{ property.auction_type|default:'' }}
+                                </h3>
+                              </li>
+                              <li class="blue-bg">
+                                <h3>
+                                  {{ property.property_asset|default:'' }}
+                                </h3>
+                              </li>
+                            </ul><!-- End .tags -->
+                          </div>
+                        </a>
+                      </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="text-center text-danger" style="width:100%;">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" alt="No Data Found" role="img" /></li>
+                    {% endif %}
+                        </ul>
+                </div><!-- End .listing-content -->
+
+                <div id="newlistings-listing-map" class="tab-pane new_listing_map_content listing_map_tab_content {% if listing_filter == 'new_listing' %}active{% endif %}">
+                  <ul class="listing listing-map">
+                    {% if property_list|length > 0 and listing_filter == 'new_listing'  %}
+                    {% for property in property_list %}
+                    {% now "U" as todays_date %}
+                    {% define_var property.bidding_start|parse_iso|date:"U" as start_date %}
+                    {% define_var property.bidding_end|parse_iso|date:"U" as end_date %}
+                    {% define_var property.bidding_end|remaining_hours|default:'' as remain_hr %}
+                    {% add_days property.added_on|parse_iso 15 as traditional_time %}
+                    {% define_var traditional_time|date:"U" as traditional_status_time %}
+                    <li id="listing_map_{{ property.id }}" class="{% if property.sale_by_type == 4 %}auction-hide{% endif %}">
+                      <div class="itemm">
+                        <div role="button" aria-label="like button" tabindex="1" class="like_post {% if property.is_favourite %}active{% endif %}" title="Add to favorite" title="Add to favorite" {% if sess_user_id %}onclick="make_favourite_listing({{ property.id }}, this);"{% else %}onclick="location.href='{% url 'login' %}?next=/our-listing-map/'"{% endif %}>
+                          <span class="icon star-icon" role="presentation">&nbsp;</span>
+                        </div><!-- End .like_post -->
+                        <a role="button" href="/asset-details/?property_id={{ property.id }}">
+                          <div class="pic">
+                            <img class="slide-fixed" src="{% static 'theme-4/images/transparent2.png' %}" alt="Transparent">
+  <!--                          <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">-->
+                            {% if property.idx_property_image|length and property.idx_property_id %}
+                              <img class="slide-img" src="{% if property.idx_property_image.upload %}{{property.idx_property_image.upload}}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                              {% else %}
+                              <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                              {% endif %}
+                            <div class="top">
+                              <h4 class="property-price">
+
+                                  {% if property.sale_by_type == 4 %}
+                                    Asking Price
+                                  {% elif property.sale_by_type == 7 %}
+
+                                    {% if property.highest_best_format == 3 %}
+                                      {% if property.un_priced == True %}
+                                        {% if property.current_best_offer %}
+                                          Current Offer
+                                        {% else %}
+                                          Unpriced
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.current_best_offer %}
+                                          Current Offer
+                                        {% else %}
+                                          Asking Price
+                                        {% endif %}
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.un_priced == True %}
+                                        Unpriced
+                                      {% else %}
+                                        Asking Price
+                                      {% endif %}
+
+                                    {% endif %}
+                                  {% else %}
+                                    {% if property.property_current_price %}
+                                      Current Bid
+                                    {% else %}
+                                      Starting Bid
+                                    {% endif %}
+                                  {% endif %}
+
+                                {% if property.sale_by_type == 7 %}
+                                <span>
+                                  {% if property.highest_best_format == 3 %}
+                                    {% if property.un_priced == True %}
+                                      {% if property.current_best_offer %}
+                                        ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.current_best_offer %}
+                                        ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                      {% else %}
+                                        ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    {% endif %}
+                                  {% else %}
+                                    {% if property.un_priced == False %}
+                                      ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                    {% endif %}
+                                  {% endif %}
+                                </span>
+                                {% else %}
+                                <span>
+                                  {% if property.property_current_price %}
+                                    ${{ property.property_current_price|convert_num|intcomma|default:'0' }}
+                                  {% else %}
+                                    ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                  {% endif %}
+                                </span>
+                                {% endif %}
+                              </h4>
+                              <div class="badgeBoxes">
+                                <span class="stripe">
+                                  {% if property.sale_by_type == 1 %}
+                                    {% if todays_date <= start_date %}
+                                    Coming Soon
+                                    {% elif todays_date > start_date and todays_date <= end_date %}
+                                      {% if remain_hr > 24 %}
+                                      Now Bidding
+                                      {% else %}
+                                      Closing Today
+                                      {% endif %}
+                                    {% else %}
+                                    {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 4  %}
+                                    {% if property.status_id == 1 %}
+                                      {% if todays_date < traditional_status_time %}
+                                        New
+                                      {% else %}
+                                        {{ property.status|default:'' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 6  %}
+
+                                    {% if todays_date <= start_date %}
+                                      Coming Soon
+                                    {% elif todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% elif property.sale_by_type == 7 %}
+                                    {% if todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% else %}
+                                  {{ property.status|default:'' }}
+                                  {% endif %}
+                                </span>
+                              </div><!-- End .badgeBoxes -->
+                            </div>
+                          </div>
+                          <div class="content">
+                            <div class="auction-startup">
+                              <div class="property-info">
+                                <h2 title="{{ property.address_one|default:'' }}">
+                                  <span>
+                                    {% if property.address_one|length > 28 %}
+                                    {{ property.address_one|slice:":25"|default:'' }}...
+                                    {% else %}
+                                    {{ property.address_one|default:'' }}
+                                    {% endif %}
+                                  </span>
+                                  {{ property.city|capfirst|default:'' }}, {{ property.state_name|default:'' }} {{ property.postal_code|default:'' }}
+                                </h2>
+                              </div>
+                              {% if property.sale_by_type != 4 %}
+                              <div class="auction-start">
+                                <span class="covert_auction_date_range_all_listings" data-start-date="{{ property.bidding_start|default:''}}" data-end-date="{{ property.bidding_end|default:''}}"></span>
+                              </div><!-- End .auction-start -->
+                            </div><!-- End .auction-startup -->
+                            <ul class="tags">
+                              <li>
+                                <h3>
+                                  {{ property.auction_type|default:'' }}
+                                </h3>
+                              </li>
+                              <li class="blue-bg">
+                                <h3>
+                                  {{ property.property_asset|default:'' }}
+                                </h3>
+                              </li>
+                            </ul><!-- End .tags -->
+                            {% endif %}
+                          </div>
+                        </a>
+                      </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="text-center text-danger" style="width:100%;">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" alt="No Data Found" role="img" /></li>
+                    {% endif %}
+                  </ul>
+                </div><!-- End .listing-content -->
+
+                <div id="traditional-listing-map" class="tab-pane traditional_listing_map_content listing_map_tab_content {% if listing_filter == 'traditional_listing' %}active{% endif %}">
+                  <ul class="listing listing-map">
+                    {% if property_list|length > 0 and listing_filter == 'traditional_listing'  %}
+                    {% for property in property_list %}
+                    {% now "U" as todays_date %}
+                    {% define_var property.bidding_start|parse_iso|date:"U" as start_date %}
+                    {% define_var property.bidding_end|parse_iso|date:"U" as end_date %}
+                    {% define_var property.bidding_end|remaining_hours|default:'' as remain_hr %}
+                    {% add_days property.added_on|parse_iso 15 as traditional_time %}
+                    {% define_var traditional_time|date:"U" as traditional_status_time %}
+                    <li id="listing_map_{{ property.id }}" class="{% if property.sale_by_type == 4 %}auction-hide{% endif %}">
+                      <div class="itemm">
+                        <div role="button" aria-label="like button" tabindex="1" class="like_post {% if property.is_favourite %}active{% endif %}" title="Add to favorite" {% if sess_user_id %}onclick="make_favourite_listing({{ property.id }}, this);"{% else %}onclick="location.href='{% url 'login' %}?next=/our-listing-map/'"{% endif %}>
+                          <span class="icon star-icon" role="presentation">&nbsp;</span>
+                        </div><!-- End .like_post -->
+                        <a role="button" href="/asset-details/?property_id={{ property.id }}">
+                          <div class="pic">
+                            <img class="slide-fixed" src="{% static 'theme-4/images/transparent2.png' %}" alt="Transparent">
+<!--                            <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">-->
+                            {% if property.idx_property_image|length and property.idx_property_id %}
+                            <img class="slide-img" src="{% if property.idx_property_image.upload %}{{property.idx_property_image.upload}}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                            {% else %}
+                            <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                            {% endif %}
+                            <div class="top">
+                              <h4 class="property-price">
+                                {% if property.sale_by_type == 4 %}
+                                      Asking Price
+                                    {% elif property.sale_by_type == 7 %}
+
+                                      {% if property.highest_best_format == 3 %}
+                                        {% if property.un_priced == True %}
+                                          {% if property.current_best_offer %}
+                                            Current Offer
+                                          {% else %}
+                                            Unpriced
+                                          {% endif %}
+                                        {% else %}
+                                          {% if property.current_best_offer %}
+                                            Current Offer
+                                          {% else %}
+                                            Asking Price
+                                          {% endif %}
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.un_priced == True %}
+                                          Unpriced
+                                        {% else %}
+                                          Asking Price
+                                        {% endif %}
+
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.property_current_price %}
+                                        Current Bid
+                                      {% else %}
+                                        Starting Bid
+                                      {% endif %}
+                                    {% endif %}
+
+                                  {% if property.sale_by_type == 7 %}
+                                <span>
+                                    {% if property.highest_best_format == 3 %}
+                                      {% if property.un_priced == True %}
+                                        {% if property.current_best_offer %}
+                                          ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.current_best_offer %}
+                                          ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                        {% else %}
+                                          ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                        {% endif %}
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.un_priced == False %}
+                                        ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    {% endif %}
+                                  </span>
+                                  {% else %}
+                                  <span>
+                                    {% if property.property_current_price %}
+                                      ${{ property.property_current_price|convert_num|intcomma|default:'0' }}
+                                    {% else %}
+                                      ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                    {% endif %}
+                                  </span>
+                                  {% endif %}
+                              </h4>
+                              <div class="badgeBoxes">
+                                <span class="stripe">
+                                  {% if property.sale_by_type == 1 %}
+                                    {% if todays_date <= start_date %}
+                                    Coming Soon
+                                    {% elif todays_date > start_date and todays_date <= end_date %}
+                                      {% if remain_hr > 24 %}
+                                      Now Bidding
+                                      {% else %}
+                                      Closing Today
+                                      {% endif %}
+                                    {% else %}
+                                    {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 4  %}
+                                    {% if property.status_id == 1 %}
+                                      {% if todays_date < traditional_status_time %}
+                                        New
+                                      {% else %}
+                                        {{ property.status|default:'' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 6  %}
+
+                                    {% if todays_date <= start_date %}
+                                      Coming Soon
+                                    {% elif todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% elif property.sale_by_type == 7 %}
+                                    {% if todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% else %}
+                                  {{ property.status|default:'' }}
+                                  {% endif %}
+                                </span>
+                              </div><!-- End .badgeBoxes -->
+                            </div>
+                          </div>
+                          <div class="content">
+                            <div class="auction-startup">
+                              <div class="property-info">
+                                <h2 title="{{ property.address_one|default:'' }}">
+                                  <span>
+                                    {% if property.address_one|length > 28 %}
+                                    {{ property.address_one|slice:":25"|default:'' }}...
+                                    {% else %}
+                                    {{ property.address_one|default:'' }}
+                                    {% endif %}
+                                  </span>
+                                  {{ property.city|capfirst|default:'' }}, {{ property.state_name|default:'' }} {{ property.postal_code|default:'' }}
+                                </h2>
+                              </div>
+                            </div><!-- End .auction-startup -->
+                            <ul class="tags">
+                              <li>
+                                <h3>
+                                  {{ property.auction_type|default:'' }}
+                                </h3>
+                              </li>
+                              <li class="blue-bg">
+                                <h3>
+                                  {{ property.property_asset|default:'' }}
+                                </h3>
+                              </li>
+                            </ul><!-- End .tags -->
+                          </div>
+                        </a>
+                      </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="text-center text-danger" style="width:100%;">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" alt="No Data Found" role="img" /></li>
+                    {% endif %}
+                  </ul>
+                </div><!-- End .listing-content -->
+                {% comment %}
+
+                <div id="featured-map" class="tab-pane featured_map_content listing_map_tab_content {% if listing_filter == 'featured' %}active{% endif %}">
+                  <ul class="listing listing-map">
+                    {% if property_list|length > 0 and listing_filter == 'featured'  %}
+                    {% for property in property_list %}
+                    {% now "U" as todays_date %}
+                    {% define_var property.bidding_start|parse_iso|date:"U" as start_date %}
+                    {% define_var property.bidding_end|parse_iso|date:"U" as end_date %}
+                    {% define_var property.bidding_end|remaining_hours|default:'' as remain_hr %}
+                    {% add_days property.added_on|parse_iso 15 as traditional_time %}
+                    {% define_var traditional_time|date:"U" as traditional_status_time %}
+                    <li id="listing_map_{{ property.id }}" class="{% if property.sale_by_type == 4 %}auction-hide{% endif %}">
+                      <div class="itemm">
+                        <div role="button" aria-label="like button" tabindex="1" class="like_post {% if property.is_favourite %}active{% endif %}" title="Add to favorite" {% if sess_user_id %}onclick="make_favourite_listing({{ property.id }}, this);"{% else %}onclick="location.href='{% url 'login' %}?next=/our-listing-map/'"{% endif %}>
+                          <span class="icon star-icon" role="presentation">&nbsp;</span>
+                        </div><!-- End .like_post -->
+                        <a role="button" href="/asset-details/?property_id={{ property.id }}">
+                          <div class="pic">
+                            <img class="slide-fixed" src="{% static 'theme-4/images/transparent2.png' %}" alt="Transparent">
+  <!--                          <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">-->
+                            {% if property.idx_property_image|length and property.idx_property_id %}
+                              <img class="slide-img" src="{% if property.idx_property_image.upload %}{{property.idx_property_image.upload}}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                              {% else %}
+                              <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                              {% endif %}
+                            <div class="top">
+                              <h4 class="property-price">
+                                {% if property.sale_by_type == 4 %}
+                                        Asking Price
+                                      {% elif property.sale_by_type == 7 %}
+
+                                        {% if property.highest_best_format == 3 %}
+                                          {% if property.un_priced == True %}
+                                            {% if property.current_best_offer %}
+                                              Current Offer
+                                            {% else %}
+                                              Unpriced
+                                            {% endif %}
+                                          {% else %}
+                                            {% if property.current_best_offer %}
+                                              Current Offer
+                                            {% else %}
+                                              Asking Price
+                                            {% endif %}
+                                          {% endif %}
+                                        {% else %}
+                                          {% if property.un_priced == True %}
+                                            Unpriced
+                                          {% else %}
+                                            Asking Price
+                                          {% endif %}
+
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.property_current_price %}
+                                          Current Bid
+                                        {% else %}
+                                          Starting Bid
+                                        {% endif %}
+                                      {% endif %}
+
+                                    {% if property.sale_by_type == 7 %}
+                                  <span>
+                                      {% if property.highest_best_format == 3 %}
+                                        {% if property.un_priced == True %}
+                                          {% if property.current_best_offer %}
+                                            ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                          {% endif %}
+                                        {% else %}
+                                          {% if property.current_best_offer %}
+                                            ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                          {% else %}
+                                            ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                          {% endif %}
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.un_priced == False %}
+                                          ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                        {% endif %}
+                                      {% endif %}
+                                    </span>
+                                    {% else %}
+                                    <span>
+                                      {% if property.property_current_price %}
+                                        ${{ property.property_current_price|convert_num|intcomma|default:'0' }}
+                                      {% else %}
+                                        ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    </span>
+                                    {% endif %}
+                              </h4>
+                              <div class="badgeBoxes">
+                                <span class="stripe">
+                                  {% if property.sale_by_type == 1 %}
+                                    {% if todays_date <= start_date %}
+                                    Coming Soon
+                                    {% elif todays_date > start_date and todays_date <= end_date %}
+                                      {% if remain_hr > 24 %}
+                                      Now Bidding
+                                      {% else %}
+                                      Closing Today
+                                      {% endif %}
+                                    {% else %}
+                                    {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 4  %}
+                                    {% if property.status_id == 1 %}
+                                      {% if todays_date < traditional_status_time %}
+                                        New
+                                      {% else %}
+                                        {{ property.status|default:'' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 6  %}
+
+                                    {% if todays_date <= start_date %}
+                                      Coming Soon
+                                    {% elif todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% elif property.sale_by_type == 7 %}
+                                    {% if todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% else %}
+                                  {{ property.status|default:'' }}
+                                  {% endif %}
+                                </span>
+                              </div><!-- End .badgeBoxes -->
+                            </div>
+                          </div>
+                          <div class="content">
+                            <div class="auction-startup">
+                              <div class="property-info">
+                                <h2 title="{{ property.address_one|default:'' }}">
+                                  <span>
+                                  {% if property.address_one|length > 28 %}
+                                    {{ property.address_one|slice:":25"|default:'' }}...
+                                    {% else %}
+                                    {{ property.address_one|default:'' }}
+                                  {% endif %}
+                                  </span>
+                                  {{ property.city|capfirst|default:'' }}, {{ property.state_name|default:'' }} {{ property.postal_code|default:'' }}
+                                </h2>
+                              </div>
+                              {% if property.sale_by_type != 4 %}
+                              <div class="auction-start">
+                                <span class="covert_auction_date_range_all_listings" data-start-date="{{ property.bidding_start|default:''}}" data-end-date="{{ property.bidding_end|default:''}}"></span>
+                              </div><!-- End .auction-start -->
+                            </div><!-- End .auction-startup -->
+                            <ul class="tags">
+                              <li>
+                                <h3>
+                                  {{ property.auction_type|default:'' }}
+                                </h3>
+                              </li>
+                              <li class="blue-bg">
+                                <h3>
+                                  {{ property.property_asset|default:'' }}
+                                </h3>
+                              </li>
+                            </ul><!-- End .tags -->
+                            {% endif %}
+                          </div>
+                        </a>
+                      </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="text-center text-danger" style="width:100%;">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" alt="No Data Found" role="img" /></li>
+                    {% endif %}
+                  </ul>
+                </div><!-- End .listing-content -->
+                {% endcomment %}
+
+                <div id="recently-listing-map" class="tab-pane recent_sold_listing_map_content listing_map_tab_content {% if listing_filter == 'recent_sold_listing' %}active{% endif %}">
+                  <ul class="listing listing-map">
+                    {% if property_list|length > 0 and listing_filter == 'recent_sold_listing'  %}
+                    {% for property in property_list %}
+                    {% now "U" as todays_date %}
+                    {% define_var property.bidding_start|parse_iso|date:"U" as start_date %}
+                    {% define_var property.bidding_end|parse_iso|date:"U" as end_date %}
+                    {% define_var property.bidding_end|remaining_hours|default:'' as remain_hr %}
+                    {% add_days property.added_on|parse_iso 15 as traditional_time %}
+                    {% define_var traditional_time|date:"U" as traditional_status_time %}
+                    <li id="listing_map_{{ property.id }}" class="{% if property.sale_by_type == 4 %}auction-hide{% endif %}">
+                      <div class="itemm">
+                        <div role="button" aria-label="like button" tabindex="1" class="like_post {% if property.is_favourite %}active{% endif %}" title="Add to favorite" {% if sess_user_id %}onclick="make_favourite_listing({{ property.id }}, this);"{% else %}onclick="location.href='{% url 'login' %}?next=/our-listing-map/'"{% endif %}>
+                          <span class="icon star-icon" role="presentation">&nbsp;</span>
+                        </div><!-- End .like_post -->
+                        <a role="button" href="/asset-details/?property_id={{ property.id }}">
+                          <div class="pic">
+                            <img class="slide-fixed" src="{% static 'theme-4/images/transparent2.png' %}" alt="Transparent">
+  <!--                          <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">-->
+                            {% if property.idx_property_image|length and property.idx_property_id %}
+                              <img class="slide-img" src="{% if property.idx_property_image.upload %}{{property.idx_property_image.upload}}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                              {% else %}
+                              <img class="slide-img" src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'theme-4/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+                              {% endif %}
+                            <div class="top">
+                              <h4 class="property-price">
+                                {% if property.sale_by_type == 4 %}
+                                      Asking Price
+                                    {% elif property.sale_by_type == 7 %}
+
+                                      {% if property.highest_best_format == 3 %}
+                                        {% if property.un_priced == True %}
+                                          {% if property.current_best_offer %}
+                                            Current Offer
+                                          {% else %}
+                                            Unpriced
+                                          {% endif %}
+                                        {% else %}
+                                          {% if property.current_best_offer %}
+                                            Current Offer
+                                          {% else %}
+                                            Asking Price
+                                          {% endif %}
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.un_priced == True %}
+                                          Unpriced
+                                        {% else %}
+                                          Asking Price
+                                        {% endif %}
+
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.property_current_price %}
+                                        Current Bid
+                                      {% else %}
+                                        Starting Bid
+                                      {% endif %}
+                                    {% endif %}
+
+                                  {% if property.sale_by_type == 7 %}
+                                  <span>
+                                    {% if property.highest_best_format == 3 %}
+                                      {% if property.un_priced == True %}
+                                        {% if property.current_best_offer %}
+                                          ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                        {% endif %}
+                                      {% else %}
+                                        {% if property.current_best_offer %}
+                                          ${{ property.current_best_offer|convert_num|intcomma|default:'0' }}
+                                        {% else %}
+                                          ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                        {% endif %}
+                                      {% endif %}
+                                    {% else %}
+                                      {% if property.un_priced == False %}
+                                        ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                      {% endif %}
+                                    {% endif %}
+                                  </span>
+                                  {% else %}
+                                  <span>
+                                    {% if property.property_current_price %}
+                                      ${{ property.property_current_price|convert_num|intcomma|default:'0' }}
+                                    {% else %}
+                                      ${{ property.property_price|convert_num|intcomma|default:'0' }}
+                                    {% endif %}
+                                  </span>
+                                  {% endif %}
+                              </h4>
+                              <div class="badgeBoxes">
+                                <span class="stripe">
+                                  {% if property.sale_by_type == 1 %}
+                                    {% if todays_date <= start_date %}
+                                    Coming Soon
+                                    {% elif todays_date > start_date and todays_date <= end_date %}
+                                      {% if remain_hr > 24 %}
+                                      Now Bidding
+                                      {% else %}
+                                      Closing Today
+                                      {% endif %}
+                                    {% else %}
+                                    {{ property.status|default:'' }}
+                                    {% endif %}
+                                  {% elif property.sale_by_type == 4  %}
+                                    {% if property.status_id == 1 %}
+                                      {% if todays_date < traditional_status_time %}
+                                        New
+                                      {% else %}
+                                        {{ property.status|default:'' }}
+                                      {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% elif property.sale_by_type == 6  %}
+
+                                    {% if todays_date <= start_date %}
+                                      Coming Soon
+                                    {% elif todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% elif property.sale_by_type == 7 %}
+                                    {% if todays_date > start_date and todays_date < end_date %}
+                                        {% if remain_hr < 24 %}
+                                          Closing Today
+                                        {% else %}
+                                          {{ property.status|default:'' }}
+                                        {% endif %}
+                                    {% else %}
+                                      {{ property.status|default:'' }}
+                                    {% endif %}
+
+                                  {% else %}
+                                  {{ property.status|default:'' }}
+                                  {% endif %}
+                                </span>
+                              </div><!-- End .badgeBoxes -->
+                            </div>
+                          </div>
+                          <div class="content">
+                            <div class="auction-startup">
+                              <div class="property-info">
+                                <h2 title="{{ property.address_one|default:'' }}">
+                                  <span>
+                                    {% if property.address_one|length > 28 %}
+                                      {{ property.address_one|slice:":25"|default:'' }}...
+                                      {% else %}
+                                      {{ property.address_one|default:'' }}
+                                    {% endif %}
+                                    </span>
+                                    {{ property.city|capfirst|default:'' }}, {{ property.state_name|default:'' }} {{ property.postal_code|default:'' }}
+                                </h2>
+                              </div>
+                              {% if property.sale_by_type != 4 %}
+                              <div class="auction-start">
+                                <span class="covert_auction_date_range_all_listings" data-start-date="{{ property.bidding_start|default:''}}" data-end-date="{{ property.bidding_end|default:''}}"></span>
+                              </div><!-- End .auction-start -->
+                            </div><!-- End .auction-startup -->
+                            <ul class="tags">
+                              <li>
+                                <h3>
+                                  {{ property.auction_type|default:'' }}
+                                </h3>
+                              </li>
+                              <li class="blue-bg">
+                                <h3>
+                                  {{ property.property_asset|default:'' }}
+                                </h3>
+                              </li>
+                            </ul><!-- End .tags -->
+                            {% endif %}
+                          </div>
+                        </a>
+                      </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="text-center text-danger" style="width:100%;">
+                      <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" alt="No Data Found" role="img" /></li>
+                    {% endif %}
+                  </ul>
+                </div><!-- End .listing-content -->
+
+              </div><!-- End .tab-content -->
+
+              <div class="pagination-wrap">
+                <ul>
+                  <li class="page-item">Result Per Page:</li>
+                  <li class="page-item">
+                    <select name="map_pagi" aria-label="Result" class="form-control" id="map_pagi" onchange="getresultmap('our_listing',1,'','','','');">
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="30">30</option>
+                      <option value="40">40</option>
+                    </select>
+                  </li>
+                </ul>
+                <ul class="pagination" id="map_prop_listing_pagination_list">
+                  {{ pagination_html }}
+                </ul>
+              </div><!-- End .pagination-wrap -->
+            </div><!-- End .listing-list -->
+
+          </div><!-- End .listing-map-wrap -->
+
+        </div><!-- End .container-fluid -->
+      </div><!-- End .product-listing -->
+    </div>
+    
+
+  </div><!-- end .body-content -->
+
+  <div class="filter-sidebar">
+    <a class="closee burger"><i class="fa fa-times"></i></a>
+    <div class="item">
+      <div class="block">
+        <div class="form-group">
+          <label for="" class="pb5">Asset Type</label>
+          <select name="filter_asset_type" id="filter_asset_type" class="select">
+            <option value="">All</option>
+            <option value="3">Residential</option>
+            <option value="2">Commercial</option>
+            <option value="1">Land/Lots</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="" class="pb5">Auction Type</label>
+          <select name="filter_auction_type" id="filter_auction_type" class="select">
+            <option value="">All</option>
+            <option value="1">Classic Online Auction</option>
+            <option value="7">Highest and Best</option>
+            <option value="2">Insider Online Auction</option>
+            <option value="6">Live Event Auction</option>
+            <option value="4">Traditional Listing</option>
+          </select>
+        </div>
+<!--        <div class="clearfix">-->
+<!--          <label for="" >Asset Type</label>-->
+<!--          <ul class="badgeFilter">-->
+<!--            <li>-->
+<!--              <input class="css-checkbox" name="real" type="checkbox" id="real" value="1">-->
+<!--              <label for="real" class="check-label">Real Estate</label>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <input class="css-checkbox" name="note" type="checkbox" id="note" value="2">-->
+<!--              <label for="note" class="check-label">Note</label>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <input class="css-checkbox" name="other" type="checkbox" id="other" value="3">-->
+<!--              <label for="other" class="check-label">Other</label>-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--        </div>-->
+      </div><!-- End .block -->
+
+      <div class="block">
+        <div class="form-group">
+          <label for="" class="pb5">Beds</label>
+          <select name="filter_beds" id="filter_beds" class="select">
+            <option value="">Any</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="5">5+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="" class="pb5">Baths</label>
+          <select name="filter_baths" id="filter_baths" class="select">
+            <option value="">Any</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="5">5+</option>
+          </select>
+        </div>
+<!--        <h6>Offer</h6>-->
+<!--        <ul class="badgeFilter">-->
+<!--          <li>-->
+<!--            <input class="css-checkbox" name="financing" type="checkbox" id="financing" value="4">-->
+<!--            <label for="financing" class="check-label">Financing Available</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input class="css-checkbox" name="opportunity" type="checkbox" id="opportunity" value="5">-->
+<!--            <label for="opportunity" class="check-label">Opportunity Zone</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input class="css-checkbox" name="broker" type="checkbox" id="broker" value="6">-->
+<!--            <label for="broker" class="check-label">Broker Co-Op Available</label>-->
+<!--          </li>-->
+<!--        </ul>-->
+      </div><!-- End .block -->
+
+      <div class="block">
+        <div class="form-group">
+          <label for="" class="pb5">MLS ID</label>
+          <input id="filter_mls_property" type="text" name="filter_mls_property" value="" class="form-control" aria-label="MLS ID" role="textbox">
+        </div>
+<!--        <h6>MLS Property</h6>-->
+
+        <h6>Price</h6>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="filter_min_price" class="">Min</label>
+              <input id="filter_min_price" type="text" name="filter_min_price" value="" placeholder="$1000" class="form-control" aria-label="Min" role="textbox">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="filter_max_price" class="">Max</label>
+              <input id="filter_max_price" type="text" name="filter_max_price" value="" placeholder="$10000" class="form-control" aria-label="Max" role="textbox">
+            </div>
+          </div>
+        </div>
+
+<!--        <h6>Property Type</h6>-->
+<!--        <ul class="type">-->
+<!--          <li>-->
+<!--            <input id="Retail" type="checkbox" name="gender" value="Retail" class="css-checkbox">-->
+<!--            <label for="Retail" class="check-label">Retail</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input id="Office" type="checkbox" name="gender" value="Office" class="css-checkbox">-->
+<!--            <label for="Office" class="check-label">Office</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input id="Multifamily" type="checkbox" name="gender" value="Multifamily" class="css-checkbox">-->
+<!--            <label for="Multifamily" class="check-label">Multifamily</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input id="Hospitality" type="checkbox" name="gender" value="Hospitality" class="css-checkbox">-->
+<!--            <label for="Hospitality" class="check-label">Hospitality</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input id="Land" type="checkbox" name="gender" value="Land" class="css-checkbox">-->
+<!--            <label for="Land" class="check-label">Land</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input id="Self" type="checkbox" name="gender" value="Self" class="css-checkbox">-->
+<!--            <label for="Self" class="check-label">Self Storage</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input id="Parking" type="checkbox" name="gender" value="Parking" class="css-checkbox">-->
+<!--            <label for="Parking" class="check-label">Parking</label>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <input id="Commercial" type="checkbox" name="gender" value="Commercial" class="css-checkbox">-->
+<!--            <label for="Commercial" class="check-label">Commercial</label>-->
+<!--          </li>-->
+<!--        </ul>-->
+
+        <a href="#" class="btn btn-secondary width100" onclick="getresultmapfilter('our_listing',1,'','','','');"><i class="fa fa-search"></i> Search</a>
+
+      </div><!-- End .block -->
+    </div>
+  </div>
+  <div class="overlayy"></div>
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+{% endblock %}
+{% block js_content %}
+<script>
+  var is_first_login = {{request.session.is_first_login}};
+  var user_id = {{ request.session.user_id }};
+  $(document).ready(function() {
+    // $('#map_pagi').chosen();
+    // $('#map_datesort').chosen();
+    $(document).on('keyup', '#property_map_search_text', function(e){
+          var x = document.getElementById(this.id + "autocomplete-list");
+          if (x) x = x.getElementsByTagName("div");
+          if (e.keyCode == 40) {
+            /*If the arrow DOWN key is pressed,
+            increase the currentFocus variable:*/
+            currentFocus++;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 38) { //up
+            /*If the arrow UP key is pressed,
+            decrease the currentFocus variable:*/
+            currentFocus--;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 13) {
+            /*If the ENTER key is pressed, prevent the form from being submitted,*/
+            e.preventDefault();
+            if (currentFocus > -1) {
+              /*and simulate a click on the "active" item:*/
+              if (x) x[currentFocus].click();
+            }
+          }else{
+            var search = $(this).val();
+            $.ajax({
+                url: '/front-listing-search-suggestion/',
+                type: 'post',
+                dateType: 'json',
+                cache: false,
+                data: {'search': search},
+                beforeSend: function(){
+
+                },
+                success: function(response){
+                    if(response.error == 0 && response.status == 200){
+                        autocomplete("property_map_search_text", response.suggestion_list);
+                    }else{
+                        closeAllSuggestions('autocomplete-items');
+                    }
+                }
+            });
+          }
+
+  });
+  });
+</script>
+
+<script>
+    jQuery('#property-tab').on('click', 'a[data-toggle="tab"]', function(e) {
+     e.preventDefault();
+     var $link = $(this);
+     if (!$link.parent().hasClass('active')) {
+       //remove active class from other tab-panes
+       jQuery('.tab-content:not(.' + $link.attr('href').replace('#','') + ') .tab-pane').removeClass('active');
+       // click first submenu tab for active section
+          jQuery('a[href="' + $link.attr('href') + '_all"][data-toggle="tab"]').click();
+
+       // activate tab-pane for active section
+       jQuery('.tab-content.' + $link.attr('href').replace('#','') + ' .tab-pane:first').addClass('active');
+          $('#hello').find('a').trigger('click');
+
+     }
+     console.log(jQuery(e.target).attr("href"))
+     let type = jQuery(e.target).attr("href");
+     jQuery(type+"_monday").addClass('active')
+   jQuery(type+" li:first-child").addClass('active')
+   console.log(jQuery(type+" #hello"))
+   });
+  </script>
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-4/js/autosuggestion.js' %}?v=2.0"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/our_listing_js.js' %}?v=4.7"></script>
+<script type="text/javascript" src="{% static 'theme-4/js/hamburger.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/pagination.js' %}?v=1.1"></script>
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3&key={{site_detail.google_map_key}}&callback=dunplab_map" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.11.0/js/bootstrap-tour.js"></script>
+<script type="text/javascript" src="{% static 'theme-common/js/map_listing_tour.js' %}?v=3.1"></script>
+<script>
+/*var agent_id = $.urlParam('agent_id');
+if(typeof(agent_id) != 'undefined' && agent_id != ""){
+    $("#agent_id").val(agent_id);
+}
+getresultmap('our_listing', 1, '', '', '', '');*/
+</script>
+<script>
+  var markerClusterer = null;
+  var map= null;
+  var lookup_markers = [];
+  function dunplab_map(){
+    var location = [];
+    try{
+      var listing = "{{ property_list_json }}";
+      listing = listing.replace(/&quot;/g,'"');
+      var property_list = JSON.parse(listing);
+      console.log(property_list)
+      /*$.each(property_list, function(i, item) {
+          console.log(item.latitude);
+          console.log(item.longitude);
+          if(item.latitude && item.longitude){
+            var new_array = [];
+            var latitude = parseFloat(item.latitude);
+            var longitude = parseFloat(item.longitude);
+            var item_name = item.name;
+
+            new_array.push(item_name);
+            new_array.push(latitude);
+            new_array.push(longitude);
+            location.push(new_array);
+            //var newLatlng = new google.maps.LatLng(parseFloat(item.latitude),parseFloat(item.longitude));
+            //var marker=new google.maps.Marker({position:newLatlng,map:map,title:"{{ item.name }}"});
+            //google.maps.event.addListener(marker,"click",function(){infowindow.open(map,marker);});
+          }
+      });*/
+    }catch(ex){
+      console.log(ex);
+      var location = [];
+    }
+    var myLatlng = new google.maps.LatLng(37.090240, -95.712891);
+    /*$.each(property_list, function(i, item) {
+      if(item.latitude && item.longitude){
+        myLatlng = new google.maps.LatLng(37.090240, -95.712891);
+      }
+    });*/
+    var myOptions={
+      zoom:4,
+      center:myLatlng,
+      mapTypeId:"roadmap",
+      streetViewControl:false,
+      rotateControl:false,
+      disableDefaultUI:true,
+      styles:[
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f5f5f5"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#616161"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#f5f5f5"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#bdbdbd"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#eeeeee"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#757575"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e5e5e5"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ffffff"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#757575"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dadada"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#616161"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e5e5e5"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#eeeeee"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#c9c9c9"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  }
+],
+      //styles:[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#757575"}]},{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"administrative.land_parcel","stylers":[{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#181818"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"poi.park","elementType":"labels.text.stroke","stylers":[{"color":"#1b1b1b"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry","stylers":[{"color":"#4e4e4e"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#3d3d3d"}]}]
+    };
+    map = new google.maps.Map(document.getElementById("mapView"),myOptions);
+
+    initZoomControl(map);
+    initFullscreenControl(map);
+    var marker, i;
+
+    $.each(property_list, function(i, item) {
+
+      if(item.property_image.image){
+        var img_url = aws_url+''+item.property_image.bucket_name+'/'+item.property_image.image;
+      }
+      else{
+        var img_url = '/static/theme-4/images/property-default-img.png';
+      }
+      var featured_class = '';
+      if(item.is_featured){
+        featured_class = 'active';
+      }
+      var item_status = '';
+      if(item.status){
+        item_status = item.status;
+      }
+      var property_address = '';
+      var complete_address = '';
+      if(item.city){
+        property_address = ucfirst(item.city);
+        complete_address = ucfirst(item.city)
+      }
+      if(item.iso_state_name){
+        property_address = property_address+', '+item.iso_state_name;
+      }
+      if(item.state_name){
+        complete_address = complete_address+', '+item.state_name;
+      }
+      if(item.postal_code){
+        property_address = property_address+', '+item.postal_code;
+        complete_address = complete_address+', '+item.postal_code;
+      }
+      property_address = property_address.replace(/(^\s*,)|(,\s*$)/g, '');
+      complete_address = complete_address.replace(/(^\s*,)|(,\s*$)/g, '');
+      if(item.address_one.length > 28){
+        var short_addr = item.address_one.slice(0, 25);
+      }else{
+        var short_addr = item.address_one;
+      }
+
+      try{
+        if(item.bidding_start){
+          var bidding_start = getLocalDate(item.bidding_start, 'mm-dd-yyyy','ampm');
+        }else{
+          var bidding_start = '';
+        }
+      }catch(ex){
+          console.log(ex);
+          var bidding_start = '';
+      }
+
+      try{
+        if(item.bidding_start){
+          var new_today = item.new_today;
+        }else{
+          var new_today = '';
+        }
+      }catch(ex){
+          console.log(ex);
+          var new_today = '';
+      }
+      try{
+        if(item.bidding_end){
+          var bidding_end = getLocalDate(item.bidding_end, 'mm-dd-yyyy','ampm');
+        }else{
+          var bidding_end = '';
+        }
+      }catch(ex){
+          console.log(ex);
+          var bidding_end = '';
+      }
+      var now = new Date().getTime();
+      var sale_by_type = item.sale_by_type;
+      var added_on = getLocalDate(item.added_on, 'mm-dd-yyyy','ampm');
+      added_on = new Date(added_on);
+      var new_added_date = added_on.setDate(added_on.getDate() + 15);
+      if(parseInt(sale_by_type) == 1){
+        if(bidding_start != "" && bidding_end != ""){
+          var start_date_time = new Date(bidding_start).getTime();
+          var end_date_time = new Date(bidding_end).getTime();
+          var distance = end_date_time - now;
+          var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          if(new_today && now < start_date_time){
+            item_status = 'New Today'
+          }else if(now < start_date_time){
+            item_status = 'Coming Soon';
+          }else if(now > start_date_time && now < end_date_time){
+            if(parseInt(days) == 0){
+                item_status = 'Closing Today';
+            }else{
+                item_status = 'Now Bidding';
+            }
+          }
+        }
+      }else if(parseInt(sale_by_type) == 4){
+          var traditional_status_time = new Date(added_on).getTime();
+          if(parseInt(item.status_id) == 1){
+            if(new_today && now < start_date_time){
+              item_status = 'New Today'
+            }else if(now < traditional_status_time){
+              item_status = 'New';
+            }
+          }
+      }else if(parseInt(sale_by_type) == 6){
+        if(new_today && now < start_date_time){
+            item_status = 'New Today'
+        }else if(parseInt(days) == 0 && now > start_date_time && now < end_date_time){
+            item_status = 'Closing Today';
+        }
+      }else if(parseInt(sale_by_type) == 7){
+        if(new_today && now < start_date_time){
+            item_status = 'New Today'
+        }else if(parseInt(days) == 0 && now > start_date_time && now < end_date_time){
+            item_status = 'Closing Today';
+        }
+      }
+
+
+      var formatter = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        });
+      try{
+        if(parseInt(item.sale_by_type) == 7){
+          var price = 0;
+          if(parseInt(item.highest_best_format) == 3){
+            if(item.un_priced == true){
+              if(item.current_best_offer){
+                var price = item.current_best_offer;
+              }
+            }else{
+              if(item.current_best_offer){
+                var price = item.current_best_offer;
+              }else{
+                var price = item.property_price;
+              }
+            }
+          }else{
+            if(item.un_priced == false){
+              var price = item.property_price;
+            }
+          }
+          if(parseInt(price)){
+            if(price > parseInt(price)){
+               var property_price = formatter.format(price);
+            }else{
+              var property_price = formatter.format(parseInt(price));
+              property_price = property_price.replace(/\.0+$/,'');
+            }
+          }else{
+            var property_price = '';
+          }
+
+          /*if(item.un_priced == true){
+            var price = 0;
+            if(item.current_best_offer){
+              var price = item.current_best_offer;
+            }
+          }else{
+            if(parseInt(item.highest_best_format) == 3){
+              if(item.current_best_offer){
+                var price = item.current_best_offer;
+              }else{
+                var price = item.property_price;
+              }
+            }
+          }
+          if(parseInt(price)){
+            if(price > parseInt(price)){
+               var property_price = formatter.format(price);
+            }else{
+              var property_price = formatter.format(parseInt(price));
+              property_price = property_price.replace(/\.0+$/,'');
+            }
+          }else{
+            var price = item.property_price;
+            if(price > parseInt(price)){
+               var property_price = formatter.format(price);
+            }else{
+              var property_price = formatter.format(parseInt(price));
+              property_price = property_price.replace(/\.0+$/,'');
+            }
+          }*/
+
+        }else{
+          var price = item.property_current_price;
+          if(parseInt(price)){
+            if(price > parseInt(price)){
+               var property_price = formatter.format(price);
+            }else{
+              var property_price = formatter.format(parseInt(price));
+              property_price = property_price.replace(/\.0+$/,'');
+            }
+          }else{
+            var price = item.property_price;
+            if(price > parseInt(price)){
+               var property_price = formatter.format(price);
+            }else{
+              var property_price = formatter.format(parseInt(price));
+              property_price = property_price.replace(/\.0+$/,'');
+            }
+          }
+        }
+      }catch(ex){
+        console.log(ex);
+        var property_price = '$0';
+      }
+      var date_string = '';
+        if(parseInt(item.sale_by_type) == 7){
+          date_string = 'Offer ';
+        }
+
+        var favourite_listing = '';
+        if(item.is_favourite == true){
+          favourite_listing = 'active';
+        }
+        var date_section = '';
+        var auction_hide = ''
+        if(parseInt(item.sale_by_type) != 4){
+          respDateString = date_conversation_start_end_date(item.bidding_start, item.bidding_end)
+          date_section = '<div class="auction-start">' +
+              respDateString
+          '</div>'
+
+          //date_section = '<div class="auction-start"><div class="item"><span>'+date_string+'Start Date:'+bidding_start+''+date_string+'End Date: '+bidding_end+'</span></div></div>';
+        }
+        else {
+          auction_hide = 'auction-hide'
+        }
+
+        if(parseInt(item.sale_by_type) == 1 || parseInt(item.sale_by_type) == 6){
+          if(item.property_current_price){
+            var price_label = 'Current Bid';
+          }else{
+            var price_label = 'Starting Bid';
+          }
+        }else{
+          if(parseInt(item.sale_by_type) == 7){
+            if(item.highest_best_format == 3){
+              if(item.un_priced == true){
+                  if(item.current_best_offer){
+                    var price_label = 'Current Offer';
+                  }else{
+                    var price_label = 'Unpriced';
+                  }
+              }else{
+                if(item.current_best_offer){
+                  var price_label = 'Current Offer';
+                }else{
+                  var price_label = 'Asking Price';
+                }
+              }
+            }else{
+              if(item.un_priced == true){
+                var price_label = 'Unpriced';
+              }else{
+                var price_label = 'Asking Price';
+              }
+            }
+            /*if(item.un_priced == true){
+              if(item.current_best_offer){
+                var price_label = 'Current Offer';
+              }else{
+                var price_label = 'Unpriced';
+              }
+            }else{
+              if(parseInt(item.highest_best_format) == 3){
+                  if(item.current_best_offer){
+                    var price_label = 'Current Offer';
+                  }else{
+                    var price_label = 'Asking Price';
+                  }
+              }else{
+                var price_label = 'Asking Price';
+              }
+            }*/
+
+          }else{
+            var price_label = 'Asking Price';
+          }
+
+        }
+        var sess_user_id = '{{ sess_user_id }}';
+        var site_url = '{{ site_url }}';
+        var login_url = "/login?next=/our-listing-map/";
+        var no_items = "";
+        var link = '/asset-details/?property_id='+item.id;
+        if  (item.is_multiple_parcel){
+          var no_items = '<div class="nume">Number of Items: '+item.no_lots+'</div>';
+          var link = '/multiple-parcel/?portfolio_id='+item.parcel_id;
+        }
+        if(sess_user_id && sess_user_id != "None" && sess_user_id != ""){
+          var contentString='<div class="map-list '+ auction_hide +'" id="listing_map_inner_'+item.id+'"><div class="like_post '+favourite_listing+'" title="Add to favorite" onclick="make_favourite_listing(\''+item.id+'\',this)"><span class="icon star-icon">&nbsp;</span></div><a href="'+link+'"><figure><img class="slide-fixed" src="/static/theme-4/images/transparent2.png" alt="Transparent"><img class="slide-img" src="'+img_url+'" alt="real estate sales"><div class="top"><h4 class="property-price">'+price_label+'<span>'+property_price+'</span></h4><div class="badgeBoxes"><span class="stripe">'+item_status+'</span></div></div>'+no_items+'</figure><figcaption><div class="auction-startup"><div class="property-info"><h2 title="'+ complete_address +'"><span>'+short_addr+'</span>'+property_address+'</h2></div>'+date_section+' </div></div><ul class="tags"><li><h3>'+item.auction_type+'</h3></li><li class="blue-bg"><h3>'+item.property_asset+'</h3></li></ul></figcaption></a></div>';
+        }else{
+          var contentString='<div class="map-list '+ auction_hide +'" id="listing_map_inner_'+item.id+'"><div class="like_post '+favourite_listing+'" title="Add to favorite" onclick="redirect_login(\''+login_url+'\')"><span class="icon star-icon">&nbsp;</span></div><a href="'+link+'"><figure><img class="slide-fixed" src="/static/theme-4/images/transparent2.png" alt="Transparent"><img class="slide-img" src="'+img_url+'" alt="real estate sales"><div class="top"><h4 class="property-price">'+price_label+'<span>'+property_price+'</span></h4><div class="badgeBoxes"><span class="stripe">'+item_status+'</span></div></div>'+no_items+'</figure><figcaption><div class="auction-startup"><div class="property-info"><h2 title="'+ complete_address +'" ><span>'+short_addr+'</span>'+property_address+'</h2></div>'+date_section+'</div></div><ul class="tags"><li><h3>'+item.auction_type+'</h3></li><li class="blue-bg"><h3>'+item.property_asset+'</h3></li></ul></figcaption></a></div>';
+        }
+
+
+        //var infowindow = new google.maps.InfoWindow({content:item.name});
+        var infowindow = new google.maps.InfoWindow({content:contentString});
+        var image="/static/theme-4/images/pin-icon.png";
+
+        //if(item.latitude && item.longitude){
+          var latLng = new google.maps.LatLng(item.latitude,
+              item.longitude);
+          //var markerImage = new google.maps.MarkerImage(image, new google.maps.Size(30, 40));
+          marker = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            icon: {
+              url: image,
+              scaledSize: new google.maps.Size(30, 45), // scaled size
+              origin: new google.maps.Point(0,0), // origin
+              anchor: new google.maps.Point(0, 0) // anchor
+            },
+            title: item.name,
+          });
+          lookup_markers.push(marker);
+
+          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+              infowindow.setContent(contentString);
+              infowindow.open(map, marker);
+            }
+          })(marker, i));
+          /*google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
+            return function() {
+              infowindow.close();
+            }
+          })(marker, i));*/
+
+        //}
+
+    });
+    try{
+      if (markerClusterer) {
+        markerClusterer.clearMarkers();
+      }
+      var marker_image=base_url+"/static/theme-4/images/dot-icon.png";
+      console.log(marker_image);
+       markerClusterer = new MarkerClusterer(map, lookup_markers, {
+          maxZoom: 15,
+          gridSize: 50,
+          styles: [{url: marker_image, height: 38, width: 38, textColor: 'white'}],
+       });
+       /*markerClusterer = new MarkerClusterer(map, lookup_markers, {
+          imagePath:
+            "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+        });*/
+    }catch(ex){
+      console.log(ex);
+    }
+  }
+
+
+  /* map control button */
+  function initZoomControl(map) {
+    document.querySelector(".zoom-control-in").onclick = function () {
+      map.setZoom(map.getZoom() + 1);
+    };
+
+    document.querySelector(".zoom-control-out").onclick = function () {
+      map.setZoom(map.getZoom() - 1);
+    };
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(
+      document.querySelector(".zoom-control")
+    );
+    document.querySelector(".zoom-control").style.paddingTop = "10px";
+
+  }
+
+
+  function initFullscreenControl(map) {
+      const elementToSendFullscreen = map.getDiv().firstChild;
+      const fullscreenControl = document.querySelector(".fullscreen-control");
+      //map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(fullscreenControl);
+
+      fullscreenControl.onclick = function () {
+        if (isFullscreen(elementToSendFullscreen)) {
+          exitFullscreen();
+        } else {
+          requestFullscreen(elementToSendFullscreen);
+        }
+        document.querySelector(".zoom-control").style.paddingTop = "10px";
+      };
+
+      document.onwebkitfullscreenchange =
+        document.onmsfullscreenchange =
+        document.onmozfullscreenchange =
+        document.onfullscreenchange =
+          function () {
+            if (isFullscreen(elementToSendFullscreen)) {
+              fullscreenControl.classList.add("is-fullscreen");
+            } else {
+              fullscreenControl.classList.remove("is-fullscreen");
+            }
+          };
+    }
+
+    function isFullscreen(element) {
+      return (
+        (document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement) == element
+      );
+    }
+
+    function requestFullscreen(element) {
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.webkitRequestFullScreen) {
+        element.webkitRequestFullScreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.msRequestFullScreen) {
+        element.msRequestFullScreen();
+      }
+    }
+
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script>
+  const socket_domain = "{{ node_url }}";
+  var site_id = "{{ site_id|default:'' }}";
+</script>
+<script type="text/javascript" src="{% static 'theme-common/js/listing_socket.js' %}?v=1.1"></script>
+{% endblock %}

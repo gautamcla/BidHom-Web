@@ -1,0 +1,18 @@
+{% if document_list %}
+{% for doc in document_list %}
+<li rel_id="" rel_position="">
+  <figure>
+  {% if doc.extension == 'pdf' %}
+    <i class='fas fa-file-pdf'></i>
+  {% elif doc.extension == 'docx' %}
+    <i class='far fa-file-alt'></i>
+  {% elif doc.extension == 'doc' %}
+  <i class='fas fa-file-word'></i>
+  {% else %}
+  <i class="fas fa-file-image"></i>
+  {% endif %}
+    </figure>
+  <figcaption><a href="{{ aws_url }}{{ doc.bucket_name }}/{{ doc.doc_file_name }}" data-article-id="" data-image-id="" data-image-name="" data-image-section=""  class="close-btn"><h6>{{ doc.original_doc_name }}</h6></a></figcaption>
+</li>
+{% endfor %}
+{% endif %}

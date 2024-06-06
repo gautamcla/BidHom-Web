@@ -1,0 +1,41 @@
+// Import Bootstrap Compass integration
+@import "bootstrap-scss/bootstrap-compass";
+
+// Import custom Bootstrap variables
+@import "bootstrap-scss/bootstrap-variables";
+
+// Import Bootstrap for Sass
+@import "bootstrap-scss/bootstrap";
+
+@import "custom-scss/resetcss";
+
+
+//Import custom varialbles
+@import "custom-scss/custom-variable";
+
+// Import custom-mixing scss
+@import "custom-scss/custom-mixing";
+
+// Import common scss
+@import "custom-scss/common"; 
+
+// Import Plugins scss
+
+@import "plugin-scss/animate.scss";
+@import "plugin-scss/scrollCSS.scss";
+@import "plugin-scss/checkbox.scss";
+@import "plugin-scss/popup-page.scss";
+@import "plugin-scss/nav.scss";
+@import "plugin-scss/slider.scss";
+@import "plugin-scss/testimonial.scss";
+@import "plugin-scss/tooltip.scss";
+@import "plugin-scss/chosen-select.scss";
+@import "plugin-scss/toggle.scss";
+@import "plugin-scss/datepicker.scss";
+
+
+//Import "inner pages scss"
+
+@import "custom-scss/dashboard-page";
+@import "custom-scss/range-page";
+@import "custom-scss/propertybot-page";

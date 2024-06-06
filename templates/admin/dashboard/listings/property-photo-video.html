@@ -1,0 +1,282 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.1" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+ <div class="dashboard-body">
+        <div class="row">
+         <form name="property_photo_video_frm" id="property_photo_video_frm" method="post">
+             {% csrf_token %}
+            <input type="hidden" name="property_id" id="property_id" value="{{ request.GET.property_id }}" />
+            <input type="hidden" name="next_url" id="next_url" value="" />
+           <input type="hidden" name="step" id="step" value="3" />
+          <div class="col-md-12 col-sm-12">
+            <div class="table-heading">
+              <div class="item">
+                <h6>
+                  <strong>Add Listing </strong>
+                </h6>
+              </div>
+            </div>
+
+            <div class="website-plan">
+              <div class="steps">
+                <ul class="progressbar">
+                  <li class="active">
+                    <a href="{% if request.GET.property_id %}/admin/listing-property-info/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon property-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Property Information</span>
+                  </li>
+                  <li class="active">
+                    <a href="{% if request.GET.property_id %}/admin/property-map-view/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon map-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Map & Street View</span>
+                  </li>
+                  <li class="active">
+                    <a href="{% if request.GET.property_id %}/admin/property-photo-video/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon photos-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Property Photos & Videos</span>
+                  </li>
+                  <li>
+                    <a href="{% if request.GET.property_id %}/admin/property-document/?property_id={{ request.GET.property_id }}{% else %}#{% endif %}">
+                      <span class="circle">
+                        <div class="icon document-icon"></div>
+                      </span>
+                    </a>
+                    <span class="name">Due Diligence Vault</span>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- End .website-plan -->
+
+            <div class="customscroll bidder-accordian">
+              <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                              Property Photos & Videos
+                              <span class="icon"></span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                      <div class="panel-body">
+                        <h6>
+                          <i class="far fa-image red-text"></i> Photos
+                        </h6>
+                        <div class="upload-fav">
+                          <div class="item">
+                            <div class="dropzone" id="propertyImageFrm">
+                                <input type="hidden" id="property_image_id" name="property_image_id" value="{{ property_details.property_image_ids|default:'' }}"/>
+                                  <input type="hidden" name="property_image_name" id="property_image_name" value="{{ property_details.property_image_name|default:'' }}"/>
+                                  <div class="dz-default dz-message" data-dz-message="">
+                                    <div class="block">
+                                      <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Photos</button>
+                                    </div>
+                                    <div class="block">
+                                      or
+                                    </div>
+                                    <div class="block">
+                                      <h6>
+                                        Drag & Drop Docs
+                                        <span>Supported Files: jpg, jpeg, png</span>
+                                      </h6>
+                                    </div>
+                                  </div>
+                            </div>
+                          </div>
+                          <div class="item">
+                            <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                              <span class="tooltipp__content">Allowed file types are jpg, jpeg, png. Preferred image size is 617*414 px.</span>
+                            </div>
+                          </div>
+                        </div><!-- End .uplaod-fav -->
+                        <p id="custom_property_image_error"  class="custom_image_error" style="display:none;">Image is required.</p>
+                        <h6>
+                           Primary photos
+                          <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                            <span class="tooltipp__content right">Drag and drop photos to change their order.</span>
+                          </div>
+                        </h6>
+
+                        <div class="image-show-list" id="PropertyImgDiv" style="{% if property_details.photo|length > 0 %}{% else %}display:none;{% endif %}">
+                          <ul id="propertyImgList">
+                            {% for item in property_details.photo %}
+                            <li rel_id="{{ item.upload_id }}" rel_position="{{ forloop.counter }}">
+                              <a href="javascript:void(0)" data-article-id="{{ property_details.id }}" data-image-id="{{ item.upload_id }}" data-image-name="{{ item.doc_file_name }}" data-image-section="{{ item.bucket_name }}"  class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+                              <img src="{% if item.doc_file_name %}{{ aws_url }}{{ item.bucket_name }}/{{ item.doc_file_name }}{% else %}{% static 'admin/images/upload-banner-1.png' %}{% endif %}" alt="">
+                              <figcaption>
+                                <h6>
+                                  {{ item.doc_file_name }}
+                                </h6>
+                                <p class="size_date_sec" data-file-size="{{ item.file_size }}" data-added-date="{{ item.added_on }}">
+                                  File Size: {{ item.file_size }} <br>
+                                  Uploaded: {{ item.added_on|parse_iso|date:'M j, Y h:i:sa' }}
+                                </p>
+                                <div class="move">
+                                  <i class="fas fa-expand-arrows-alt"></i> Move
+                                </div>
+                              </figcaption>
+                            </li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+
+                        <h6>
+                          <i class="fas fa-video red-text"></i> Videos
+                          <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                            <span class="tooltipp__content right">Add Youtube/Vimeo video url</span>
+                          </div>
+                        </h6>
+
+                        <div class="add-video">
+                          <div class="block">
+
+                            <input type="hidden" name="property_video_id" id="property_video_id" class="form-control" value="{{ property_details.property_video_ids|default:'' }}">
+                            <input type="hidden" name="property_video_name" id="property_video_name" class="form-control" value="{{ property_details.property_video_name|default:'' }}">
+                            <input type="text" name="property_video_url" id="property_video_url" class="form-control" placeholder="Enter url" value="">
+                          </div>
+                          <div class="block">
+                            <button type="button" id="addVideoBtn" class="btn btn-primary">Add Video</button>
+                          </div>
+                        </div>
+                        <!-- <div class="upload-fav">
+                          <div class="item">
+                            <div class="dropzone" id="propertyVideoFrm">
+                                <input type="hidden" id="property_video_id" name="property_video_id" value=""/>
+                                  <input type="hidden" name="property_video_name" id="property_video_name" value=""/>
+                                  <div class="dz-default dz-message" data-dz-message="">
+                                    <div class="block">
+                                      <button type="button" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Videos</button>
+                                    </div>
+                                    <div class="block">
+                                      or
+                                    </div>
+                                    <div class="block">
+                                      <h6>
+                                        Drag & Drop Docs
+                                        <span>Supported Files: jpg, jpeg, png</span>
+                                      </h6>
+                                    </div>
+                                  </div>
+                            </div>
+                          </div>
+                          <div class="item">
+                            <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                              <span class="tooltipp__content">Prefered logo size is 226x76px. Raster (GIF, PNG, BMP, TIFF, JPEG 2000) and vector file formats (EPS, WMF, SVG) are recommended, as
+                                they support transparency. <br><img src="{% static 'admin/images/tooltip/banner.png' %}" alt=""></span>
+                            </div>
+                          </div>
+                        </div> -->
+                        
+                        <!-- End .uplaod-fav -->
+
+                        <p class="mb10">
+                           Primary Videos
+                        </p>
+
+                        <div class="image-show-list" id="PropertyVideoDiv" style="{% if property_details.video|length > 0 %}{% else %}display:none;{% endif %}">
+                          <ul id="propertyVideoList">
+                              {% for item in property_details.video %}
+                            <li rel_id="{{ item.upload_id }}">
+                              <a href="javascript:void(0)" data-article-id="{{ property_details.id }}" data-image-id="{{ item.upload_id }}" data-image-name="{{ item.doc_file_name }}" data-image-section="property_video"  class="close-btn confirm_image_delete"><i class="fas fa-times"></i></a>
+
+                              <iframe width="190" height="126" src="{{ item.doc_file_name }}" frameborder="0" allowfullscreen></iframe>
+      </iframe>
+
+                            </li>
+                              {% endfor %}
+                          </ul>
+                        </div>
+
+                      </div>
+                    </div>
+                </div><!-- End .panel -->
+
+              </div><!-- panel-group -->
+            </div><!-- End .customscroll -->
+
+            <div class="clearfix pt30">
+              <button type="button" name="property_image_submit_next_btn" id="property_image_submit_next_btn" value="Next" class="btn btn-primary">Next</button><button type="button" name="property_image_submit_exit_btn" id="property_image_submit_exit_btn" value="save_exit" class="btn btn-primary">Save & Exit</button><a href="/admin/listing/" class="btn btn-primary-bdr">Cancel</a>
+            </div>
+
+          </div><!-- End .col-md-10 -->
+            </form>
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/ckeditor/ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/properties.js' %}?v=1.0"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=3.8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+
+<script>
+    $(function() {
+      $('#datetimepicker1, #datetimepicker2').datetimepicker({
+
+      });
+      $('#propertyImgList').sortable({
+        stop: function(e, ui) {
+            $.map($(this).find('li'), function(el) {
+                console.log($(el).attr('class'));
+                var custom_index = parseInt($(el).index())+1;
+                $(el).attr('rel_position', custom_index);
+
+            });
+            reindex_prop_img_list();
+        }
+
+    });
+    });
+    function reindex_prop_img_list(){
+      var img_id_list = [];
+      var img_name_list = [];
+      var str_img_id = '';
+      var str_img_name = '';
+      $('#propertyImgList li').each(function(index){
+        var rel_id = $(this).find('a').attr('data-image-id');
+        var rel_name = $(this).find('a').attr('data-image-name');
+        img_id_list.push(rel_id);
+        img_name_list.push(rel_name);
+      });
+      str_img_id = img_id_list.toString();
+      str_img_name = img_name_list.toString();
+      $('#property_image_id').val(str_img_id);
+      $('#property_image_name').val(str_img_name);
+    }
+    $('.select').chosen();
+</script>
+{% endblock %}

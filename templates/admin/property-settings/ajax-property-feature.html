@@ -1,0 +1,255 @@
+{% load static %}
+{% load dashboard_extra %}
+
+
+    <div class="listing-top">
+      <div class="block">
+          <h6>{{feature_type_name}} : <b>{{total_contacts|default:'0'}}</b></h6>
+      </div>
+
+      <div class="block">
+        <ul>
+          <li>
+            <form action="" class="search-field last">
+                <div class="search-icon"><i class="fas fa-search"></i></div>
+                <input type="text" id="search" class="form-control input-sm" placeholder="Search for..." value="{{search}}">
+              <button class="btn btn-primary btn-sm pl20 searchBtn"  type="submit">Go!</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="listing-bottom">
+      <div class="block right">
+        <i class="fa fa-filter"></i> Filters
+      </div>
+      <div class="block">
+        <select class="form-control" name="asset_id" id="asset_id" required="required">
+          <option value="" {% if asset_id == '' %}selected="selected" {% endif %} >Asset Types</option>
+          {% for data in asset_data %}
+          <option value="{{data.id}}" {% if asset_id and asset_id == data.id %} selected="selected" {% endif %} >{{data.name}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="block" style="min-width: 130px;">
+        <select class=" form-control" name="per_page_record" id="per_page_record">
+              <option value="10" {% if page_size == 10%} selected {% endif %}>10 Records</option>
+              <option value="20" {% if page_size == 20%} selected {% endif %}>20 Records</option>
+              <option value="30" {% if page_size == 30%} selected {% endif %}>30 Records</option>
+              <option value="40" {% if page_size == 40%} selected {% endif %}>40 Records</option>
+              <option value="50" {% if page_size == 50%} selected {% endif %}>50 Records</option>
+        </select>
+      </div>
+      <div class="block">
+        <a type="button" class="btn btn-primary" data-toggle="modal" data-target=".add-property-feature-modal" ><i class="fa fa-user-plus" aria-hidden="true"></i> Add {{feature_type_name}}</a>
+      </div>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %} alert-danger {% elif message.tags == 'success' %} alert-success {% else %} alert-info {% endif %} alert-dismissible " role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>{{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-striped jambo_table bulk_action">
+            <thead>
+            <tr class="headings">
+                <th class="column-title">ID </th>
+                <th class="column-title">Name </th>
+                <th class="column-title">Property Asset Type </th>
+                <th class="column-title">Status </th>
+                <th class="column-title no-link last"><span class="nobr">Action</span>
+                </th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% if data %}
+                {% for ptype in data %}
+              <tr class="even pointer">
+                <td class=" ">{{ forloop.counter|add:start_index }}</td>
+                <td class=" ">{{ptype.name}}</td>
+                <td class=" ">{{ptype.asset_name}}</td>
+                <td class=" ">
+                    {% if ptype.is_active %}
+                    <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{ptype.id}}">Active</button> 
+                    {% else %}
+                    <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{ptype.id}}">Inactive</button> 
+                    {% endif %}
+                </td>
+                <td class="last">
+                    <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+                      <form method="post" data-id="{{ptype.id}}" action="{% url 'admin-property-fetaure-status-change' %}" class="ActiveInactive" >
+                          {% csrf_token %}
+                          <input type="hidden" name="feature_id" value="{{ptype.id}}">
+                          <input type="hidden" name="feature_type" value="{{feature_type_key}}">
+                          <input type="hidden" class="status-change" name="status" value="{{ptype.is_active|yesno:"0,1"}}">
+                          {% if ptype.is_active %}
+                          <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+                          {% else %}
+                          <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+                          {% endif %}
+                      </form>
+                      <button type="button" data-id="{{ptype.id}}" data-name="{{ptype.name}}" data-asset="{{ptype.asset_id}}" data-status="{{ptype.is_active}}" class="btn btn-xs btn-round btn-primary edit-property-feature"><i class="fa fa-edit"></i> Edit</button>
+                    </div>
+                </td>
+              </tr>
+                {% endfor %}
+            {% else %}
+                <tr>  <td class=" ">No {{feature_type_name}} available </td></tr>
+            {% endif %}
+            
+            </tbody>
+        </table>
+
+        {% if  total_contacts > 0 %}
+        <nav aria-label="Page navigation example" style="float:right;">
+        <ul class="pagination justify-content-end">
+            {{pagination|safe}}
+        </ul>
+        </nav>
+        {% endif %}
+    </div>
+       
+
+<!-- Property Feature type modal -->
+  <div class="modal fade add-property-feature-modal centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">{{feature_type_name}}</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'admin-property-features' %}" id="addPropertyFeatureForm" data-parsley-validate class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <input type="hidden" name="feature_type" value="{{feature_type_key}}"/>
+            <div class="form-group">
+              <label class="lh46 col-md-4 col-sm-4 col-xs-12" for="name">Name<span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-4 col-sm-4 col-xs-12" for="asset_id">Property Asset Type <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="form-control" name="asset_id" required="required">
+                    {% for data in asset_data %}
+                        <option value="{{data.id}}" >{{data.name}}</option>
+                    {% endfor %}
+                </select>              
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-4 col-sm-4 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="form-control" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-4 col-sm-4 col-xs-12">
+                &nbsp;
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modals -->
+
+
+  <!--Edit Address Type Modal-->
+  <div class="modal fade edit-property-feature-modal centered-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">{{feature_type_name}}</h4>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'admin-property-features' %}" id="editPropertyFeatureForm" data-parsley-validate class="form-horizontal form-label-left">
+            {% csrf_token %}
+            <input type="hidden" name="feature_type" value="{{feature_type_key}}"/>
+            <input type="hidden" id="feature_id" name="feature_id" >
+            <div class="form-group">
+              <label class="lh46 col-md-4 col-sm-4 col-xs-12" for="name">Name<span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="edit_name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-4 col-sm-4 col-xs-12" for="asset_id">Property Asset Type <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <select class="select form-control" id="edit_asset" name="asset_id" required="required">
+                    {% for data in asset_data %}
+                        <option value="{{data.id}}" >{{data.name}}</option>
+                    {% endfor %}
+                </select>              
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="lh46 col-md-4 col-sm-4 col-xs-12" for="is_active">Status <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+              <select class="select form-control" id="edit_is_active" name="is_active" required="required">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-4 col-sm-4 col-xs-12">
+                &nbsp;
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-primary-bdr" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End modal-->
+
+
+
+{% block js_content %}
+  <script>
+  $(function() {
+    $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+    $('#addPropertyFeatureForm').parsley();
+
+  });
+  </script>
+
+<script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+
+
+
+{% endblock %}

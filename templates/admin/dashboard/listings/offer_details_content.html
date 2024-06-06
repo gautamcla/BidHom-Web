@@ -1,0 +1,298 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+<div class="head">
+  <h5>
+    Details
+  </h5>
+  {% if offer.is_sold %}
+    {% if offer.is_accepted %}
+      {% if offer.is_accepted.accepted and offer.is_accepted.accepted_by|lower == 'seller' %}
+        {% define_var 'Offer Accepted' as offer_text %}
+        {% define_var 1 as offer_val %}
+      {% else %}
+        {% define_var 'Offer Accepted by buyer' as offer_text %}
+        {% define_var 1 as offer_val %}
+      {% endif %}
+    {% elif offer.is_rejected %}
+      {% if offer.is_rejected.declined and offer.is_rejected.declined_by|lower == 'seller' %}
+        {% define_var 'Offer Rejected' as offer_text %}
+        {% define_var 2 as offer_val %}
+      {% else %}
+        {% define_var 'Offer Rejected by buyer' as offer_text %}
+        {% define_var 2 as offer_val %}
+      {% endif %}
+    {% else %}
+      {% define_var 'Sold' as offer_text %}
+      {% define_var 2 as offer_val %}
+    {% endif %}
+  {% else %}
+    {% if offer.is_accepted %}
+      {% if offer.is_accepted.accepted and offer.is_accepted.accepted_by|lower == 'seller' %}
+        {% define_var 'Offer Accepted' as offer_text %}
+        {% define_var 1 as offer_val %}
+      {% else %}
+        {% define_var 'Offer Accepted by buyer' as offer_text %}
+        {% define_var 1 as offer_val %}
+      {% endif %}
+    {% elif offer.is_rejected %}
+      {% if offer.is_rejected.declined and offer.is_rejected.declined_by|lower == 'seller' %}
+        {% define_var 'Offer Rejected' as offer_text %}
+        {% define_var 2 as offer_val %}
+      {% else %}
+        {% define_var 'Offer Rejected by buyer' as offer_text %}
+        {% define_var 2 as offer_val %}
+      {% endif %}
+    {% else %}
+      {% define_var 'Offer Pending' as offer_text %}
+      {% define_var 2 as offer_val %}
+    {% endif %}
+  {% endif %}
+  <div class="btns">
+    <a href="#" class="btn btn-danger btn-sm">{{ offer_text }}</a>
+    {% if offer.buyer_id != session_user_id %}<a class="btn btn-secondary btn-sm" href="javascript:void(0)" onclick="show_offer_chat('{{ offer.property|default:'' }}','{{ offer.buyer_id }}')">Chat</a>{% endif %}
+  </div>
+
+</div>
+
+<div class="offerdetail-main-bg">
+  <div class="bidderrecord-top">
+    <figure>
+      <img src="{% if offer.property_detail.property_image.image %}{{ aws_url }}{{ offer.property_detail.property_image.bucket_name }}/{{ offer.property_detail.property_image.image }}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt="">
+    </figure>
+    <figcaption>
+      <h6>
+        {{ offer.property_detail.address_one|default:'' }}
+        <span><i class="fas fa-map-marker-alt"></i> {{ offer.property_detail.city|default:'' }}, {{ offer.property_detail.state|default:'' }}, {{ offer.property_detail.postal_code|default:'' }}</span>
+      </h6>
+    </figcaption>
+    <ul>
+      <li>
+        <span>Listing type:</span> Traditional Sale
+      </li>
+      <li>
+        <span>Asking Price:</span> ${{ offer.asking_price|convert_float|intcomma|default:'0' }}
+      </li>
+      {% if offer.winning_amount > 0 %}
+      <li>
+        <span>Winning Amount:</span> ${{ offer.winning_amount|convert_float|intcomma|default:'0' }}
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingOne">
+          <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="">
+                Buyer Information
+                <span class="icon"></span>
+              </a>
+          </h4>
+      </div>
+      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="collapseOne">
+        <div class="panel-body">
+          <div class="table-responsive">
+          <table class="offerdetailListtable">
+            <tr>
+              <td>
+                Buyer
+              </td>
+              <td>
+                {{ offer.user_detail.first_name|default:'' }} {{ offer.user_detail.last_name|default:'' }}
+              </td>
+              <td>
+                Phone
+              </td>
+              <td>
+                {{ offer.user_detail.phone_no|format_phone|default:'' }}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Buyer Email
+              </td>
+              <td>
+                {{ offer.user_detail.email|default:'' }}
+              </td>
+              <td>
+                Date
+              </td>
+              <td>
+                <p class="convert_to_local_date_time" data-value="{{ offer.added_on|default:'' }}">{{ offer.added_on|default:'' }}</p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Address
+              </td>
+              <td colspan="3">
+                {{ offer.user_detail.address_first|default:'' }} {{ offer.user_detail.city|default:'' }}, {{ offer.user_detail.state|default:'' }}, {{ offer.user_detail.postal_code|default:'' }}
+              </td>
+              <!--<td>
+                Price
+              </td>
+              <td>
+                ${{ offer.asking_price|convert_float|intcomma|default:'0' }}
+              </td>-->
+            </tr>
+
+          </table>
+        </div>
+        </div>
+      </div>
+    </div><!-- End .panel-default -->
+
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingTwo">
+          <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" class="">
+                Buyer Questionnaire
+                <span class="icon"></span>
+              </a>
+          </h4>
+      </div>
+      <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+        <div class="panel-body">
+          <ul class="offerdetailList">
+            {% if offer.user_type == 2 %}
+              <li>
+                <span>Have you committed to working with an agent yet?: </span>
+                {% if offer.working_with_agent %}Yes, I have{% else %} No, I haven’t{% endif %}</label>
+
+              </li>
+              {% if not offer.working_with_agent %}
+              <li>
+                <span>Have you toured the property in person?: </span>
+                {% if offer.property_in_person == 1 %}Yes, I have{% elif offer.property_in_person == 2 %} No, not yet{% else %}I would like to see it{% endif %}</label>
+
+              </li>
+              <li>
+                <span>Have you been pre-qualified by your lender?: </span>
+                {% if offer.pre_qualified_lender == 1 %}Yes, I have{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %} I’m buying with all cash{% endif %}</label>
+
+              </li>
+              {% endif %}
+            {% else %}
+              <li>
+                <span>Have you toured the property with your client in person?: </span>
+                {% if offer.property_in_person == 1 %}Yes, we have{% elif offer.property_in_person == 2 %} No, not yet{% else %} We would like to see it{% endif %}</label>
+              </li>
+              <li>
+                <span>Has your client been pre-qualified by a lender?: </span>
+                {% if offer.pre_qualified_lender == 1 %}Yes{% elif offer.pre_qualified_lender == 2 %} No, not yet{% else %}  Buying with all cash{% endif %}</label>
+
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div><!-- End .panel-default -->
+
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingThree">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree" class="">
+            Offer Documents
+            <span class="icon"></span>
+          </a>
+        </h4>
+      </div>
+      <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingThree">
+        <div class="panel-body">
+          <div class="buyer-doc">
+            <h6>Buyer Documents</h6>
+            <div class="btns">
+              {% if offer.document %}<a href="javascript:void(0)" class="btn btn-secondary btn-sm" onclick="get_offer_documents('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}');"><i class="fas fa-eye"></i> View Document</a>{% else %}-{% endif %}
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- End .panel-default -->
+
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingFour">
+          <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="true" aria-controls="collapseFour" class="">
+                Offer Details
+                <span class="icon"></span>
+              </a>
+          </h4>
+      </div>
+      <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFour">
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table width="100%" class="table table-scroll offerdetailTable">
+              <thead>
+                <tr>
+                  <th>
+                    User
+                  </th>
+                  <th>
+                    Offer Amount
+                  </th>
+                  <th>
+                    Status
+                  </th>
+                  <th>
+                    Action
+                  </th>
+                  <th>
+                    Date
+                  </th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                {% if offer.offer_history|length > 0 %}
+                  {% for history in offer.offer_history %}
+                  <tr>
+                    <td>
+                      {% if user_id == history.user %}
+                      You
+                    {% else %}
+                      {{ history.first_name }} {{ history.last_name }}
+                    {% endif %}
+                    </td>
+                    <td>
+                      ${{ history.offer_price|convert_float|intcomma|default:'0' }}
+                    </td>
+                    <td>
+                      <span class="badge badge-success">
+                        {{ history.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <a href="javascript:void(0)" onclick="show_offer_message('{{ history.comments|escape_char|default:'NA' }}');" class="blue-text" title="View Message">View Details</a>
+                    </td>
+                    <td class="convert_to_local_date_time" data-value="{{ history.added_on|default:'' }}">
+                      {{ history.added_on|default:'' }}
+                    </td>
+                  </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td colspan="5">
+                    <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- End .panel-default -->
+
+  </div><!-- End .panel-group -->
+
+</div>
+<div class="clearfix">
+  <button class="btn btn-green btn-sm" id="accept_offer" {% if offer.can_accept %}onclick="confirm_seller_accept_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_accept %}disabled{% endif %}>Accept Offer</button> <button class="btn btn-primary btn-sm" id="counter_offer" {% if offer.can_counter %}onclick="counter_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_counter %}disabled{% endif %} >Make Counter Offer</button>
+  <button class="btn btn-secondary btn-sm" id="reject_offer"  {% if offer.can_reject %}onclick="confirm_seller_reject_offer('{{ offer.property_detail.id|default:'' }}','{{ offer.master_offer|default:'' }}')"{% endif %} {% if not offer.can_reject %}disabled{% endif %}>Decline Offer</button>
+</div>
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+{% endblock %}

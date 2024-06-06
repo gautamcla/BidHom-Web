@@ -1,0 +1,47 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if bid_history %}
+{% for bids in bid_history %}
+    <tr>
+        <td>
+        {{ forloop.counter|add:start_index }}
+        </td>
+        <td>
+        {% if bids.bidder_detail %}
+        {{bids.bidder_detail.first_name}} {{bids.bidder_detail.last_name}}
+        {% else %}
+        -
+        {% endif %}
+        </td>
+         <td>
+        {% if bids.bidder_detail %}
+        {{bids.bidder_detail.email|default:'-'}}
+        {% endif %}
+        </td>
+        <td>
+        {% if bids.bidder_detail %}
+        {{bids.bidder_detail.phone_no|default:''|format_phone}}
+        {% endif %}
+        </td>
+        <td>
+        ${{bids.bid_amount|intcomma|default:'0'}}
+        </td>
+        <td>
+        {{bids.ip_address|default:'-'}}
+        </td>
+        <td class="convert_to_local_date_time" data-value="{{ bids.bid_date|default:'' }}">
+        {{bids.bid_date|default:'-'}}
+        </td>
+    </tr>
+{% endfor %}
+{% else %}
+<tr>
+    <td class="fullwidth text-center" colspan="7"><img src="{% static 'theme-4/images/no-data-image.png' %}" alt="real estate sales"></td>
+</tr>
+{% endif %}
+
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>
+
+{% endblock %}

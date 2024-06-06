@@ -1,0 +1,120 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'theme-4/css/images-grid.css' %}?v=1.1" type="text/css" rel="stylesheet" />
+    <style>
+     * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+{% endblock %}
+{% block content %}
+{% load humanize %}
+
+<div class="body-content">
+    <h4 style="text-align:center;color:blue;">Welcome Socket Programming</h4>
+    <h4 id="broadcast" style="text-align:center;color:red;"> </h4>
+    <h4 id="test" style="text-align:center;color:red;"> </h4>
+    <h4 id="watcher" style="text-align:center;color:red;"> </h4>
+    <h4 style="text-align:center;color:red;"> Auction Data</h4>
+    <h5 id="start_date" style="text-align:center;color:red;"> </h5>
+    <h5 id="end_date" style="text-align:center;color:red;"> </h5>
+    <h5 id="start_price" style="text-align:center;color:red;"> </h5>
+    <h5 id="reserve_amount" style="text-align:center;color:red;"> </h5>
+    <h5 id="bid_increments" style="text-align:center;color:red;"> </h5>
+    <h5 id="msg" style="text-align:center;color:red;"> </h5>
+
+</div><!-- end .body-content -->
+{% endblock %}
+
+{% block js_content %}
+<script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+
+<script>
+const socket_domain = "{{node_url}}";
+const socket = io.connect(socket_domain, {
+    transports: ["websocket", "xhr-polling", "htmlfile", "jsonp-polling"],
+    rejectUnauthorized: false,
+    requestCert: false,
+});
+
+// -------------------Socket call----------------
+<!--socket.on('newconnection',function(data) {-->
+<!--    $("#broadcast").html(data.description)-->
+<!--});-->
+
+<!--socket.emit("test");-->
+<!--socket.on('test',function(data) {-->
+<!--    $("#test").html(data.msg)-->
+<!--});-->
+
+<!--socket.emit("watcher");-->
+<!--socket.on('watcher',function(data) {-->
+<!--    $("#watcher").html(data.no_watcher)-->
+<!--});-->
+
+
+<!--socket.emit("checkAuctionData", {"id":1, "property_id": 74});-->
+<!--socket.on('checkAuctionData',function(data) {-->
+<!--    console.log(data.data)-->
+<!--    data = data.data-->
+<!--    $("#start_date").html(data.start_date)-->
+<!--    $("#end_date").html(data.end_date)-->
+<!--    $("#start_price").html(data.start_price)-->
+<!--    $("#reserve_amount").html(data.reserve_amount)-->
+<!--    $("#bid_increments").html(data.bid_increments)-->
+<!--    $("#msg").html(data.msg)-->
+<!--});-->
+
+<!--// Check bid amount at user end-->
+<!--socket.emit("checkBid", {"user_id":111, "property_id": 54, "auction_id": 49, "domain_id": 68});-->
+<!--socket.on('checkBid',function(data) {-->
+<!--    console.log(data)-->
+<!--});-->
+
+// Check bid amount at user end
+<!--socket.emit("bidHistory", {"property_id": 74, "auction_id": 65, "domain_id": 68});-->
+<!--socket.on('bidHistory',function(data) {-->
+<!--    console.log(data)-->
+<!--});-->
+
+<!--// heck auction status based on time and mark sold or ended etc..-->
+<!--socket.emit("checkAuction", {"property_id": 74, "domain_id": 68});-->
+<!--socket.on('checkAuction',function(data) {-->
+<!--    console.log(data)-->
+<!--});-->
+
+
+
+// Check bid amount at user end
+<!--socket.emit("addBid", {"property_id": 74, "auction_id": 65, "domain_id": 68, "min_bid_amount": 1000, "bid_amount": 4000, "bid_increment": 1000, "user_id": 188});-->
+<!--socket.on('addBid',function(data) {-->
+<!--    console.log(data)-->
+<!--});-->
+
+
+<!--// Check bid amount at user end-->
+<!--socket.emit("addBid", {"property_id": 51, "auction_id": 46, "domain_id": 68, "min_bid_amount": 5000, "bid_amount": 11000, "bid_increment": 1000, "user_id": 111});-->
+<!--socket.on('addBid',function(data) {-->
+<!--    console.log(data)-->
+<!--});-->
+
+
+
+socket.on('newclientconnect',function(data) {
+ console.log(data)
+});
+
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "layout/theme-4/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% load humanize %}
+<div class="register-wrap" id="regSection">
+  <div class="register-inner">
+    <div class="register-left">
+      <h1 class="pb10">
+        {% if site_id == 192 %}
+          Create Your Free Revol Bidding Account
+        {% else %}
+          Ready to be there from {{site_detail.company_name}}
+        {% endif %}
+      </h1>
+      <h2 class="pb20">
+        Search, watch and bid from anywhere
+      </h2>
+      <h3 class="pb10">
+        Member Benefits
+      </h3>
+      <ul>
+        <li>
+          - Get unlimited access to our marketplace properties
+        </li>
+        <li>
+          - Subscribe to be one of the first to know about upcoming opportunities
+        </li>
+        <li>
+          - Watch bidding live
+        </li>
+        <li>
+          - Download / view diligence documents
+        </li>
+        <li>
+          - Register and bid 
+        </li>
+      </ul>
+    </div><!-- End .register-left -->
+    <div class="register-right">
+      <h5 class="pb10">
+        Create Your Free Account
+      </h5>
+      <form method="post" name="user_register_frm" id="user_register_frm">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="first_name">Select Type</label>
+              <select id="describedBy" name="described_by" class="chosen-select form-control" required>
+                <option value="" disabled selected>What Describes You Best? </option>
+                <option value="1">Buyer</option>
+                <option value="2">Seller </option>
+                <option value="3">Broker/Agent </option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label >First name</label>
+              <input type="text" name="first_name" id="first_name" class="form-control alphaAccpt" placeholder="First name" aria-label="First Name" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label >Last name</label>
+              <input type="text" name="last_name" id="last_name" class="form-control alphaAccpt" placeholder="Last name" aria-label="Last Name" required>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" name="email" id="email" class="form-control" placeholder="Email" aria-label="Email" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label" for="password">Create Password</label>
+              <input type="password"  name="password" id="password" class="form-control" maxlength="12" placeholder="Create Password"  aria-label="pwd" required>
+              <div class="tooltipp"><i class="fas fa-question-circle" role="presentation"></i>
+                <span class="tooltipp__content right-bottom pwd">
+                  <ul class="pwd-required">
+                    <li>
+                      Min 6 Characters
+                    </li>
+                    <li>
+                      Include at least 1 uppercase letter
+                    </li>
+                    <li>
+                      Include at least 1 number
+                    </li>
+                  </ul>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="phone">Phone number</label>
+              <input type="text" name="phone" id="phone" class="form-control" aria-label="Phone" placeholder="Phone number" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="10" required>
+            </div>
+          </div>
+        </div>
+        <div class="row broker-agent-inputs" style="display:none;">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="brokerage_name">Brokerage Name</label>
+              <input type="text"  name="brokerage_name" id="brokerage_name" aria-label="Brokerage" class="form-control" placeholder="Brokerage Name" required>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="licence_number">License State &amp; No.</label>
+              <input type="text" name="licence_number" id="licence_number" class="form-control" placeholder="License State" aria-label="License State" maxlength="10" required>
+              <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                <span class="tooltipp__content right-bottom pwd">
+                  <ul class="pwd-required">
+                    <li>
+                      Ex: KS 012345678
+                    </li>
+                  </ul>
+                </span>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+        <div class="form-group">
+          <input type="checkbox" checked name="agree_term" id="agreeTerm" value="1" class="css-checkbox" aria-label="agree" required>
+          <label for="agreeTerm" class="check-label">I am agree to the <a href="/terms/" class="term-text" target="_blank" aria-label="Marketplace" tabindex="1">Terms &amp; Conditions</a> and confirm that
+            I am over 18 year of age.</label>
+        </div>
+        <div class="form-group" id="first_recapcha">
+          <div class="g-recaptcha" data-sitekey="{{captcha_site_key}}" data-callback="recaptchaCallback"></div>
+          <input type="hidden" class="hiddenRecaptcha required" name="hiddenFirstRecaptcha" id="hiddenFirstRecaptcha" aria-label="captcha">
+          <p id="custom_captcha_error" style="display:none;"  class="error">Please confirm you are a human.</p>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6 col-sm-6">
+            <button role="button" type="submit" id="btn_reg" class="btn btn-secondary btn-full" tabindex="1">Sign Up</button>
+          </div>
+          <div class="col-md-6 col-sm-6">
+            <a role="button" href="/login/" class="btn btn-primary btn-full" tabindex="2">Cancel</a>
+          </div>
+          <div class="col-md-12 not-account center pt10">
+            Already a member? <a role="button" href="{% url 'login' %}" class="signup-txt" tabindex="3">Sign In</a>
+          </div>
+        </div>  
+      </form>
+    </div><!-- End .register-right -->
+  </div><!-- End .register-innder -->
+</div><!-- End .register-wrap -->
+
+<div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+{% endblock %}
+
+
+{% block js_content %}
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+  <script type="text/javascript" src="{% static 'theme-common/js/jquery.growl.js' %}?v=4.7"></script>
+  <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'theme-common/js/authentication.js' %}?v=1.1"></script>
+  <script>
+  $(function(){
+    var captcha_site_key = '{{captcha_site_key}}';
+  });
+    
+</script>
+{% endblock %}

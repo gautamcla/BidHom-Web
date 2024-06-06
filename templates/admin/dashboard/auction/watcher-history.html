@@ -1,0 +1,42 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if watcher_history %}
+{% for watcher in watcher_history %}
+<tr>
+    {% if watcher.watcher_detail %}
+    <td>
+        <a href="javascript:void(0);" data-id="{{watcher.id}}" class="blue-text show-bidder-info"><strong>{{watcher.watcher_detail.first_name}}&nbsp;{{watcher.watcher_detail.last_name}}&nbsp;<i {% if forloop.counter0 == 0  %}class="fas fa-chevron-up" {% else %}class="fas fa-chevron-down"{% endif %} id="arrowPositionBidder{{watcher.id}}"></i></strong></a><br>
+        <p id="showBidderinfoBidder{{watcher.id}}" {% if forloop.counter0 != 0  %}style="display:none"{% endif %}>
+            {% if watcher.watcher_detail.address_first %}
+            <span class="blue-text">
+            {{watcher.watcher_detail.address_first}},
+            </span><br>
+            {% endif %}
+            <span class="blue-text">
+            {% if watcher.watcher_detail.city %}
+            {{watcher.watcher_detail.city}},
+            {% endif %}
+            {% if watcher.watcher_detail.state %}
+            {{watcher.watcher_detail.state}},
+            {% endif %}
+            {% if watcher.watcher_detail.postal_code %}
+            {{watcher.watcher_detail.postal_code}}
+            {% endif %}
+            </span><br>
+            <span class="blue-text">{{watcher.watcher_detail.phone_no|default:''|format_phone}}</span><br>
+            <span class="blue-text">{{watcher.watcher_detail.email}}</span><br>
+            {{watcher.watcher_detail.ip_address|default:''}}
+        </p>
+    </td>
+    {% endif %}
+</tr>
+{% endfor %}
+{% else %}
+<div class="block-item">
+  <div class="item fullwidth"><img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" /></div>
+</div>
+{% endif %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=4.7"></script>
+{% endblock %}

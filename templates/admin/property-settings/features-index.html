@@ -1,0 +1,51 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% block title %} Property Lookups {% endblock title %}
+
+{% block styles %}
+  <link href="{% static 'admin/vendors/jQuery-Multiple-Select/dist/css/selectize.bootstrap3.css' %}" type="text/css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+    <div class="form-group">
+      <label class=" " for="feature_type">Choose Property Feature To View/Manage </label>
+      <select class="select form-control" name="feature_type" id="feature_type" required="required">
+            <option value="" disabled selected>Choose Property Feature</option>
+            {% for key, value in property_feature_list.items %}
+            <option value="{{key}}">{{value}}</option>
+            {% endfor %}
+      </select>
+    </div>
+    
+    <div class="ln_solid"></div>
+    <input type="hidden" name="page-property-feature-list" id="page-property-feature-list" value="1" />						
+
+    <div id="property-features-list">
+    </div>
+  
+</div>
+
+
+{% endblock%}
+
+{% block js_content %}
+  <script>
+  $(function() {
+      setTimeout(function() {
+          $(".alert").hide();
+      }, 3000);
+  });
+  </script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/common.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/property-features.js' %}?v=1.0"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/boolean-active-inactive.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/build/js/jquery-ui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/vendors/jQuery-Multiple-Select/dist/js/standalone/selectize.js' %}"></script>
+
+
+{% endblock %}

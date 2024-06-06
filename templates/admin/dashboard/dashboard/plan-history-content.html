@@ -1,0 +1,31 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if plan_history_list %}
+    {% for history in plan_history_list %}
+      <tr>
+        <td>
+          &nbsp;{{ history.member_plan }}
+        </td>
+        <td class="convert_to_local_date_time" data-value="{{ history.payment_date|default:'' }}">{{ history.payment_date }}</td>
+        <td>
+          {{ history.theme_name|default:'' }}
+        </td>
+        <td>
+          &nbsp;${{ history.amount|floatformat:"-2"|intcomma }}
+        </td>
+
+        <td>
+          <span class="label label-success">Success</span>
+        </td>
+        <td class="center">
+          <a href="javascript:void(0)" onclick="download_invoice_pdf('{{ history.id|default:'' }}')" data-toggle="tooltip" data-placement="top" title="Download PDF" download><img src="{% static 'admin/images/download-invoice.svg' %}" alt=""></a>
+        </td>
+      </tr>
+    {% endfor %}
+  {% else %}
+    <tr><td colspan="5" class="center"><span class="text-danger"><img src="/static/admin/images/no-data-image.png" alt=""></span></td></tr>
+  {% endif %}
+{% block js_content %}
+<script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=5.1"></script>
+{% endblock %}

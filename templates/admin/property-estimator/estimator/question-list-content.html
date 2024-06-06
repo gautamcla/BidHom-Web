@@ -1,0 +1,35 @@
+{% load static %}
+{% if estimator_question_list %}
+    {% for ques in estimator_question_list %}
+    <tr class="even pointer">
+    <td class=" ">{{ forloop.counter0|add:sno }}</td>
+    <td class=" ">{{ques.category_name}}</td>
+    <td class=" ">{{ques.question}}</td>
+    <td class=" ">
+      {% if ques.status_name|lower == 'active' %}
+      <button type="button" class="btn  btn-xs btn-round btn-success" id="statusText{{ques.id}}">Active</button>
+      {% else %}
+      <button type="button" class="btn  btn-xs btn-round btn-warning" id="statusText{{ques.id}}">Inactive</button>
+       {% endif %}
+    </td>
+    <td class="last">
+      <div class="btn-toolbar" role="toolbar" style="display:inline-flex;">
+        <button type="button" data-id="{{ques.id}}" data-name="{{ques.name}}" data-status="{% if ques.status_name|lower == 'active' %}1{% else %}0{% endif %}" data-slug="{{ ques.slug|default:'' }}" class="btn btn-xs btn-round btn-primary edit-question"><i class="fa fa-edit"></i> Edit</button>
+          {% comment %}
+          <input type="hidden" name="event_id" value="{{ques.id}}">
+          <input type="hidden" class="status-change" name="status" value="{% if ques.status_name|lower == 'active' %}0{% else %}1{% endif %}">
+          {% if ques.status_name|lower == 'active' %}
+            <button type="submit" class="btn btn-xs btn-round btn-warning"><i class="fa fa-remove"></i> Deactivate</button>
+          {% else %}
+            <button type="submit" class="btn btn-xs btn-round btn-success"><i class="fa fa-check"></i> Activate</button>
+          {% endif %}
+          {% endcomment %}
+      </div>
+
+    </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr>  <td class=" ">No Question available </td></tr>
+{% endif %}
+<script type="text/javascript" src="{% static 'admin/build/js/estimator-question.js' %}"></script>

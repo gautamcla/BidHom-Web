@@ -1,0 +1,187 @@
+{% load static %}
+{% load dashboard_extra %}
+{% load humanize %}
+{% if favorite_listing %}
+    {% for listing in favorite_listing %}
+    <div class="list" id="favourite_row_{{ listing.property }}">
+
+      <div class="list-left">
+        <figure>
+          <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+            <img class="slide-fixed" src="{% static 'theme-4/user-dashboard/images/transparent.png' %}" alt="real estate sales">
+            <img class="slide-img" src="{% if listing.image.image %}{{ aws_url }}{{ listing.image.bucket_name }}/{{ listing.image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales">
+          </a>
+        </figure>
+        <figcaption>
+          <div class="type">
+            {{ listing.auction_type }}
+          </div>
+          <h6 class="name">
+            <span title="{{ listing.address_one }}">{% if listing.address_one|length > 25 %}{{ listing.address_one|slice:":22" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+          </h6>
+          <div class="location">
+            <i class="fa-solid fa-location-dot"></i> {{ listing.city }}, {{ listing.state }}
+          </div>
+        </figcaption>
+      </div><!-- End .list-left -->
+
+      <div class="list-right">
+        <ul class="top-list">
+          <li>
+            <h6>
+              Property Type
+              <span class="blue-text">
+                {{ listing.property_type }}
+              </span>
+            </h6>
+          </li>
+          <li>
+            <h6>
+              Asset Information
+              
+                {% if listing.auction_type_id == 4  %}
+                  <div class="price-info">
+                    <div class="price">
+                      <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                    </div>
+                  </div>
+                {% elif listing.auction_type_id == 6  %}
+                  <div class="price-info">
+                    <div class="price">
+                      <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                    </div>
+                  </div>
+                {% elif listing.auction_type_id == 7  %}
+                  <div class="price-info">
+                    <div class="price">
+                      {% if listing.un_priced == True %}
+                        {% if listing.current_best_offer_amount %}
+                          <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                        {% else %}
+                        <span class="blue-text">Unpriced</span>
+                        {% endif %}
+                      {% else %}
+                        {% if listing.un_priced == False %}
+                          {% if listing.highest_best_format == 3 %}
+                            {% if listing.current_best_offer_amount %}
+                              <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                            {% else %}
+                              <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                            {% endif %}
+                          {% else %}
+                            <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                          {% endif %}
+                        {% endif %}
+        
+                      {% endif %}
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="price-info">
+                    <div class="price">
+                      <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                    </div>
+                    <div class="price">
+                      <span class="blue-text">Bid Increment:</span> ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+                    </div>
+                  </div>
+                {% endif %}
+            </h6>
+          </li>
+          <li>
+            <h6>
+              Unfavorite
+              <span> 
+                <a href="javascript:void(0)" onclick="fav_property_delete_confirmation({{ listing.property }});" class="badge badge-info"><i class="fa fa-trash"></i></a>
+              </span>
+            </h6>
+          </li>
+        </ul>
+      </div><!-- End .list-right -->
+
+
+      <!-- <div class="item id_column">
+        {{ forloop.counter0|add:sno }}
+      </div>
+      <div class="item">
+          <a href="/asset-details/?property_id={{ listing.property }}" target="_blank">
+        <div class="user-pics">
+          <span class="user-pic"><img src="{% if listing.image.image %}{{ aws_url }}{{ listing.image.bucket_name }}/{{ listing.image.image }}{% else %}{% static 'theme-4/user-dashboard/images/property-default-img.png' %}{% endif %}" alt="real estate sales"></span>
+          <h6>
+            <span class="blue-text" title="{{ listing.address_one }}">{% if listing.address_one|length > 25 %}{{ listing.address_one|slice:":22" }}...{% else %}{{ listing.address_one|default:'' }}{% endif %}</span>
+            <i class="fas fa-map-marker-alt"></i> {{ listing.city }}, {{ listing.state }}
+          </h6>
+        </div>
+          </a>
+      </div>
+      <div class="item">
+        {{ listing.property_type }}
+      </div>
+
+      <div class="item">
+        {{ listing.auction_type }}
+      </div>
+      <div class="item">
+        {% if listing.auction_type_id == 4  %}
+          <div class="price-info">
+            <div class="price">
+              <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+            </div>
+          </div>
+        {% elif listing.auction_type_id == 6  %}
+          <div class="price-info">
+            <div class="price">
+              <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+            </div>
+          </div>
+        {% elif listing.auction_type_id == 7  %}
+          <div class="price-info">
+            <div class="price">
+              {% if listing.un_priced == True %}
+                {% if listing.current_best_offer_amount %}
+                  <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                {% else %}
+                <span class="blue-text">Unpriced</span>
+                {% endif %}
+              {% else %}
+                {% if listing.un_priced == False %}
+                  {% if listing.highest_best_format == 3 %}
+                    {% if listing.current_best_offer_amount %}
+                      <span class="blue-text">Current Offer:</span> ${{ listing.current_best_offer_amount|convert_num|intcomma|default:'0' }}
+                    {% else %}
+                      <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                    {% endif %}
+                  {% else %}
+                    <span class="blue-text">Asking Price:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+                  {% endif %}
+                {% endif %}
+
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="price-info">
+            <div class="price">
+              <span class="blue-text">Starting Bid:</span> ${{ listing.price|convert_num|intcomma|default:'0' }}
+            </div>
+            <div class="price">
+              <span class="blue-text">Bid Increment:</span> ${{ listing.bid_increment|convert_num|intcomma|default:'0' }}
+            </div>
+          </div>
+        {% endif %}
+
+      </div>
+      <div class="item">
+        <a href="javascript:void(0)" onclick="fav_property_delete_confirmation({{ listing.property }});" class="badge badge-danger"><i class="fa fa-trash"></i></a>
+      </div> -->
+
+    </div><!-- End .block-item -->
+    {% endfor %}
+    {% else %}
+    <div class="list">
+      <div class="fullwidth">
+        <img src="{% static 'admin/images/no-data-image.png' %}" alt="real estate sales">
+      </div>
+    </div>
+    {% endif %}
+<script type="text/javascript" src="{% static 'theme-common/js/common.js' %}?v=4.7"></script>

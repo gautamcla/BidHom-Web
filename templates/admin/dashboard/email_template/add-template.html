@@ -1,0 +1,122 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+    <link href="{% static 'admin/css/dropzone.css' %}?v=2.2" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+
+        <div class="row">
+          <form name="add_template_form" id="add_template_form" method="post" autocomplete="off">
+            {% csrf_token %}
+          <div class="col-md-12 col-sm-12">
+            <div class="back-btn">
+              <a href="/admin/email-template/"><i class="fas fa-chevron-left"></i> Back</a>
+            </div>
+
+            <h6>
+              <strong>Template Information</strong>
+            </h6>
+            <div class="box clearfix">
+              <div class="row">
+                <input type="hidden" name="template_id" id="template_id" value="{{ template_details.id|default:'' }}"/>
+                <div class="col-lg-12 col-md-12">
+                  <div class="form-group">
+                    <label for="subject">Subject <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" value="{{ template_details.email_subject|default:'' }}">
+                  </div>
+                </div>
+                <div class="col-lg-12 col-md-12">
+                  <div class="form-group">
+                    <label for="event_name">Event <span class="text-danger">*</span></label>
+                    <select class="select form-control" name="event_name" id="event_name" >
+                      <option value="">Select</option>
+                      {% for event in event_list %}
+                        <option value="{{ event.id }}" {% if template_details.event_id == event.id %}selected{% endif %}>{{ event.event_name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <!--<div class="col-lg-12 col-md-12">
+                  <div class="form-group">
+                    <label for="subject">Notification Text </label>
+                    <input type="text" class="form-control" name="notification_text" id="notification_text" placeholder="Notification Text" value="{{ template_details.notification_text|default:'' }}">
+                  </div>
+                </div>
+                <div class="col-lg-12 col-md-12">
+                  <div class="form-group">
+                    <label for="subject">Push Notification Text </label>
+                    <input type="text" class="form-control" name="push_notification_text" id="push_notification_text" placeholder="Push Notification Text" value="{{ template_details.push_notification_text|default:'' }}">
+                  </div>
+                </div>-->
+                <div class="col-md-12 col-sm-12">
+                  <div class="form-group">
+                    <label for="email_content">Content <span class="text-danger">*</span></label>
+                    <textarea name="email_content" id="email_content" class="ckeditor form-control">{{ template_details.email_content|default:'' }}</textarea>
+                  </div>
+                </div><!-- End .col-md-10 -->
+
+
+                <div class="col-lg-4 col-md-6">
+                  <div class="form-group">
+                    <label for="template_status">Status <span class="text-danger">*</span></label>
+                    <select name="template_status" class="select form-control" id="template_status">
+                      <option value="">Select</option>
+                      <option value="1" {% if template_details.status == 1 %}selected{% endif %}>Active</option>
+                      <option value="2" {% if template_details.status == 2 %}selected{% endif %}>InActive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- End .box -->
+
+            <div class="clearfix pt30">
+              <button type="submit" id="submit" class="btn btn-primary">Save</button>
+              <a href="/admin/email-template/" class="btn btn-primary-bdr">Cancel</a>
+            </div>
+            <div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+          </div><!-- End .col-md-10 -->
+          </form>
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+{% endblock %}
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/custom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/ckeditor/ckeditor.js' %}"></script>
+    <!--<script type="text/javascript" src="{% static 'admin/js/tinymce/tinymce.min.js' %}"></script>-->
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.4"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/email_template.js' %}?v=3.6"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=3.6"></script>
+<script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+      <script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+
+<script>
+      var response_msg = '{{ response.msg }}';
+      var response_error = '{{ response.error }}';
+      $(document).ready(function(){
+        myfunction(response_error, response_msg);
+      });
+      function myfunction(){
+        if(response_error == '0' && response_msg != ""){
+          $.growl.notice({title: "Business Info ", message: response_msg, size: 'large'});
+        }else if(response_error == '1' && response_msg != ""){
+          $.growl.error({title: "Business Info ", message: response_msg, size: 'large'});
+        }else{
+
+        }
+      }
+
+    </script>
+{% endblock %}

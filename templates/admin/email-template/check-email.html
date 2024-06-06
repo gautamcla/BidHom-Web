@@ -1,0 +1,66 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Add Template {% endblock title %}
+
+{% block style %}
+  {{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+{% load humanize %}
+<div class="dashboard-body">
+
+  <h3>Check Email Template</h3>
+  
+  <div class="box">
+    
+    
+
+    <form method="post" id="check_email_template" action="#" class="form-horizontal form-label-left" data-parsley-validate>
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Event Type</label>
+            <select id="template_list" class="template_list form-control" name="teplate_list">
+              {% for list in all_data %}
+                <option value="{{list.id}}" data-slug="{{list.event_slug}}">{{list.event_name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Email To</label>
+            <input name="email_to" id="email_to" placeholder="info@gmail.com" class="form-control">
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="site">Enter Params Json
+            </label>
+            <textarea id="params_data" name="params_data" rows="20" cols="70" placeholder='{"email": "dummy@etc.com", "name": "Jerry"}' class="form-control"></textarea>
+          </div>
+        </div>
+
+        <div class="clearfix">
+          <button id="check_email_template_submit" type="button" class="btn btn-primary">Send</button>
+        </div>
+      </div>
+    </form>
+  </div>
+          
+</div>
+
+
+{% endblock %}
+
+{% block js_content %}
+  <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+  <script type="text/javascript" src="{% static 'admin/js/verify-email.js' %}"></script>
+  <script>
+    $(".template_list").chosen();
+  </script>
+{% endblock %}

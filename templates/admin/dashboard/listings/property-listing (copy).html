@@ -1,0 +1,1346 @@
+{% extends "admin/layout/layout.html" %}
+{% load static %}
+{% load dashboard_extra %}
+{% block title %}{{title}}{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+{% endblock %}
+{% block content %}
+{% load tz %}
+{% load humanize %}
+
+<div class="dashboard-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <div class="listing-top">
+              <div class="block">
+                <h6>
+                  <strong>Listings</strong>
+                </h6>
+              </div>
+              <div class="block rgt">
+                <form action="" class="search-field">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" class="form-control input-sm sugesstion_input" placeholder="Search" name="prop_search" id="prop_search" value="{{ search|default:'' }}"><button type="button" id="searchPropertyBtn" class="btn btn-primary btn-sm pl20" onclick="propertyListingSearch(1);">Search</button>
+                </form>
+                <a href="/admin/listing-property-info/" class="btn btn-secondary btn-sm"><i class="fas fa-plus"></i> Add New Listing</a>
+              </div>
+              <div class="block" id="download_btn_section">
+                <a href="javascript:void(0)" class="btn btn-blue btn-sm pl20" onclick="downloadListing(1);"><i class="fas fa-download"></i> Download</a>
+                <a href="/admin/listing-settings/" class="btn btn-blue btn-sm pl20"><i class="fas fa-wrench"></i> Setting</a>
+              </div>
+            </div>
+
+            <div class="listing-bottom">
+              <div class="block right">
+                <i class="fas fa-filter"></i> Filters
+              </div>
+              <div class="block" >
+                <select class="select form-control" name="filter_agent" id="filter_agent" onchange="propertyListingSearch(1);">
+                  <option value="">All Agents</option>
+                  {% for agent in agent_list %}
+                  <option value="{{ agent.id }}">{{ agent.first_name }}&nbsp;{{agent.last_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="block auction-typee">
+                <select class="select form-control" name="filter_auction_type" id="filter_auction_type" onchange="propertyListingSearch(1);">
+
+                  {% for item in auction_type_list %}
+                    <option value="{{ item.id }}" {% if auction_id == item.id %}selected{% endif %}>{{ item.auction_type }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="block">
+                <select class="select form-control" name="filter_asset_type" id="filter_asset_type" onchange="filter_property_asset_type(this, 1);">
+                  <option value="">All Asset Type</option>
+                  {% for asset in asset_listing %}
+                  <option value="{{ asset.id }}" {% if asset_type_id == asset.id %}selected{% endif %}>{{ asset.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <!--<div class="block">
+                <select class="select" name="filter_property_type" id="filter_property_type" onchange="propertyListingSearch(1);">
+                  <option value="">All</option>
+                  {% for item in property_type_listing %}
+                  <option value="{{ item.id }}">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>-->
+              <div class="block">
+                <select class="select form-control" name="prop_filter_status" id="prop_filter_status" onchange="propertyListingSearch(1);">
+                  <option value="">All Status</option>
+                  {% if status_list %}
+                  {% for item in status_list %}
+                    <option value="{{ item.id }}" {% if item.id == property_details.status %}selected{% endif %} {% if item.id == status %}selected{% endif %}>{{ item.status_name }}</option>
+                  {% endfor %}
+                  {% endif %}
+                </select>
+              </div>
+              <div class="block" style="min-width: 130px;">
+                <select class="select form-control" name="prop_num_record" id="prop_num_record" onchange="propertyListingSearch(1);">
+                  <option value="">Record per page</option>
+                  <option value="10" {% if page_size == 10 %}selected{% endif %}>10 Property</option>
+                  <option value="20" {% if page_size == 20 %}selected{% endif %}>20 Property</option>
+                  <option value="30" {% if page_size == 30 %}selected{% endif %}>30 Property</option>
+                  <option value="40" {% if page_size == 40 %}selected{% endif %}>40 Property</option>
+                  <option value="50" {% if page_size == 50 %}selected{% endif %}>50 Property</option>
+                </select>
+              </div>
+              
+            </div>
+
+            <div class="default-table listing-table {% if auction_id == 1 or auction_id == 2 %}classic{% elif auction_id == 4 %}traditonal{% elif auction_id == 6 %}live{% elif auction_id == 7 %}highest{% else %}{% endif %}" id="tbl_property_list">
+              <div class="block">
+                <div class="item">
+                  No.
+                </div>
+                <div class="item">
+                  Property Name
+                </div>
+                <div class="item">
+                  Property Type
+                </div>
+                <!-- <div class="item">
+                  Auction Type
+                </div> -->
+                {% if auction_id != 6 %}
+                <div class="item">
+                  {% if auction_id == 4 or auction_id == 7 %}Review Offers{% else %}Bidders{% endif %}
+                </div>
+                {% endif %}
+                <div class="item">
+                  Listing Agent
+                </div>
+                {% if auction_id == 4 or auction_id == 6 or auction_id == 7 %}
+                {% else %}
+                <div class="item">
+                  Bids
+                </div>
+                {% endif %}
+                <div class="item">
+                  No. of view
+                </div>
+                {% if auction_id == 4 %}
+                {% else %}
+                  {% if auction_id == 7 %}
+                    <div class="item">
+                      Offer Start
+                    </div>
+                    <div class="item">
+                      Offer End
+                    </div>
+                  {% else %}
+                    <div class="item">
+                      Bidding Start
+                    </div>
+                    <div class="item">
+                      Bidding End
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+                <div class="item">
+                  Created Date
+                </div>
+                <div class="item">
+                  Property Status
+                </div>
+                <div class="item">
+                  Approval Status
+                </div>
+
+                <div class="item">
+                  Action
+                </div>
+                
+              </div><!-- End .block -->
+              <input type="hidden" name="counter_num" id="counter_num" value="{{ sno|default:1 }}">
+              <div class="block sscroll" id="property_list">
+                {% if property_list|length > 0 %}
+                  {% if property_list|length > 3 %}
+                    {% define_var property_list|length|add:'-1' as first_row %}
+                    {% define_var property_list|length as second_row %}
+                  {% else %}
+                    {% define_var 0 as first_row %}
+                    {% define_var 0 as second_row %}
+                  {% endif %}
+                {% for property in property_list %}
+                <div class="block-item listing_blocks {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}last-row{% endif %}{% endif %}" data-auction-type="{{ property.sale_by_type }}" data-property="{{ property.id }}" data-index="{{ forloop.counter0|add:sno }}" rel_id="{{ property.id }}" row_id="row_id_{{ property.id }}">
+
+                  <div class="item srNum">
+                    {{ forloop.counter0|add:sno }}
+                  </div>
+
+                  <div class="item">
+                    <div class="user-pics">
+                      <a href="/asset-details/?property_id={{ property.id }}" target="_blank">
+                      <span class="user-pic"><img src="{% if property.property_image.image %}{{ aws_url }}{{ property.property_image.bucket_name }}/{{ property.property_image.image }}{% else %}{% static 'admin/images/property-default-img.png' %}{% endif %}" alt=""></span>
+                      <h6>
+                        <span class="blue-text" title="{{ property.name }}">{{ property.name|slice:":22" }}...</span>
+                        <i class="fas fa-map-marker-alt"></i> {{ property.property_location }}
+                      </h6>
+                        </a>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    {{ property.property_type|default:'' }}
+                  </div>
+                  <!-- <div class="item">
+                    {{ property.auction_type }}
+                  </div> -->
+                  {% if property.sale_by_type != 6 %}
+                  <div class="item">
+                    {% if property.sale_by_type == 7 %}
+                      <a href="/admin/user-best-offer-list/?id={{ property.id }}"  style="{% if property.bidder_offer_count > 0 %}cursor:pointer;{% else %}cursor: initial;{% endif %}">
+                    {% elif property.sale_by_type == 4 %}
+                      <a href="/admin/user-traditional-offer-list/?id={{ property.id }}"  style="{% if property.bidder_offer_count > 0 %}cursor:pointer;{% else %}cursor: initial;{% endif %}">
+                    {% else %}
+                    <a href="javascript:void(0)"  onclick="propertyBidderListingSearch({{ property.id }} ,1, '')" style="{% if property.bidder_offer_count > 0 %}cursor:pointer;{% else %}cursor: initial;{% endif %}">
+                    {% endif %}
+                    <button class="badge {% if property.sale_by_type == 7 or property.sale_by_type == 4 %}badge-warning{% else %}badge-info{% endif %} bidder-badge" ><i class="fas fa-user"></i></button><span class="total-bidder">{{ property.bidder_offer_count|default:'0' }}</span>
+                    </a>
+                      <!-- <button class="badge badge-info" data-toggle="modal" data-target="#bidderlistModal"><i class="fas fa-user"></i> 5</button> -->
+                  </div>
+                  {% endif %}
+                  <div class="item">
+                    <div class="brokr-nme">
+                      <span>{{ property.broker_name }}</span>
+                      <small class="blue-text"><a href="{{ property.domain_url }}" target="_blank">{{ property.domain_url }}</a></small>
+                    </div>
+                  </div>
+                  {% if property.sale_by_type == 4 or property.sale_by_type == 6 or property.sale_by_type == 7 %}
+                  {% else %}
+                  <div class="item">
+                    {% if property.sale_by_type == 4 %}
+                      <button class="badge badge-info bids-limit">0</button>
+                    {% elif property.sale_by_type == 2 %}
+                      <button class="badge badge-info bids-limit" onclick="propertyInsiderBidHistorySearch({{ property.id }} ,1, 'dutch')">{{ property.bids }}</button>
+                    {% else %}
+                      <button class="badge badge-info bids-limit" onclick="propertyBidHistorySearch({{ property.id }} ,1)">{{ property.bids }}</button>
+                    {% endif %}
+                  </div>
+                  {% endif %}
+                  <div class="item">
+                    {{ property.no_view }}
+                  </div>
+                  {% if property.sale_by_type == 4 %}
+                  {% else %}
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ property.bidding_start|default:'' }}">
+                    {{ property.bidding_start|default:'' }}
+                  </div>
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ property.bidding_end|default:'' }}">
+                    {{ property.bidding_end|default:'' }}
+                  </div>
+                  {% endif %}
+                  <div class="item convert_to_local_date_time date-block" data-value="{{ property.created_date|default:'' }}">
+                    {{ property.created_date|default:'' }}
+                  </div>
+
+                  <div class="item">
+                    <div class="{% if is_broker == 1 %}display_status{% endif %}" id="display_status_{{ property.id }}">
+                    <span class="badge {% if property.status_id == 2 %} badge-danger{% elif property.status_id == 4 %} badge-warning{% else %}badge-success{% endif %}" style="cursor:pointer;">
+                      {{ property.status }}
+                    </span>
+                  </div>
+                    <div class="{% if is_broker == 1 %}change_status{% endif %}" id="change_status_{{ property.id }}" style="display:none;">
+                      <select class="select form-control listing_change_status" name="listing_change_status" id="listing_change_status_{{ property.id }}" onchange="change_property_status({{ property.id }},this)">
+
+                        {% if status_list %}
+                        {% for item in status_list %}
+                          <option value="{{ item.id }}" {% if item.id == property.status_id %}selected{% endif %}>{{ item.status_name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                      </select>
+                    </div>
+
+                  </div>
+                  <div class="item">
+
+                    <div class="{% if is_broker == 1 %}approval_status{% endif %}" id="approval_status_{{ property.id }}">
+                      <span class="badge {% if property.is_approved %} badge-success{% else %}badge-warning{% endif %}" style="cursor:pointer;">
+                        {{ property.approval }}
+                      </span>
+                    </div>
+                    <div class="{% if is_broker == 1 %}change_approval{% endif %}" id="change_approval_{{ property.id }}" style="display:none;">
+                    <select class="select form-control listing_change_approval" name="listing_change_approval" id="listing_change_approval_{{ property.id }}" onchange="change_apporval_status({{ property.id }}, this)">
+
+
+                          <option value="1" {% if property.is_approved == True %}selected{% endif %}>Approved</option>
+                          <option value="0" {% if property.is_approved == False %}selected{% endif %}>Not Approved</option>
+
+                      </select>
+                      </div>
+                  </div>
+
+
+                  <div class="item">
+                    <div class="action_dropdown {% if first_row > 0 and second_row > 0 %}{% if forloop.counter == first_row or forloop.counter == second_row %}dropup{% endif %}{% endif %}">
+                    <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </a>
+                    <ul role="menu" class="dropdown-header-top author-log dropdown-menu right">
+                        <li><a href="/admin/listing-property-info/?property_id={{ property.id }}"><i class="far fa-edit"></i> Edit</a>
+                        </li>
+                        <li><a href="javascript:void(0)" onclick="property_delete_confirmation({{ property.id }});"><i class="fas fa-trash"></i> Delete</a>
+
+                        </li>
+                        {% if property.sale_by_type == 4 or property.sale_by_type == 6 or property.sale_by_type == 7  %}
+                        {% else %}
+                        <li><a href="javascript:void(0)" onclick="get_listing_setting_details({{ property.id }})"><i class="fas fa-cogs"></i> Setting</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                      </div>
+                  </div>
+
+                </div><!-- End .block-item -->
+                {% endfor %}
+                {% else %}
+                <div class="block-item">
+                  <div class="item fullwidth">
+                    <div class="item fullwidth">
+                        <img src="{% static 'admin/images/no-data-image.png' %}" class=" center mb0" />
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div><!-- End .block -->
+            </div><!-- End .create-table -->
+
+            <div class="pagination">
+              <ul id="prop_listing_pagination_list">
+                {{ pagination_html }}
+              </ul>
+            </div><!-- End .pagination -->
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+      </div><!-- End .dashboard-body -->
+
+<div id="bidderlistModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidders List
+          </h5>
+          <div class="bidderrecord-top">
+            <figure>
+              <img src="{% static 'theme-2/images/default-img.png' %}" alt="" id="popup_property_image">
+            </figure>
+            
+            <figcaption>
+              <a href="" id="propertyLink" target="_blank"></a>
+                <h6 id="popup_property_address">
+                  M&T Bank Building
+                  <span><i class="fas fa-map-marker-alt"></i> Altoona, Pennsylvania</span>
+                </h6>
+              </a>
+            </figcaption>
+            
+            <div class="listing-bottom">
+              <div class="block">
+                <input type="hidden" name="popup_property_id" id="popup_property_id" value=""/>
+                <form action="" class="search-field">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" class="form-control sugesstion_input" name="popup_bidder_popup_search" id="popup_bidder_popup_search" onkeyup="bidder_popup_search_suggesstion(this, event)"><button type="button" onclick="propertyBidderListingSearch($('#popup_property_id').val() ,1, '')" class="btn btn-primary btn-sm pl20">Search</button>
+                </form> 
+              </div>
+              <div class="block">
+                <select class="select form-control" name="popup_filter_bidder_status" id="popup_filter_bidder_status" onchange="propertyBidderListingSearch($('#popup_property_id').val() ,1, '')">
+                  <option value="">Select</option>
+                    <option value="1">Pending Approval</option>
+                    <option value="2">Registration Approved</option>
+                    <option value="3">Approval Declined</option>
+                    <option value="4">Reviewed</option>
+                    <option value="5">Not Reviewed</option>
+                </select>
+              </div>
+              <div class="block" id="bidder_list_export_btn_section">
+                <button type="button" class="btn btn-primary btn-sm pl20" onClick="window.location.href='/static/admin/export/Bidders_List.xls'"><i class="fas fa-file-export"></i> Export</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <div class="default-table bidderlisttable">
+              <div class="block">
+                <div class="item">
+                  ID
+                </div>
+                <div class="item">
+                  Buyer Name
+                </div>
+                <div class="item">
+                  Buyer Type
+                </div>
+
+                {% comment %} <div class="item">
+                  Company
+                </div> {% endcomment %}
+                <div class="item">
+                  Email
+                </div>
+                <div class="item">
+                  Phone
+                </div>
+                <div class="item">
+                  Review Status
+                </div>
+                <div class="item">
+                  Approval Status
+                </div>
+<!--                <div class="item">-->
+<!--                  Status-->
+<!--                </div>-->
+                <div class="item">
+                  IP Address
+                </div>
+                <div class="item">
+                  Registration Date
+                </div>
+                <div class="item">
+                  Last Updated
+                </div>
+                <div class="item">
+                  Action
+                </div>
+              </div>
+              <div class="block sscroll" id="popup_bidder_list">
+
+
+              </div>
+            </div>
+            <div class="pagination" id="bid_listing_pagination">
+              <ul id="bid_popup_listing_pagination_list">
+                {{ pagination_html }}
+              </ul>
+            </div><!-- End .pagination -->
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderlistModal -->
+
+  <div id="bidderrecordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+    <input type="hidden" name="bidHistoryPropertyId" id="bidHistoryPropertyId" value=""/>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0">
+            Bidding Records
+          </h5>
+          <div class="bidderrecord-top">
+            <figure>
+              <img src="{% static 'theme-2/images/default-img.png' %}" alt="" id="bidHistoryPropertyImage">
+            </figure>
+            <figcaption>
+              <h6 id="bidHistoryPropertyName">
+                Loading...
+              </h6>
+              <ul>
+                <li>
+                  <span>Auction Type:</span><label id="bidHistoryAuctiontype">-</label>
+                </li>
+                <li>
+                  <span>Bid Increment:</span><label id="bidHistoryBidIncrement">-</label>
+                </li>
+              </ul>
+            </figcaption>
+            <div class="listing-bottom" id="bid_history_search_section">
+              <div class="block right">
+                <form action="" class="search-field">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" name="search_bid_history" id="search_bid_history" class="form-control"><button type="button" id="bid_history_search_btn" class="btn btn-primary btn-sm pl20">Search</button>
+                </form>                
+              </div>
+              <div class="block last">
+                <button type="button" class="btn btn-primary btn-sm pl20" onClick="window.location.href='/static/admin/export/Bidders_List.xls'"><i class="fas fa-file-export"></i> Export</button>
+              </div>
+              <div class="clearfix"></div>
+              <div class="block last highest_bid_btn">
+                <button type="button" class="btn btn-primary btn-sm pl20"><i class="fas fa-trash-alt"></i> Highest Bid</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="table-responsive">
+            <table width="100%" class="table bidderrecordTable">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  <th>
+                    Bidder Name
+                  </th>
+                  <th>
+                    Email
+                  </th>
+                  <th>
+                    Phone
+                  </th>
+                  <th>
+                    Bid Amount
+                  </th>
+                  <th>
+                  IP Address
+                  </th>
+                  <th>
+                    Bidding Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="bidHistoryList">
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination" id="bidHistoryPagination">
+              <ul id="bidHistoryPaginationList">
+                {{ pagination_html }}
+              </ul>
+          </div><!-- End .pagination -->
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderrecordModal -->
+<div id="confirmPropertyDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <div class="clearfix center">
+                    <button class="btn btn-primary-bdr del_prop_btn" id="del_prop_false">No</button> <button class="btn btn-primary del_prop_btn" id="del_prop_true" onclick="delete_property();">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+
+<div id="EditLisingSettingModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Property Setting</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+          <div class="col-md-12 col-sm-12">
+
+            <form name="listing_setting_frm" id="listing_setting_frm" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="property_id" id="property_id" value=""/>
+              <input type="hidden" name="auction_id" id="auction_id" value=""/>
+            <div class="">
+
+              <div class="row">
+                <div class="col-md-6 col-sm-5">
+                  <div class="form-group">
+                    <label>
+                      Auto Approval
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content right banner-tool">Help text</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-7">
+                  <div class="form-group">
+                    <input id="Residential" type="radio" name="auto_approval" value="1" class="css-radio auto_approval">
+                    <label for="Residential" class="radio-label auto_approval_label">Yes</label>
+                    &nbsp; &nbsp; &nbsp;
+                    <input id="Land" type="radio" name="auto_approval" value="0" class="css-radio" checked>
+                    <label for="Land" class="radio-label auto_approval_label">No</label>
+                  </div>
+                </div>
+              
+                <div class="col-md-6 col-sm-5">
+                  <div class="form-group" >
+                    <label>
+                      Show Reserve Met
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content right banner-tool">Help text</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-7">
+                  <div class="form-group">
+                    <input id="reserve_not_met_true" type="radio" name="reserve_not_met" class="css-radio reserve_not_met" value="1" checked>
+                    <label for="reserve_not_met_true" class="radio-label reserve_not_met_label">Yes</label>
+                    &nbsp; &nbsp; &nbsp;
+                    <input id="reserve_not_met_false" type="radio" name="reserve_not_met" class="css-radio reserve_not_met" value="0" checked >
+                    <label for="reserve_not_met_false" class="radio-label reserve_not_met_label">No</label>
+                  </div>
+                </div>
+             
+                <div class="col-md-6 col-sm-5">
+                  <div class="form-group">
+                    <label>
+                      Is Log Time Extension
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content right banner-tool">Help text</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-7">
+                  <div class="form-group">
+                    <input id="is_log_time_extension_true" type="radio" name="is_log_time_extension" value="1" class="css-radio is_log_time_extension" value="1">
+                    <label for="is_log_time_extension_true" class="radio-label is_log_time_extension_label">Yes</label>
+                    &nbsp; &nbsp; &nbsp;
+                    <input id="is_log_time_extension_false" type="radio" name="is_log_time_extension" value="0" class="css-radio is_log_time_extension" value="0" checked>
+                    <label for="is_log_time_extension_false" class="radio-label is_log_time_extension">No</label>
+                  </div>
+                </div>
+              
+                <div class="col-md-6 col-sm-5">
+                  <div class="form-group">
+                    <label for="" class="lh46">
+                      Timer Flash <span class="text-danger">*</span>
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content right banner-tool">Help text</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-7">
+                  <div class="form-group timer">
+                    <input type="number" class="form-control" onkeypress="return isNumber(event)" name="timer_flash" min="1" id="timer_flash" placeholder="Timer flash" value="" maxlength="10" onkeydown="if(this.value.length==10 && event.keyCode!=8) return false;">
+                    <div class="tagline">Minutes</div>
+                  </div>
+                </div>
+             
+                <div class="col-md-6 col-sm-5">
+                  <div class="form-group">
+                    <label for="" class="lh46">
+                      Log Time Extension <span class="text-danger">*</span>
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content right banner-tool">Help text</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-7">
+                  <div class="form-group timer">
+                    <input type="number" class="form-control" name="log_time_extension" min="1" id="log_time_extension" onkeypress="return isNumber(event)" placeholder="Log Time Extension" value="" maxlength="10" onkeydown="if(this.value.length==10 && event.keyCode!=8) return false;">
+                    <div class="tagline">Minutes</div>
+                  </div>
+                </div>
+              
+                <div class="col-md-6 col-sm-5"> 
+                  <div class="form-group"> 
+                    <label for="" class="lh46">
+                      When to start adding <span class="text-danger">*</span>
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content right banner-tool">Help text</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-7">
+                  <div class="form-group timer">
+                    <input type="number" min="1" class="form-control" name="remain_time_to_add_extension" id="remain_time_to_add_extension" onkeypress="return isNumber(event)" placeholder="When To Start Adding" value="" maxlength="10" onkeydown="if(this.value.length==10 && event.keyCode!=8) return false;">
+                    <div class="tagline">Minutes</div>
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-md-6 col-sm-5 bid_limit_section">
+                  <div class="form-group">
+                    <label for="bid_limit" class="lh46">
+                      Bid Limit <span class="text-danger">*</span>
+                      <div class="tooltipp"><i class="fas fa-question-circle"></i>
+                        <span class="tooltipp__content right banner-tool">Help text</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-7 bid_limit_section">
+                  <div class="form-group bid-limit">
+                    <span class="dollar">$</span>
+                    <input type="number" class="form-control" name="bid_limit" id="bid_limit" placeholder="Bid Limit" min="0" onkeypress="return isNumber(event)" value="" maxlength="10" onkeydown="if(this.value.length==10 && event.keyCode!=8) return false;">
+                  </div>
+                </div>
+              </div>
+
+              <div class="clearfix pt10 center">
+                <button type="submit" class="btn btn-primary">Save</button> <button type="button" class="btn btn-primary-bdr" onclick="close_listing_setting_popup()">Cancel</button>
+              </div>
+            </div><!-- End .box -->
+            </form>
+
+          </div><!-- End .col-md-10 -->
+        </div><!-- End .row -->
+        </div>
+      </div>
+    </div>
+  </div><!-- End EditLisingSettingModal -->
+<div id="confirmPropertyBidderDeleteModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Are you sure you want to delete?
+                  </p>
+                  <input type="hidden" id="UserId" value=""/>
+                  <input type="hidden" id="auctionId" value=""/>
+                  <input type="hidden" id="propertyId" value=""/>
+                  <div class="clearfix center" id="deleteBidderBtnSection">
+                    <button type="button" class="btn btn-primary del_bidder_btn" id="del_bidder_true">Yes</button><button type="button" class="btn btn-primary-bdr del_bidder_btn" id="del_bidder_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+
+<div id="viewofferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="viewoffer-wrap">
+            <div class="offer-main">
+              <h5>
+                Offers
+              </h5>
+              <div class="space">
+                <div class="table-responsive">
+                  <table width="100%" class="table table-scroll offerTable">
+                    <thead>
+                      <tr>
+                        <th>
+                          Buyer
+                        </th>
+                        <th>
+                          Offer Amount
+                        </th>
+                        <th>
+                          Date
+                        </th>
+                        <th>
+                          Chat
+                        </th>
+                        <!--<th>
+                          Doc
+                        </th>-->
+                      </tr>
+                    </thead>
+                    <tbody id="view_offer_list">
+                      <tr>
+                        <td>
+                          <input type="checkbox" class="css-checkbox" id="search-icon">
+                          <label for="search-icon" class="check-label">Edna Rose</label>
+                        </td>
+                        <td>
+                          $45,000
+                        </td>
+                        <td>
+                          2021-03-30<br>16:00
+                        </td>
+                        <td>
+                          <i class="far fa-envelope"></i>
+                        </td>
+                        <td>
+                          <a href="#" class="red-text"><i class="fas fa-download"></i></a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="offerdetail-main" id="offer_details">
+              <h5>
+                Details
+              </h5>
+              <div class="bidderrecord-top">
+                <figure>
+                  <img src="images/upload-banner-1.png" alt="">
+                </figure>
+                <figcaption>
+                  <h6>
+                    <span><i class="fas fa-map-marker-alt"></i> </span>
+                  </h6>
+                  <ul>
+                    <li>
+                      <span>Listing type:</span>
+                    </li>
+                  </ul>
+                </figcaption>
+              </div>
+              <div class="space">
+                <div class="table-responsive">
+                  <table class="offerdetailListtable">
+                    <tr>
+                      <td>
+                        Buyer
+                      </td>
+                      <td>
+                        &nbsp;
+                      </td>
+                      <td>
+                        Phone
+                      </td>
+                      <td>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Buyer Email
+                      </td>
+                      <td>
+                        &nbsp;
+                      </td>
+                      <td>
+                        Date
+                      </td>
+                      <td>
+                        &nbsp;
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <!-- <ul class="offerdetailList">
+                  <li>
+                    <label for="">Buyer:</label>
+                  </li>
+                  <li>
+                    <label for="">Offer:</label>
+                  </li>
+                  <li>
+                    <label for="">Buyer Email:</label>
+                  </li>
+                  <li>
+                    <label for="">Date:</label>
+                  </li>
+                </ul> -->
+
+                <div class="table-responsive">
+                  <table width="100%" class="table table-scroll offerdetailTable">
+                    <thead>
+                      <tr>
+                        <th>
+                          User
+                        </th>
+                        <th>
+                          Offer Amount
+                        </th>
+                        <th>
+                          Status
+                        </th>
+                        <th>
+                          Date
+                        </th>
+                        <th>
+                          Message
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+                          <span class="badge badge-success">
+
+                          </span>
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+                          <a href="#" class="blue-text"><i class="far fa-eye"></i></a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!--<p class="font13">
+                  By clicking Submit Counter Offer you understand that if the participant accept, <br>
+                  your listing will immediately end per the <span class="blue-text">listing agreement.</span>
+                </p>-->
+
+                <div class="clearfix">
+                <button class="btn btn-green">Accept Offer</button> <button class="btn btn-primary" >Make Counter Offer</button>
+                <button class="btn btn-secondary">Decline Offer</button>
+                </div>
+              </div>-->
+
+            </div>
+          </div><!-- End .viewoffer-wrap -->
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End .bidderlistModal -->
+
+  <div id="counterOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Counter Offer</h5>
+          <button type="button" class="close" id="close_counter_popup_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="counter_offer_frm" id="counter_offer_frm" method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <input type="hidden" name="property_id" id="counter_property_id" value="" />
+            <input type="hidden" name="negotiated_id" id="negotiated_id" value="" />
+            <div class="form-group">
+              <label for="existing_offer_price" class="pb10">Existing Offer amount</label>
+              <input type="text" class="form-control bdr" name="existing_offer_price" id="existing_offer_price" placeholder="Enter Existing Offer Amount" readonly>
+            </div>
+            <div class="form-group">
+              <label for="offer_price" class="pb10">Counter Offer amount</label>
+              <input type="text" class="form-control bdr" name="offer_price" id="offer_price" placeholder="Enter Counter Offer amount" maxlength="14">
+            </div>
+            <div class="form-group">
+              <label for="offer_comment" class="pb10">Message</label>
+              <textarea name="offer_comment" class="form-control textarea bdr" id="offer_comment" cols="30" rows="4" placeholder="Enter Your Message"></textarea>
+            </div>
+            <!--<p class="font13">
+              By clicking Submit Counter Offer you understand that if the participant accept, <br>
+              your listing will immediately end per the <span class="blue-text">listing agreement.</span>
+            </p>-->
+            <div class="clearfix center">
+              <button class="btn btn-secondary">Submit Counter Offer</button> <button type="button" class="btn btn-primary-bdr" id="close_counter_popup">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .counterOfferModal -->
+<div id="viewMsgHistoryModal" class="modal centered-modal personalModalwrap confirmModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Message</h5>
+        <button type="button" class="close" id="msg_close_true" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="user_msg">
+
+        </p>
+        <div class="clearfix center">
+          <p>
+            <button type="" class="btn btn-secondary confirm_bid_btn" id="msg_true">OK</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+<div id="confirmRejectOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Reject Confirmation</h5>
+                  <button type="button" class="close" id="reject_offer_false_top">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="property_id" id="rej_property_id" value=""/>
+                <input type="hidden" name="negotiated_id" id="rej_negotiated_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Do you want to Reject Offer?
+                  </p>
+                  <div class="clearfix center">
+                    <button type="button" class="btn btn-primary reject_offer_btn" id="reject_offer_true" onclick="reject_traditional_offer()">Yes</button> <button type="button" data-dismiss="modal" class="btn btn-primary-bdr reject_offer_btn" id="reject_offer_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .logoutModal -->
+<div id="confirmAcceptOfferModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Accept Confirmation</h5>
+                  <button type="button" class="close" id="accept_offer_false_top">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="property_id" id="accept_property_id" value=""/>
+                <input type="hidden" name="negotiated_id" id="accept_negotiated_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Do you want to Accept Offer?
+                  </p>
+                  <div class="clearfix center">
+                     <button type="button" class="btn btn-primary accept_offer_btn" id="accept_offer_true" onclick="accept_traditional_offer()">Yes</button> <button type="button" data-dismiss="modal" class="btn btn-primary-bdr accept_offer_btn" id="accept_offer_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .confirmRejectOfferModal -->
+<div id="confirmDeleteLastBidModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Delete Confirmation</h5>
+                  <button type="button" class="close" id="delete_last_bid_false_top">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <input type="hidden" name="property_id" id="del_bid_property_id" value=""/>
+                <div class="modal-body">
+                  <p class="font15 center">
+                    Do you want to Delete Highest Bid?
+                  </p>
+                  <div class="clearfix center" id="delete_bid_button_section">
+                     <button type="button" class="btn btn-primary delete_last_bid_btn" id="delete_last_bid_true">Yes</button> <button type="button" data-dismiss="modal" class="btn btn-primary-bdr delete_last_bid_btn" id="delete_last_bid_false">No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End .confirmRejectOfferModal -->
+<div id="viewOfferDocumentModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Documents</h5>
+          <button type="button" class="close" id="close_offer_doc_popup_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <ul class="document-list" id="offer_doc_list">
+
+              </ul>
+
+            </div>
+
+            <div class="clearfix center">
+               <button type="button" data-dismiss="modal" class="btn btn-primary-bdr" id="close_offer_doc_popup">Close</button>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div><!-- End .viewOfferDocumentModal -->
+<div id="offerChatModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+      <div class="modal-header">
+          <h5 class="modal-title">Chat</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <form name="offerChatFrm" id="offerChatFrm" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="property_id" id="chat_property_id"/>
+          <input type="hidden" name="user_id" id="chat_user_id"/>
+      <div class="modal-body">
+          <div class="form-group">
+              <label for="user_message" class="pb10">Enter your message</label>
+              <textarea name="user_message" id="user_message" cols="30" rows="10" class="form-control bdr" placeholder="Type a message"></textarea>
+          </div>
+          <div class="center">
+              <button type="submit" class="btn btn-secondary width100">Send</button>
+          </div>
+      </div>
+      </form>
+      </div>
+  </div>
+  </div><!-- End .chatagentModal -->
+<div id="sendLoiModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Send LOI</h5>
+          <button type="button" class="close" id="close_send_loi_pop_top">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form name="send_loi_frm" id="send_loi_frm" method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <input type="hidden" name="property_id" id="loi_property_id" value="" />
+            <input type="hidden" name="negotiated_id" id="loi_negotiated_id" value="" />
+            <input type="hidden" name="user_id" id="loi_user_id" value="" />
+
+            <div class="form-group">
+              <label for="loi_email" class="pb10">Email</label>
+              <input type="email" class="form-control bdr" name="loi_email" id="loi_email" placeholder="Enter Email">
+            </div>
+            <div class="form-group">
+              <label for="loi_comment" class="pb10">Message</label>
+              <textarea name="loi_comment" class="form-control textarea bdr" id="loi_comment" cols="30" rows="4" placeholder="Enter Your Message"></textarea>
+            </div>
+
+            <div class="clearfix center">
+              <button type="submit" class="btn btn-secondary">Send</button> <button type="button" data-dismiss="modal" class="btn btn-primary-bdr" id="close_send_loi_pop">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div><!-- End .sendLoiModal -->
+<div id="insiderbidderrecordModal" class="modal centered-modal personalModalwrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-laptop" role="document">
+      <input type="hidden" name="insiderBidHistoryPropertyId" id="insiderBidHistoryPropertyId" value=""/>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="center mb0" id="insider_auction_name">
+            Insider Auction
+          </h5>
+          <div class="bidderrecord-top">
+            <figure>
+              <img src="images/upload-banner-1.png" alt="" id="insiderBidHistoryPropertyImage">
+            </figure>
+            <figcaption>
+              <h6 id="insiderBidHistoryPropertyName">
+                M&T Bank Building
+                <span><i class="fas fa-map-marker-alt"></i> Altoona, Pennsylvania</span>
+              </h6>
+              <ul>
+                <li>
+                  <span>Auction type:</span> Insider Online Auction
+                </li>
+                <!--<li>
+                  <span>Bid Increment:</span> $300
+                </li>-->
+              </ul>
+            </figcaption>
+            <div class="listing-bottom" id="insider_bid_history_search_section">
+              <div class="block right">
+                <form action="" class="search-field">
+                  <div class="search-icon"><i class="fas fa-search"></i></div>
+                  <input type="text" class="form-control" name="insider_search_bid_history" id="insider_search_bid_history"><button class="btn btn-primary btn-sm pl20">Search</button>
+                </form>
+              </div>
+              <div class="block last">
+                <button class="btn btn-primary btn-sm pl20"><i class="fas fa-file-export"></i> Export</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <ul class="insider-tabs" id="insider_tab_li_content">
+            <li class="tab-link insider_tab_link" data-tab="round-1" id="insider_dutch_btn_li">
+              <a href="javascript:void(0)" id="insider_dutch_btn" onclick="propertyInsiderBidHistorySearch('{{ property.id }}' ,1, 'dutch')">
+              Round 1 : Dutch Auction
+              </a>
+            </li>
+            <li class="tab-link insider_tab_link" data-tab="round-2" id="insider_sealed_btn_li">
+              <a href="javascript:void(0)" id="insider_sealed_btn" onclick="propertyInsiderBidHistorySearch('{{ property.id }}' ,1, 'sealed')">
+                Round 2 : Sealed Bid Amount
+              </a>
+            </li>
+            <li class="tab-link insider_tab_link" data-tab="round-3" id="insider_english_btn_li">
+              <a href="javascript:void(0)" id="insider_english_btn" onclick="propertyInsiderBidHistorySearch('{{ property.id }}' ,1, 'english')">
+                Round 3 : English Auction
+              </a>
+            </li>
+          </ul>
+
+          <div class="table-responsive">
+            <div id="round-1" class="tab-content insider_tab_content current">
+              <div class="default-table insiderbidderlisttable">
+                <div class="block">
+                  <div class="item">
+                    #
+                  </div>
+                  <div class="item">
+                    Bidder Name
+                  </div>
+                  <div class="item">
+                    User Type
+                  </div>
+                  <div class="item">
+                    Email
+                  </div>
+                  <div class="item">
+                    Phone
+                  </div>
+                  <div class="item">
+                    Starting Bid
+                  </div>
+                  <div class="item bidamount">
+                    Bid Amount
+                  </div>
+                  <div class="item">
+                    IP Address
+                  </div>
+                  <div class="item">
+                    Bidding Start Time
+                  </div>
+                  <div class="item date-block">
+                    Bidding End Time
+                  </div>
+                </div><!-- End .block -->
+                <div class="block sscroll" id="dutchBiddingList">
+
+                </div><!-- End .block -->
+              </div><!-- End .create-table -->
+            </div><!-- End .round-1 -->
+
+            <div id="round-2" class="tab-content insider_tab_content">
+              <div class="default-table insiderbidderlisttable">
+                <div class="block">
+                  <div class="item">
+                    #
+                  </div>
+                  <div class="item">
+                    Bidder Name
+                  </div>
+                  <div class="item">
+                    User Type
+                  </div>
+                  <div class="item">
+                    Email
+                  </div>
+                  <div class="item">
+                    Phone
+                  </div>
+                  <div class="item">
+                    Starting Bid
+                  </div>
+                  <div class="item bidamount">
+                    Bid Amount
+                  </div>
+                  <div class="item">
+                    IP Address
+                  </div>
+                  <div class="item">
+                    Bidding Start Time
+                  </div>
+                  <div class="item date-block">
+                    Bidding End Time
+                  </div>
+                </div><!-- End .block -->
+                <div class="block sscroll" id="sealedBiddingList">
+
+                </div><!-- End .block -->
+              </div><!-- End .create-table -->
+            </div><!-- End .round-2 -->
+
+            <div id="round-3" class="tab-content insider_tab_content">
+              <div class="default-table insiderbidderlisttable">
+                <div class="block">
+                  <div class="item">
+                    #
+                  </div>
+                  <div class="item">
+                    Bidder Name
+                  </div>
+                  <div class="item">
+                    User Type
+                  </div>
+                  <div class="item">
+                    Email
+                  </div>
+                  <div class="item">
+                    Phone
+                  </div>
+                  <div class="item">
+                    Starting Bid
+                  </div>
+                  <div class="item bidamount">
+                    Bid Amount
+                  </div>
+                  <div class="item">
+                    IP Address
+                  </div>
+                  <div class="item">
+                    Bidding Start Time
+                  </div>
+                  <div class="item date-block">
+                    Bidding End Time
+                  </div>
+                </div><!-- End .block -->
+                <div class="block sscroll" id="englishBiddingList">
+
+                </div><!-- End .block -->
+              </div><!-- End .create-table -->
+            </div><!-- End .round-3 -->
+
+          </div><!-- End .table-responsive -->
+
+          <div class="pagination" id="insiderBidHistoryPagination">
+            <ul id="insiderBidHistoryPaginationList">
+            </ul>
+          </div><!-- End .pagination -->
+
+        </div>
+        
+      </div>
+    </div>
+  </div><!-- End .bidderrecordModal -->
+<div class="overlay" style="display:none;">
+              <div class="loader">Loading...</div>
+            </div>
+{% endblock %}
+{% block js_content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script type="text/javascript" src="{% static 'admin/js/tableHeadFixer.js' %}?v=1.1"></script>
+    <script type="text/javascript" src="{% static 'admin/js/mask_input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom.js' %}?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.blockUI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_validator.js' %}?v=2.3"></script>
+    <script type="text/javascript" src="{% static 'admin/js/jquery.growl.js' %}"></script>
+    <script type="text/javascript" src="{% static 'admin/js/pagination.js' %}?v=1.0"></script>
+    <script type="text/javascript" src="{% static 'admin/js/autosuggestion.js' %}?v=2.0"></script>
+    <script type="text/javascript" src="{% static 'admin/js/custom_js.js' %}?v=6.2"></script>
+<script type="text/javascript" src="{% static 'admin/js/properties.js' %}?v=6.3"></script>
+<script type="text/javascript" src="{% static 'admin/js/dropzone.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/custom_dropzone.js' %}?v=3.1"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    //getresult('prop_listing', 1, '', '', '');
+    $('.select').chosen();
+</script>
+{% endblock %}
